@@ -28,7 +28,7 @@ public class PlayerController3 : MonoBehaviour
 
     // Raycasting Variables
     public int verticalRays = 8;
-    public float Margin;   // Not needed?
+    float Margin = 0.05f;
     
     private Rect box;
     private float colliderHeight;
@@ -153,29 +153,31 @@ public class PlayerController3 : MonoBehaviour
 
         // First determine if the player is not moving up, if not the check for collisions below
         #region Checking Below
-        
+		bool connected = false;
+		Ray ray;
+
         // Check for collisions below the player if he/she is not moving up
-        if (grounded || falling)
-        {
+        //if (grounded || falling)
+        //{
             // Check each of the four corners and the center of the collider
             // TODO: Store coordinates in an array to do this as a loop
 
             // True if any ray hits a collider
-            bool connected = false;
+            //bool connected = false;
 
             // Set the raycast distance to check as far as the player will fall this frame
             distance = (colliderHeight / 2) + Mathf.Abs(velocity.y * Time.deltaTime);
 
             // Top Left (Min X, Max Z)
             startPoint = new Vector3(collider.bounds.min.x, collider.bounds.center.y, collider.bounds.max.z);
-            Ray ray = new Ray(startPoint, Vector3.down);
+			ray = new Ray(startPoint, Vector3.up * Mathf.Sign(velocity.y));
             connected = Physics.Raycast(ray, out hitInfo, distance);
 
             // Top Right (Max X, Max Z)
             if (!connected)
             {
                 startPoint = new Vector3(collider.bounds.max.x, collider.bounds.center.y, collider.bounds.max.z);
-                ray = new Ray(startPoint, Vector3.down);
+				ray = new Ray(startPoint, Vector3.up * Mathf.Sign(velocity.y));
                 connected = Physics.Raycast(ray, out hitInfo, distance);
             }
 
@@ -183,7 +185,7 @@ public class PlayerController3 : MonoBehaviour
             if (!connected)
             {
                 startPoint = new Vector3(collider.bounds.min.x, collider.bounds.center.y, collider.bounds.min.z);
-                ray = new Ray(startPoint, Vector3.down);
+				ray = new Ray(startPoint, Vector3.up * Mathf.Sign(velocity.y));
                 connected = Physics.Raycast(ray, out hitInfo, distance);
             }
 
@@ -191,26 +193,38 @@ public class PlayerController3 : MonoBehaviour
             if (!connected)
             {
                 startPoint = new Vector3(collider.bounds.max.x, collider.bounds.center.y, collider.bounds.min.z);
-                ray = new Ray(startPoint, Vector3.down);
+				ray = new Ray(startPoint, Vector3.up * Mathf.Sign(velocity.y));
                 connected = Physics.Raycast(ray, out hitInfo, distance);
             }
+
+			// Center (Center Y, Center Z)
+			if (!connected)
+			{
+				startPoint = new Vector3(collider.bounds.center.x, collider.bounds.center.y, collider.bounds.center.z);
+				ray = new Ray(startPoint, Vector3.up * Mathf.Sign(velocity.y));
+				connected = Physics.Raycast(ray, out hitInfo, distance);
+			}
 
             // If any rays connected move the player and set grounded to true since we're now on the ground
             if (connected)
             {
-                grounded = true;
-                falling = false;
-                canJump = true;
-                transform.Translate(Vector3.down * (hitInfo.distance - colliderHeight / 2));
+				if (velocity.y < 0) {
+	                grounded = true;
+	                falling = false;
+	                canJump = true;
+				}
+				transform.Translate(Vector3.up * Mathf.Sign(velocity.y) * (hitInfo.distance - colliderHeight / 2));
                 velocity = new Vector3(velocity.x, 0f, velocity.z);
             }
 
             // Otherwise we're not grounded (temporary?)
             else
                 grounded = false;
-        }
+        //}
 
         #endregion Checking Below
+
+		/* We don't need this.
 
         // Second check above if the player is moving upwards
         #region Checking Above
@@ -219,14 +233,14 @@ public class PlayerController3 : MonoBehaviour
         else if (!grounded && !falling)
         {
             // True if any ray hits a collider
-            bool connected = false;
+            //bool connected = false;
 
             // Set the raycast distance to check as far as the player will move up this frame
             distance = (colliderHeight / 2) + Mathf.Abs(velocity.y * Time.deltaTime);
 
             // Top Left (Min X, Max Z)
             startPoint = new Vector3(collider.bounds.min.x, collider.bounds.center.y, collider.bounds.max.z);
-            Ray ray = new Ray(startPoint, Vector3.up);
+            ray = new Ray(startPoint, Vector3.up);
             connected = Physics.Raycast(ray, out hitInfo, distance);
 
             // Top Right (Max X, Max Z)
@@ -262,15 +276,65 @@ public class PlayerController3 : MonoBehaviour
                 velocity = new Vector3(velocity.x, 0f, velocity.z);
             }
         }
+		
 
         #endregion Checking Above
-
+		*/
         // Third check the player's velocity along the X axis and check for collisions in that direction is non-zero
         #region Checking X Axis
 
         // TODO: Write final movement and collision code
         // NOTE: This is temporary movement code with no collision detection
 
+		// True if any ray hits a collider
+		connected = false;
+		
+		// Set the raycast distance to check as far as the player will move this frame
+		distance = (colliderWidth / 2) + Mathf.Abs(velocity.x * Time.deltaTime);
+		
+		// Bottom Front (Min Y, Max Z)
+		startPoint = new Vector3(collider.bounds.center.x, collider.bounds.min.y + Margin, collider.bounds.max.z);
+		ray = new Ray(startPoint, Vector3.right * Mathf.Sign(velocity.x));
+		connected = Physics.Raycast(ray, out hitInfo, distance);
+		
+		// Top Front (Max Y, Max Z)
+		if (!connected)
+		{
+			startPoint = new Vector3(collider.bounds.center.x, collider.bounds.max.y, collider.bounds.max.z);
+			ray = new Ray(startPoint, Vector3.right * Mathf.Sign(velocity.x));
+			connected = Physics.Raycast(ray, out hitInfo, distance);
+		}
+		
+		// Bottom Back (Min Y, Min Z)
+		if (!connected)
+		{
+			startPoint = new Vector3(collider.bounds.center.x, collider.bounds.min.y + Margin, collider.bounds.min.z);
+			ray = new Ray(startPoint, Vector3.right * Mathf.Sign(velocity.x));
+			connected = Physics.Raycast(ray, out hitInfo, distance);
+		}
+		
+		// Top Back (Max Y, Min Z)
+		if (!connected)
+		{
+			startPoint = new Vector3(collider.bounds.center.x, collider.bounds.max.y - Margin, collider.bounds.min.z + Margin);
+			ray = new Ray(startPoint, Vector3.right * Mathf.Sign(velocity.x));
+			connected = Physics.Raycast(ray, out hitInfo, distance);
+		}
+
+		// Center (Center Y, Center Z)
+		if (!connected)
+		{
+			startPoint = new Vector3(collider.bounds.center.x, collider.bounds.center.y, collider.bounds.center.z);
+			ray = new Ray(startPoint, Vector3.right * Mathf.Sign(velocity.x));
+			connected = Physics.Raycast(ray, out hitInfo, distance);
+		}
+
+		// If any rays connected move the player and set grounded to true since we're now on the ground
+		if (connected)
+		{
+			transform.Translate(Vector3.right * Mathf.Sign(velocity.x) * (hitInfo.distance - colliderWidth / 2));
+			velocity = new Vector3(0f, velocity.y, velocity.z);
+		}
 
         #endregion Checking X Axis
 
@@ -279,6 +343,56 @@ public class PlayerController3 : MonoBehaviour
 
         // TODO: Write final movement and collision code
         // NOTE: This is temporary movement code with no collision detection
+
+		// True if any ray hits a collider
+		connected = false;
+		
+		// Set the raycast distance to check as far as the player will move this frame
+		distance = (colliderDepth / 2 + Mathf.Abs(velocity.z * Time.deltaTime));
+		
+		// Top Left (Min X, Max Y)
+		startPoint = new Vector3(collider.bounds.min.x + Margin, collider.bounds.max.y - Margin, collider.bounds.center.z);
+		ray = new Ray(startPoint, Vector3.forward * Mathf.Sign(velocity.z));
+		connected = Physics.Raycast(ray, out hitInfo, distance);
+		
+		// Top Right (Max X, Max Y)
+		if (!connected)
+		{
+			startPoint = new Vector3(collider.bounds.max.x - Margin, collider.bounds.max.y - Margin, collider.bounds.center.z);
+			ray = new Ray(startPoint, Vector3.forward * Mathf.Sign(velocity.z));
+			connected = Physics.Raycast(ray, out hitInfo, distance);
+		}
+		
+		// Bottom Left (Min X, Min Y)
+		if (!connected)
+		{
+			startPoint = new Vector3(collider.bounds.min.x + Margin, collider.bounds.min.y + Margin, collider.bounds.center.z);
+			ray = new Ray(startPoint, Vector3.forward * Mathf.Sign(velocity.z));
+			connected = Physics.Raycast(ray, out hitInfo, distance);
+		}
+		
+		// Bottom Right (Max X, Min Y)
+		if (!connected)
+		{
+			startPoint = new Vector3(collider.bounds.max.x - Margin, collider.bounds.min.y + Margin, collider.bounds.center.z);
+			ray = new Ray(startPoint, Vector3.forward * Mathf.Sign(velocity.z));
+			connected = Physics.Raycast(ray, out hitInfo, distance);
+		}
+
+		// Center (Center X, Center Y)
+		if (!connected)
+		{
+			startPoint = new Vector3(collider.bounds.center.x, collider.bounds.center.y, collider.bounds.center.z);
+			ray = new Ray(startPoint, Vector3.forward * Mathf.Sign(velocity.z));
+			connected = Physics.Raycast(ray, out hitInfo, distance);
+		}
+
+		// If any rays connected move the player and set grounded to true since we're now on the ground
+		if (connected)
+		{
+			transform.Translate(Vector3.forward * Mathf.Sign(velocity.z) * (hitInfo.distance - colliderDepth / 2));
+			velocity = new Vector3(velocity.x, velocity.y, 0f);
+		}
         
 
         #endregion Checking Z Axis
