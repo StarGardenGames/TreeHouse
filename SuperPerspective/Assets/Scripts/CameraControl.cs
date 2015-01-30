@@ -26,8 +26,7 @@ public class CameraControl : MonoBehaviour {
 			transform.rotation = Quaternion.Slerp(transform.rotation, mount.rotation, speedFactor);
 		}else{
 			//fix position
-			transform.position = mount.position;
-			transform.rotation = mount.rotation;
+			Snap();
 		}
 
 		//update locked status
@@ -38,5 +37,10 @@ public class CameraControl : MonoBehaviour {
 	public void SetMount(Transform newMount){
 		mount = newMount;
 		locked = false;
+	}
+
+	public void Snap(){
+		transform.position = mount.position;
+		transform.rotation = mount.rotation;
 	}
 }
