@@ -2,15 +2,14 @@
 using System.Collections;
 
 public class CameraControl : MonoBehaviour {
-	
+
 	public static CameraControl instance;
 	public Transform mount;
 	public float speedFactor;
 	public bool locked = false, is3D = false;
 	private float t;
-	private Transform pcam, ocam;
-	
-	
+	private Transform pcam, ocam;	
+
 	void Awake(){
 		//singleton pattern
 		if( instance == null)
@@ -49,7 +48,7 @@ public class CameraControl : MonoBehaviour {
 		locked = false;
 		t = 0;
 	}
-	
+
 	public void Snap(){
 		transform.position = mount.position;
 		transform.rotation = mount.rotation;
