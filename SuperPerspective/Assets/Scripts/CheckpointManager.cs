@@ -22,9 +22,9 @@ public class CheckpointManager : MonoBehaviour {
 	};
 	static bool[] pointReached = new bool[points.Length];
 	string[] scenes ={
-		"MenuTest",
-		"MenuTest",
-		"MenuTest"
+		"LevelTest",
+		"LevelTest",
+		"LevelTest"
 	};
 
 	float menuAlpha = 0;

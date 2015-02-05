@@ -3,13 +3,22 @@ using System.Collections;
 
 public class CameraControl : MonoBehaviour {
 
+	//singleton
 	public static CameraControl instance;
-	public Transform mount;
-	public float speedFactor;
-	public bool locked = false, is3D = false;
-	private float t;
-	private Transform pcam, ocam;	
 
+	//public variables
+	public bool startOnPlayer = true;
+	public Transform mount;//unused if startOnPlayer = true;
+	public float speedFactor;
+
+	//player mount variables
+	private Transform pcam, ocam;
+
+	//camera status
+	private bool lockedToPlayer = false;
+	private bool is3D;
+
+	
 	void Awake(){
 		//singleton pattern
 		if( instance == null)
@@ -17,16 +26,28 @@ public class CameraControl : MonoBehaviour {
 		else if( instance != this)
 			Destroy(gameObject);
 	}
-
+	
 	void Start() {
 		//Get 2D and 3D camera positions
-		pcam = transform.parent.FindChild("CamPosPersp");
-		ocam = transform.parent.FindChild("CamPosOrtho");
-	}
+		GameObject p = GameObject.Find("Player");
+		pcam = p.GetComponent<Transform>().FindChild("CamPosPersp");
+		ocam = p.GetComponent<Transform>().FindChild("CamPosOrtho");
 
+		//check if we're starting on player
+		if(startOnPlayer){
+			is3D = false;
+			SetMount(ocam);
+		}else{
+			is3D = true;
+		}
+
+		//update 3d
+		update3D();
+	}
+	
 	void LateUpdate () {
 		//update position & orientation
-		if(!locked){
+		if(!lockedToPlayer){
 			transform.position = Vector3.Lerp(transform.position,mount.position, speedFactor);
 			transform.rotation = Quaternion.Slerp(transform.rotation, mount.rotation, speedFactor);
 		}else{
@@ -35,36 +56,46 @@ public class CameraControl : MonoBehaviour {
 		}
 		
 		//update locked status
-		if(Vector3.Distance(transform.position, mount.position) < .1f) {
-			locked = true;
-			//if 2D switch to ortho when the camera is in place
-			if (!is3D)
-				Camera.main.orthographic = true;
+		if(Vector3.Distance(transform.position, mount.position) < .1f && MountedToPlayer()) {
+			lockedToPlayer = true;
+			update3D();
 		}
 	}
 	
 	public void SetMount(Transform newMount){
 		mount = newMount;
-		locked = false;
-		t = 0;
+		lockedToPlayer = false;
 	}
-
+	
 	public void Snap(){
 		transform.position = mount.position;
 		transform.rotation = mount.rotation;
 	}
-
+	
 	public void Flip() {
 		is3D = !is3D;
 		if (is3D) {
 			SetMount(pcam);
-			Camera.main.orthographic = false;
+			update3D();
 		} else {
 			SetMount(ocam);
+			//we waito to update3D till we reach destination
 		}
 	}
-
+	
 	public bool IsFlipping() {
-		return !locked;
+		return MountedToPlayer() && !lockedToPlayer;
+	}
+
+	private bool MountedToPlayer(){
+		return mount==ocam || mount==pcam;
+	}
+
+	private void update3D(){
+		Camera.main.orthographic = !is3D;
+	}
+
+	public bool isLockedToPlayer(){
+		return lockedToPlayer;
 	}
 }

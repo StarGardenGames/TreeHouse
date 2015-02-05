@@ -7,8 +7,11 @@ public class PerspectiveShift : MonoBehaviour {
 	
 
 	void Update () {
+		//check if game is paused
+		if(GameStatus.instance.isPaused())
+			return;
 		//Tell the camera to the flip when flip is pressed
-		if (Input.GetButtonDown("Flip") && !CameraControl.instance.IsFlipping()) {
+		if (Input.GetButtonDown("Flip") && !CameraControl.instance.IsFlipping() && CameraControl.instance.isLockedToPlayer()) {
 			CameraControl.instance.Flip();
 		}
 	}

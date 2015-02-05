@@ -65,6 +65,10 @@ public class PlayerController3 : MonoBehaviour
 
     void Update()
     {
+		//check if game is paused
+		if(GameStatus.instance.isPaused())
+			return;
+
         // See if the player is pressing the jump button this frame
         bool input = Input.GetButton("Jump");
 
@@ -94,6 +98,10 @@ public class PlayerController3 : MonoBehaviour
     // Collision detection and velocity calculations are done in the fixed update step
     void FixedUpdate()
     {
+		//check if game is paused
+		if(GameStatus.instance.isPaused())
+			return;
+
         // Used for raycasting
         Vector3 startPoint;     // The starting point of a ray  
         float distance;         // The distance of a ray
@@ -401,6 +409,10 @@ public class PlayerController3 : MonoBehaviour
 
 	// LateUpdate is used to actually move the position of the player
 	void LateUpdate () {
+		//check if game is paused
+		if(GameStatus.instance.isPaused())
+			return;
+
         transform.Translate(velocity * Time.deltaTime);
     }
 
