@@ -189,7 +189,7 @@ public class MenuControl : MonoBehaviour {
 	}
 	
 	void updateText(string str){
-		textAlpha = 3f;
-		menuStatus.text = str;
+		/*textAlpha = 3f;
+		menuStatus.text = str;*/
 	}
 }
