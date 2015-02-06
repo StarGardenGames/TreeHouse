@@ -1,0 +1,3 @@
+2
+LevelTest 0 0
+LevelTest 50 50

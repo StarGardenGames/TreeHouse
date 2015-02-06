@@ -8,7 +8,8 @@ public class GameStatus : MonoBehaviour {
 
 	//check if paused
 	//note, marked private because I only want it to be modified in this class
-	public bool paused = false;
+	public static bool paused = false;
+
 
 	void Awake(){
 		//singleton
@@ -29,4 +30,6 @@ public class GameStatus : MonoBehaviour {
 	public bool isPaused(){
 		return paused;
 	}
+
+
 }

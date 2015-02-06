@@ -14,16 +14,6 @@ public class Checkpoint : MonoBehaviour {
 		p = GameObject.Find("Player");
 	}
 
-
-	/*void OnTriggerEnter(Collider col) {
-		Debug.Log("Collision Entered");
-		Debug.Log(col.gameObject.name);
-		if(col.gameObject.name.Equals("Player") && !CheckpointManager.instance.menuVisible){
-			Debug.Log("Collision w/ Player");
-			CheckpointManager.instance.showMenu(id);
-		}
-	}*/
-
 	// Update is called once per frame
 	void Update () {
 		//trigger menu when player is close enough

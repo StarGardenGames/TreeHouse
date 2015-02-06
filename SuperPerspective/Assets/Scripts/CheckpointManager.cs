@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
+using System.IO;
 
 public class CheckpointManager : MonoBehaviour {
 	static int destination = -1;
@@ -15,17 +16,11 @@ public class CheckpointManager : MonoBehaviour {
 
 	GameObject[] buttons;
 
-	static Vector2[] points = {
-		new Vector2(-50,-20),
-		new Vector2(150,50),
-		new Vector2(0,0)
-	};
-	static bool[] pointReached = new bool[points.Length];
-	string[] scenes ={
-		"LevelTest",
-		"LevelTest",
-		"LevelTest"
-	};
+	static Vector2[] points;//positions on map
+	static string[] scenes; //names of scenes which markers link to
+	static bool[] pointReached;
+
+	int recentPoint = -1;
 
 	float menuAlpha = 0;
 	float fadeTime = 1f;
@@ -34,10 +29,33 @@ public class CheckpointManager : MonoBehaviour {
 		//sigleton pattern
 		if(instance == null)
 			instance = this;
-		else if(instance != this)
-			Destroy(this);
+		else if(instance != this){
+			Destroy(gameObject);
+			return;
+		}
+		
+		//read in data
+		if(scenes == null){
+			StreamReader reader = new StreamReader("checkpoints.txt");
+			string line = reader.ReadLine();
+			int numPoints = System.Int32.Parse(line);
 
-		//TODO: read points from file 
+			scenes = new string[numPoints];
+			points = new Vector2[numPoints];
+			pointReached = new bool[numPoints];
+
+			string[] splitter = {" "};
+			for(int i = 0; i<numPoints; i++){
+				line = reader.ReadLine();
+				string[] splits = line.Split(splitter,3,System.StringSplitOptions.None);
+				scenes[i] = splits[0];
+				points[i] = new Vector2(
+					System.Int32.Parse(splits[1]),
+					System.Int32.Parse(splits[2])
+				);
+			}
+			reader.Close();
+		}
 
 		//move to destination if we fast travelled
 		if(destination != -1){
@@ -57,6 +75,8 @@ public class CheckpointManager : MonoBehaviour {
 				Debug.Log("You Lied >:( (i.e. Destination scene does not contain the correct checkpoint)");
 			}
 		}
+
+
 	}
 
 	// Use this for initialization
@@ -76,11 +96,14 @@ public class CheckpointManager : MonoBehaviour {
 		menuAlpha += ((menuVisible)? (1/fadeTime) : -(1/fadeTime))*Time.deltaTime;
 		menuAlpha = Mathf.Clamp(menuAlpha,0f,1f);
 		menu.GetComponent<CanvasGroup>().alpha = menuAlpha;
+		//Debug.Log(menuAlpha);
 
 	}
 
 	public void showMenu(int id){
 		pointReached[id] = true;
+		SaveManager.instance.addPointReached(id);
+		SaveManager.instance.setRecentPoint(id);
 		showMenu();
 	}
 
@@ -120,10 +143,22 @@ public class CheckpointManager : MonoBehaviour {
 		}
 	}
 
-	void goToCheckPoint(int id){
+	public void goToCheckPoint(int id){
 		destination = id;
 		exitMenu();
 		Application.LoadLevel(scenes[id]);
+	}
+
+	public void setPointReached(bool[] p){
+		pointReached = p;
+	}
+
+	public void setRecentPoint(int r){
+		recentPoint = r;
+	}
+
+	public int getNumCheckpoints(){
+		return points.Length;
 	}
 
 }

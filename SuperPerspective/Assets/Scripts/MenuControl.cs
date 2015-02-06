@@ -14,7 +14,7 @@ public class MenuControl : MonoBehaviour {
 	
 	int slotSelected = -1;
 	
-	int numMenuButtons = 4;
+	int numMenuButtons = 3;
 	int numSaveSlots = 3;
 	int numOptions = 2;
 	
@@ -60,12 +60,16 @@ public class MenuControl : MonoBehaviour {
 		
 		//init data
 		slotHasData = new bool[numSaveSlots];
-		
+
+		getSaveNames();
+
 		//disable submenus
 		setSaveMenuActive(false);
 		setOptionMenuActive(false);
-		for(int i = 0; i < numSaveSlots; i++)	
-			setSlotMenuActive(i,false);
+		for(int i = 0; i < numSaveSlots; i++){	
+			inputs[i].gameObject.SetActive(false);
+			resets[i].gameObject.SetActive(false);
+		}
 	}
 	
 	// Update is called once per frame
@@ -77,7 +81,6 @@ public class MenuControl : MonoBehaviour {
 				inputs[i].gameObject.SetActive(false);
 			else{
 				resets[i].gameObject.SetActive(false);
-				
 			}
 		}
 		
@@ -100,40 +103,42 @@ public class MenuControl : MonoBehaviour {
 	
 	public void UIClicked(string item){
 		if (item.Substring (0, 4).Equals ("Slot")) {
+			selectedSlot = item.ToCharArray()[4]-'0'-1;
 			if(item.Length == 5){
-				selectedSlot = item.ToCharArray()[4]-'0'-1;
-				for(int i = 0; i < numSaveSlots; i++)
-					if(i == selectedSlot)
-						setSlotMenuActive(i, true);
-				else
-					setSlotMenuActive(i, false);
 				if(slotHasData[selectedSlot]){
+					SaveManager.instance.setSave(selectedSlot);
 					string name = saveSlots[selectedSlot].transform.GetChild(0).GetComponent<Text>().text;
 					updateText(name + " is playing");
+					menuAlpha = .95f;
+					CameraControl.instance.MountToPlayer();
+					SaveManager.instance.loadSave();
+				}else{
+					for(int i = 0; i < numSaveSlots; i++)
+						inputs[i].gameObject.SetActive(i == selectedSlot);
 				}
 			}else{
+				//reset save
+				SaveManager.instance.resetSave(selectedSlot);
+				//update text
 				Text t = saveSlots[selectedSlot].transform.GetChild(0).GetComponent<Text>();
 				updateText(t.text+" is no more");
-				t.text = name;
 				t.text = defaultSaveName;
+				//slot doesn't have data
 				slotHasData[selectedSlot] = false;
-				setSlotMenuActive(selectedSlot,true);
+				//reset button no longer active
+				resets[selectedSlot].gameObject.SetActive(false);
+				//input becomes
 				Text t2 = inputs[selectedSlot].transform.Find("Text").GetComponent<Text>();
 				t2.text = "";
 			}
 		} else {
 			switch (item) {
 			case "Play":
-				menuAlpha=.95f;
-				break;
-			case "LoadSave":
 				setOptionMenuActive(false);
 				setSaveMenuActive(true);
 				break;
 			case "Options":
 				setSaveMenuActive(false);
-				for(int i = 0; i < numSaveSlots; i++)
-					setSlotMenuActive(i,false);
 				setOptionMenuActive(true);
 				break;
 			case "Quit":
@@ -145,13 +150,28 @@ public class MenuControl : MonoBehaviour {
 	}
 	
 	public void SlotNameEntered(string name){
+		if(name == "" || name == defaultSaveName)
+			return;
+		SaveManager.instance.setSaveName(selectedSlot,name);
 		slotHasData[selectedSlot] = true;
 		Text t = saveSlots[selectedSlot].transform.GetChild(0).GetComponent<Text>();
 		t.text = name;
-		setSlotMenuActive(selectedSlot, true);
+		inputs[selectedSlot].gameObject.SetActive(false);
+		resets[selectedSlot].gameObject.SetActive(true);
 		updateText(name + " is playing");
 	}
-	
+
+	void getSaveNames(){
+		for(int i = 0; i<3; i++){
+			string name = SaveManager.instance.getSaveName(i);
+			if(name!=""){
+				Text t = saveSlots[i].transform.GetChild(0).GetComponent<Text>();
+				t.text = name;
+				slotHasData[i]=true;
+			}
+		}
+	}
+
 	void setOptionMenuActive(bool status){
 		for(int i = 0; i < options.Length; i++)
 			options[i].gameObject.SetActive(status);
@@ -162,13 +182,10 @@ public class MenuControl : MonoBehaviour {
 			saveSlots[i].gameObject.SetActive(status);
 		if(!status)
 			selectedSlot = -1;
-	}
-	
-	void setSlotMenuActive(int index, bool status){
-		if(slotHasData[index] || !status)
-			resets[index].gameObject.SetActive(status);
-		if(!slotHasData[index] || !status)
-			inputs[index].gameObject.SetActive(status);
+		for(int i = 0; i < 3; i++){
+			resets[i].gameObject.SetActive(status && slotHasData[i]);
+			inputs[i].gameObject.SetActive(status && !slotHasData[i]);
+		}
 	}
 	
 	void updateText(string str){

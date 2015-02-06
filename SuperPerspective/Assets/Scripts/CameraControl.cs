@@ -66,6 +66,14 @@ public class CameraControl : MonoBehaviour {
 		mount = newMount;
 		lockedToPlayer = false;
 	}
+
+	public void MountToPlayer(){
+		if(is3D)
+			SetMount(pcam);
+		else
+			SetMount(ocam);
+	}
+
 	
 	public void Snap(){
 		transform.position = mount.position;
