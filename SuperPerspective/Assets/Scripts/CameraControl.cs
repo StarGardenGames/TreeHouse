@@ -9,7 +9,7 @@ public class CameraControl : MonoBehaviour {
 	//public variables
 	public bool startOnPlayer = true;
 	public Transform mount;//unused if startOnPlayer = true;
-	public float speedFactor;
+	public float transitionTime;
 
 	//player mount variables
 	private Transform pcam, ocam;
@@ -17,6 +17,11 @@ public class CameraControl : MonoBehaviour {
 	//camera status
 	private bool lockedToPlayer = false;
 	private bool is3D;
+
+	//transisition variables
+	Vector3 startPosition;
+	Quaternion startRotation;
+	float camProg = 0f;
 
 	
 	void Awake(){
@@ -32,13 +37,14 @@ public class CameraControl : MonoBehaviour {
 		GameObject p = GameObject.Find("Player");
 		pcam = p.GetComponent<Transform>().FindChild("CamPosPersp");
 		ocam = p.GetComponent<Transform>().FindChild("CamPosOrtho");
-
+		
 		//check if we're starting on player
 		if(startOnPlayer){
 			is3D = false;
 			SetMount(ocam);
 		}else{
 			is3D = true;
+			SetMount(mount);
 		}
 
 		//update 3d
@@ -47,24 +53,39 @@ public class CameraControl : MonoBehaviour {
 	
 	void LateUpdate () {
 		//update position & orientation
-		if(!lockedToPlayer){
-			transform.position = Vector3.Lerp(transform.position,mount.position, speedFactor);
-			transform.rotation = Quaternion.Slerp(transform.rotation, mount.rotation, speedFactor);
-		}else{
-			//fix position
+		if(lockedToPlayer){
 			Snap();
-		}
-		
-		//update locked status
-		if(Vector3.Distance(transform.position, mount.position) < .1f && MountedToPlayer()) {
-			lockedToPlayer = true;
-			update3D();
+		}else if(camProg<=1){
+			//update progress
+			camProg += Time.deltaTime/transitionTime;
+			camProg = Mathf.Min(1,camProg);
+			//transition
+			float f = 1-Mathf.Pow(camProg-1,2);//smothing algorithm
+			transform.position = Vector3.Lerp(startPosition, mount.position, f);
+			transform.rotation = Quaternion.Slerp(startRotation, mount.rotation, f);
+			//lock to end
+			if(camProg == 1 && MountedToPlayer()){
+				lockedToPlayer = true;
+				update3D();
+			}
 		}
 	}
 	
 	public void SetMount(Transform newMount){
 		mount = newMount;
 		lockedToPlayer = false;
+		startPosition = new Vector3(
+			transform.position.x,
+			transform.position.y,
+			transform.position.z
+		);
+		startRotation = new Quaternion(
+			transform.rotation.x,
+			transform.rotation.y,
+			transform.rotation.z,
+			transform.rotation.w
+		);
+		camProg = 0f;
 	}
 
 	public void MountToPlayer(){
@@ -106,4 +127,5 @@ public class CameraControl : MonoBehaviour {
 	public bool isLockedToPlayer(){
 		return lockedToPlayer;
 	}
+
 }

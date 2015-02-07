@@ -74,5 +74,6 @@ public class SaveManager : MonoBehaviour {
 		string pointsReached = new string(reached);
 		PlayerPrefs.SetString(i + "_pointsReached",pointsReached);
 		PlayerPrefs.SetInt(i + "_recentPoint",-1);
+		PlayerPrefs.SetString(i+"_name","");
 	}
 }

@@ -184,7 +184,8 @@ public class MenuControl : MonoBehaviour {
 			selectedSlot = -1;
 		for(int i = 0; i < 3; i++){
 			resets[i].gameObject.SetActive(status && slotHasData[i]);
-			inputs[i].gameObject.SetActive(status && !slotHasData[i]);
+			if(status == false)
+				inputs[i].gameObject.SetActive(status);
 		}
 	}
 	
