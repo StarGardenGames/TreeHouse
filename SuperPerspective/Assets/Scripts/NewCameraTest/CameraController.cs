@@ -1,14 +1,17 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+/// <summary>
+///     Determines if the camera should be in 3D or 2D state. In each state the camera
+///     attempts to follow an appropriate camera mount's position and rotation.
+/// </summary>
 [RequireComponent(typeof(MatrixBlender))]
 [RequireComponent(typeof(Camera))]
 public class CameraController : MonoBehaviour
 {
-
     #region Properties & Variables
 
-    // This is the camera component
+    // This is the camera component and matrix blender script
     Camera cam;
     MatrixBlender blender;
 
@@ -37,6 +40,7 @@ public class CameraController : MonoBehaviour
 
     #endregion Properties & Variables
 
+
     #region Monobehavior Implementation
 
     // Use this for initialization
@@ -61,21 +65,13 @@ public class CameraController : MonoBehaviour
         currentState = STATE_3D;
         StartCoroutine(Execute3DBehavior());
 	}
-	
-	// Update is called once per frame
-	void Update () {
-
-    }
 
     #endregion Monobehavior Implementation
 
+
     #region State Functions
 
-    /// <summary>
-    ///     Registered to InputManager's perspective change event.
-    ///     Switches the current camera state.
-    /// </summary>
-    /// <param name="newPerspective">The perspected to shift into.</param>
+    // Registered to InputManager's perspective change event. Switches the current camera state.
     private void SwitchState(PerspectiveType newPerspective)
     {
         if (newPerspective == PerspectiveType.p2D)
@@ -90,31 +86,23 @@ public class CameraController : MonoBehaviour
         }
     }
 
-    /// <summary>
-    ///     Runs when the camera is in 2D mode. 
-    ///     The camera will attempt to follow the 2D camera mount with damping.
-    /// </summary>
-    /// <returns></returns>
+    // Runs when the camera is in 2D mode. The camera will attempt to follow the 2D camera mount with damping.
     private IEnumerator Execute2DBehavior()
     {
-        // Used to tell if we've switched to ortho yet
-        bool orthoSet = false;
-
         while(currentState == STATE_2D)
         {
-            Debug.Log("2D");
-            
-
+            // Smoothdamp the camera towards the 2D camera mount and blend the camera matrix to the 2D settings
             transform.position = Vector3.SmoothDamp(transform.position, CameraMount2D.position, ref velocity, smoothTime);
             blender.BlendToMatrix(ortho, cameraBlendSpeed);
 
+            // If we haven't matched the 2D mount's rotation yet rotate to match
             if (!(transform.rotation == CameraMount2D.rotation))
                 transform.rotation = Quaternion.RotateTowards(transform.rotation, CameraMount2D.rotation, turnSpeed);
              
-
             yield return null;
         }
 
+        // Switch to 3D coroutine on state change
         if (currentState != STATE_2D)
         {
             startRotation = transform.rotation;
@@ -122,28 +110,22 @@ public class CameraController : MonoBehaviour
         }
     }
 
-    /// <summary>
-    ///     Runs when the camera is in 3D mode. 
-    ///     The camera will attempt to follow the 3D camera mount with damping.
-    ///     It will also rotate slightly based on use input.
-    /// </summary>
-    /// <returns></returns>
+    // Runs when the camera is in 3D mode. The camera will attempt to follow the 3D camera mount with damping.
     private IEnumerator Execute3DBehavior()
     {
-        cam.orthographic = false;
-
         while (currentState == STATE_3D)
         {
-            Debug.Log("3D");
-            
-
+            // SmoothDamp the camera towards the 3D mount's position and blend the camera's matrix to the 3D settings
             transform.position = Vector3.SmoothDamp(transform.position, CameraMount3D.position, ref velocity, smoothTime);
-            transform.rotation = Quaternion.RotateTowards(transform.rotation, CameraMount3D.rotation, turnSpeed);
             blender.BlendToMatrix(perspective, cameraBlendSpeed);
+
+            // Rotate to match the 3D mount's rotation. Always do this since it can change when uses tweaks camera
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, CameraMount3D.rotation, turnSpeed);
 
             yield return null;
         }
 
+        // Switch to the 2D coroutine on state change
         if (currentState != STATE_3D)
         {
             startRotation = transform.rotation;
@@ -152,5 +134,4 @@ public class CameraController : MonoBehaviour
     }
 
     #endregion State Functions
-
 }

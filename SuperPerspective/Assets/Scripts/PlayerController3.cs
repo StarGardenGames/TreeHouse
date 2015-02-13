@@ -67,7 +67,7 @@ public class PlayerController3 : MonoBehaviour
     {
 
         // See if the player is pressing the jump button this frame
-        bool input = Input.GetButton("Jump");
+        bool input = InputManager.instance.JumpStatus();
 
         // If this is the first frame the button was pressed then store the current time
         if (input && !lastInput)
@@ -116,7 +116,7 @@ public class PlayerController3 : MonoBehaviour
         // ------------------------------------------------------------------------------------------------------
         // X-AXIS MOVEMENT VELOCITY CALCULATIONS
         // ------------------------------------------------------------------------------------------------------
-        float xAxis = Input.GetAxis("Horizontal");
+        float xAxis = InputManager.instance.GetForwardMovement();
         float newVelocityX = velocity.x;
         if (xAxis != 0)
         {
@@ -134,7 +134,7 @@ public class PlayerController3 : MonoBehaviour
         // ------------------------------------------------------------------------------------------------------
         // Z-AXIS MOVEMENT VELOCITY CALCULATIONS
         // ------------------------------------------------------------------------------------------------------
-        float zAxis = Input.GetAxis("Vertical");
+        float zAxis = -InputManager.instance.GetSideMovement();
         float newVelocityZ = velocity.z;
         if (zAxis != 0)
         {

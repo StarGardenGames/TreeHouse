@@ -1,16 +1,26 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class LevelGeometry : MonoBehaviour {
+/// <summary>
+///     Attach this script to any level geometry that must be collidable in 2D perspective.
+///     Stretches the collider of the geometry to match the Z depth of the platform the geometry is part of.
+/// </summary>
+public class LevelGeometry : MonoBehaviour
+{
 
-    public GameObject parentPlatform;
+    #region Properties & Variables
 
-    private BoxCollider boxCollider;
-    private Vector3 colliderSize;
-    private Vector3 colliderCenter;
-    private float zScaleRatioParent;
-    private float zScaleRatioWorld;
-    private float ratio;
+    public GameObject parentPlatform;   // The platform this geometry belongs to
+
+    private BoxCollider boxCollider;    // Reference to this object's BoxCollider
+    private Vector3 colliderSize;       // Stores the collider's beginning size, usually (1, 1, 1)
+    private float zScaleRatioParent;    // Ratio of this object's z scale to the parent platform's
+    private float zScaleRatioWorld;     // Ratio of this object's z scale to the world
+
+    #endregion Properties & Variables
+
+
+    #region Monobehavior Implementation
 
     void Awake()
     {
@@ -23,26 +33,36 @@ public class LevelGeometry : MonoBehaviour {
 
         // Store the normal collider bounds and center
         colliderSize = new Vector3(1f, 1f, 1f);
-        colliderCenter = Vector3.zero;
     }
 	
 	void Start () 
     {
         // Register to perspective shift event
-        ShiftTester.instance.perspectiveShiftEvent += AdjustCollider;
+        InputManager.instance.perspectiveShiftEvent += AdjustCollider;
 	}
 
+    #endregion Monobehavior Implementation
+
+
+    #region Perspective Shift Event
+
+    
+    // Adjusts the collider to the appropriate shape when the perspective shift event occurs.
     private void AdjustCollider(PerspectiveType p)
     {
         if (p == PerspectiveType.p2D)
         {
-            boxCollider.center = new Vector3(colliderCenter.x, colliderCenter.y, (parentPlatform.transform.position.z - transform.position.z) * zScaleRatioWorld);
+            // Stretch the collider's Z depth and center z value to match parent platform
+            boxCollider.center = new Vector3(0f, 0f, (parentPlatform.transform.position.z - transform.position.z) * zScaleRatioWorld);
             boxCollider.size = new Vector3(colliderSize.x, colliderSize.y, zScaleRatioParent);
         }
         else if (p == PerspectiveType.p3D)
         {
+            // Return collider to initial state
             boxCollider.size = colliderSize;
-            boxCollider.center = colliderCenter;
+            boxCollider.center = Vector2.zero;
         }
     }
+
+    #endregion Perspective Shift Event
 }
