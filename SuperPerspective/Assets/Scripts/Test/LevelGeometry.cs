@@ -3,6 +3,8 @@ using System.Collections;
 
 public class LevelGeometry : MonoBehaviour {
 
+    public GameObject parentPlatform;
+
     private BoxCollider boxCollider;
     private Vector3 colliderSize;
     private Vector3 colliderCenter;
@@ -13,11 +15,8 @@ public class LevelGeometry : MonoBehaviour {
         // Get the BoxCollider component
         boxCollider = GetComponent<BoxCollider>();
 
-        // Compute size ratio of my transform and parent's
-        ratio = transform.parent.lossyScale.z / transform.lossyScale.z;
-
         // Store the normal collider bounds and center
-        colliderSize = boxCollider.bounds.extents / 2;
+        colliderSize = new Vector3(1f, 1f, 1f);
         colliderCenter = Vector3.zero;
     }
 	
@@ -31,7 +30,7 @@ public class LevelGeometry : MonoBehaviour {
     {
         if (p == PerspectiveType.p2D)
         {
-            Vector3 parentSize = transform.parent.collider.bounds.extents;
+            Vector3 parentSize = parentPlatform.collider.bounds.extents;
             boxCollider.size = new Vector3(colliderSize.x, colliderSize.y, parentSize.z);
         }
         else if (p == PerspectiveType.p3D)

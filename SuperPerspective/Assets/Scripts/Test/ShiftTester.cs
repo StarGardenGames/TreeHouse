@@ -14,6 +14,8 @@ public class ShiftTester : Singleton<ShiftTester>
     {
         if (Input.GetKeyDown(KeyCode.LeftShift))
         {
+            Debug.Log("SHIFTING");
+
             if (perspectiveShiftEvent != null)
             {
                 if (p == PerspectiveType.p2D)
