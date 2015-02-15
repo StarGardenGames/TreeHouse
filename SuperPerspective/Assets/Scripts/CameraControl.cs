@@ -35,8 +35,8 @@ public class CameraControl : MonoBehaviour {
 	void Start() {
 		//Get 2D and 3D camera positions
 		GameObject p = GameObject.Find("Player");
-		pcam = p.GetComponent<Transform>().FindChild("CamPosPersp");
-		ocam = p.GetComponent<Transform>().FindChild("CamPosOrtho");
+		pcam = p.GetComponent<Transform>().FindChild("2DCameraMount");
+		ocam = p.GetComponent<Transform>().FindChild("3DCameraMount");
 		
 		//check if we're starting on player
 		if(startOnPlayer){
