@@ -365,17 +365,66 @@ public class PlayerController3 : MonoBehaviour
         transform.Translate(velocity * Time.deltaTime);
     }
 
-	void DoZLock() {
+	private void DoZLock() {
 		if (zlock > int.MinValue) {
 			Vector3 pos = transform.position;
 			pos.z = zlock;
 			transform.position = pos;
 		}
 	}
+
+	private bool Check2DIntersect() {
+		// True if any ray hits a collider
+		bool connected = false;
+
+		GameObject grnd = GameObject.Find("Ground");
+		float gz = grnd.transform.lossyScale.z;
+		
+		// Top Left (Min X, Max Y)
+		Vector3 startPoint = new Vector3(collider.bounds.min.x + Margin, collider.bounds.max.y - Margin, collider.bounds.center.z - gz/2);
+		Ray ray = new Ray(startPoint, Vector3.forward);
+		connected = Physics.Raycast(ray);
+		
+		// Top Right (Max X, Max Y)
+		if (!connected)
+		{
+			startPoint = new Vector3(collider.bounds.max.x - Margin, collider.bounds.max.y - Margin, collider.bounds.center.z - gz/2);
+			ray = new Ray(startPoint, Vector3.forward);
+			connected = Physics.Raycast(ray);
+		}
+		
+		// Bottom Left (Min X, Min Y)
+		if (!connected)
+		{
+			startPoint = new Vector3(collider.bounds.min.x + Margin, collider.bounds.min.y + Margin, collider.bounds.center.z - gz/2);
+			ray = new Ray(startPoint, Vector3.forward);
+			connected = Physics.Raycast(ray);
+		}
+		
+		// Bottom Right (Max X, Min Y)
+		if (!connected)
+		{
+			startPoint = new Vector3(collider.bounds.max.x - Margin, collider.bounds.min.y + Margin, collider.bounds.center.z - gz/2);
+			ray = new Ray(startPoint, Vector3.forward);
+			connected = Physics.Raycast(ray);
+		}
+		
+		// Center (Center X, Center Y)
+		if (!connected)
+		{
+			startPoint = new Vector3(collider.bounds.center.x, collider.bounds.center.y, collider.bounds.center.z - gz/2);
+			ray = new Ray(startPoint, Vector3.forward);
+			connected = Physics.Raycast(ray);
+		}
+		
+		return connected;
+	}
 	
 	public void Flip(PerspectiveType persp) {
 		if (persp == PerspectiveType.p3D)
 			zlockFlag = true;
+		else if (Check2DIntersect())
+			InputManager.instance.SetFailFlag();
 	}
 
     #endregion

@@ -59,7 +59,8 @@ public class CameraController : MonoBehaviour
         camera.projectionMatrix = perspective;
 
         // Register the state switching function to the perspective shift event
-        ShiftTester.instance.perspectiveShiftEvent += SwitchState;  
+        
+		InputManager.instance.perspectiveShiftEvent += SwitchState;  
 
         // Start the camera in 3D state
         currentState = STATE_3D;

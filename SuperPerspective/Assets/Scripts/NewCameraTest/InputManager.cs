@@ -30,6 +30,10 @@ public class InputManager : Singleton<InputManager>
         get { return _paused; }
     }
 
+	private const float FAIL_TIME = 0.5f;
+	private float flipTimer = 0;
+	private bool flipFailed = false;
+
     #endregion Properties & Variables
 
 
@@ -64,6 +68,18 @@ public class InputManager : Singleton<InputManager>
             RaisePerspectiveShiftEvent();
 
     }
+
+	void FixedUpdate() {
+		if (flipFailed) {
+			if (flipTimer < FAIL_TIME) {
+				flipTimer += 1/50f;
+			} else {
+				RaisePerspectiveShiftEvent();
+				flipTimer = 0;
+				flipFailed = false;
+			}
+		}
+	}
 
     #endregion MonobehaviorImplementation
 
@@ -109,6 +125,10 @@ public class InputManager : Singleton<InputManager>
     {
         return Input.GetButton("Grab");
     }
+
+	public void SetFailFlag() {
+		flipFailed = true;
+	}
 
     #endregion Public Interface
 
