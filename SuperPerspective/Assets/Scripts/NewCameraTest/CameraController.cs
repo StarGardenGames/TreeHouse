@@ -77,12 +77,12 @@ public class CameraController : MonoBehaviour
         if (newPerspective == PerspectiveType.p2D)
         {
             currentState = STATE_2D;
-            Debug.Log("Switching to 2D");
+            //Debug.Log("Switching to 2D");
         }
         else if (newPerspective == PerspectiveType.p3D)
         {
             currentState = STATE_3D;
-            Debug.Log("Switching to 3D");
+            //Debug.Log("Switching to 3D");
         }
     }
 
