@@ -38,6 +38,7 @@ public class PlayerController3 : MonoBehaviour
     // Vector used to store new veolicty
     private Vector3 velocity;
 
+	// Vars for Z-locking
 	private float zlock = int.MinValue;
 	private bool zlockFlag;
 
@@ -117,8 +118,8 @@ public class PlayerController3 : MonoBehaviour
         // ------------------------------------------------------------------------------------------------------
 
         // Apply Gravity
-        if (!grounded)
-            velocity = new Vector3(velocity.x, Mathf.Max(velocity.y - gravity, -terminalVelocity), velocity.z);
+		if (!grounded)
+			velocity = new Vector3(velocity.x, Mathf.Max(velocity.y - gravity, -terminalVelocity), velocity.z);
 
         // Determine if the player is falling
         if (velocity.y < 0f)
@@ -182,14 +183,14 @@ public class PlayerController3 : MonoBehaviour
 	    distance = (colliderHeight / 2) + Mathf.Abs(velocity.y * Time.deltaTime);
 
 	    // Top Left (Min X, Max Z)
-	    startPoint = new Vector3(collider.bounds.min.x, collider.bounds.center.y, collider.bounds.max.z);
+		startPoint = new Vector3(collider.bounds.min.x + Margin, collider.bounds.center.y, collider.bounds.max.z - Margin);
 		ray = new Ray(startPoint, Vector3.up * Mathf.Sign(velocity.y));
 	    connected = Physics.Raycast(ray, out hitInfo, distance);
 
 	    // Top Right (Max X, Max Z)
 	    if (!connected)
 	    {
-	        startPoint = new Vector3(collider.bounds.max.x, collider.bounds.center.y, collider.bounds.max.z);
+			startPoint = new Vector3(collider.bounds.max.x - Margin, collider.bounds.center.y, collider.bounds.max.z - Margin);
 			ray = new Ray(startPoint, Vector3.up * Mathf.Sign(velocity.y));
 	        connected = Physics.Raycast(ray, out hitInfo, distance);
 	    }
@@ -197,7 +198,7 @@ public class PlayerController3 : MonoBehaviour
 	    // Bottom Left (Min X, Min Z)
 	    if (!connected)
 	    {
-	        startPoint = new Vector3(collider.bounds.min.x, collider.bounds.center.y, collider.bounds.min.z);
+			startPoint = new Vector3(collider.bounds.min.x + Margin, collider.bounds.center.y, collider.bounds.min.z + Margin);
 			ray = new Ray(startPoint, Vector3.up * Mathf.Sign(velocity.y));
 	        connected = Physics.Raycast(ray, out hitInfo, distance);
 	    }
@@ -205,7 +206,7 @@ public class PlayerController3 : MonoBehaviour
 	    // Bottom Right (Max X, Min Z)
 	    if (!connected)
 	    {
-	        startPoint = new Vector3(collider.bounds.max.x, collider.bounds.center.y, collider.bounds.min.z);
+			startPoint = new Vector3(collider.bounds.max.x - Margin, collider.bounds.center.y, collider.bounds.min.z + Margin);
 			ray = new Ray(startPoint, Vector3.up * Mathf.Sign(velocity.y));
 	        connected = Physics.Raycast(ray, out hitInfo, distance);
 	    }
@@ -225,13 +226,16 @@ public class PlayerController3 : MonoBehaviour
                 grounded = true;
                 falling = false;
                 canJump = true;
+				// Z-lock
 				if (hitInfo.collider.gameObject.GetComponent<LevelGeometry>())
 					zlock = hitInfo.transform.position.z;
 				else
 					zlock = int.MinValue;
 			}
+		
 			transform.Translate(Vector3.up * Mathf.Sign(velocity.y) * (hitInfo.distance - colliderHeight / 2));
 	        velocity = new Vector3(velocity.x, 0f, velocity.z);
+			CollideWithObject(hitInfo, Vector3.up);
 	    }
 
 	    // Otherwise we're not grounded (temporary?)
@@ -295,6 +299,7 @@ public class PlayerController3 : MonoBehaviour
 		{
 			transform.Translate(Vector3.right * Mathf.Sign(velocity.x) * (hitInfo.distance - colliderWidth / 2));
 			velocity = new Vector3(0f, velocity.y, velocity.z);
+			CollideWithObject(hitInfo, Vector3.right);
 		}
 
         #endregion Checking X Axis
@@ -353,9 +358,9 @@ public class PlayerController3 : MonoBehaviour
 		{
 			transform.Translate(Vector3.forward * Mathf.Sign(velocity.z) * (hitInfo.distance - colliderDepth / 2));
 			velocity = new Vector3(velocity.x, velocity.y, 0f);
+			CollideWithObject(hitInfo, Vector3.forward);
 		}
-        
-
+       	
         #endregion Checking Z Axis
 
     }
@@ -364,6 +369,8 @@ public class PlayerController3 : MonoBehaviour
 	void LateUpdate () {
         transform.Translate(velocity * Time.deltaTime);
     }
+
+	#endregion
 
 	private void DoZLock() {
 		if (zlock > int.MinValue) {
@@ -419,14 +426,28 @@ public class PlayerController3 : MonoBehaviour
 		
 		return connected;
 	}
-	
+
+	// Used to check collisions with special objects
+	private void CollideWithObject(RaycastHit hitInfo, Vector3 side) {
+		GameObject other = hitInfo.collider.gameObject;
+		float colliderDim = 0;
+		if (side == Vector3.up || side == Vector3.down)
+			colliderDim = colliderHeight;
+		if (side == Vector3.right || side == Vector3.left)
+			colliderDim = colliderWidth;
+		if (side == Vector3.forward || side == Vector3.back)
+			colliderDim = colliderDepth;
+		// Bounce Pad
+		if (side == Vector3.up && other.GetComponent<BouncePad>()) {
+			velocity.y += other.GetComponent<BouncePad>().GetBouncePower();
+		}
+	}
+
 	public void Flip(PerspectiveType persp) {
 		if (persp == PerspectiveType.p3D)
 			zlockFlag = true;
 		else if (Check2DIntersect())
 			InputManager.instance.SetFailFlag();
 	}
-
-    #endregion
 
 }
