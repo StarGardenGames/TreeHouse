@@ -42,6 +42,7 @@ public class PlayerController3 : MonoBehaviour
 	private float zlock = int.MinValue;
 	private bool zlockFlag;
 
+	private Crate crate = null;
     #endregion
 
     #region MonoBehavior Implementation
@@ -169,6 +170,7 @@ public class PlayerController3 : MonoBehaviour
         #region Checking Below
 		bool connected = false;
 		Ray ray;
+		Vector3 trajectory;
 
         // Check for collisions below the player if he/she is not moving up
         //if (grounded || falling)
@@ -232,10 +234,11 @@ public class PlayerController3 : MonoBehaviour
 				else
 					zlock = int.MinValue;
 			}
-		
+
+			trajectory = velocity.y * Vector3.up;
 			transform.Translate(Vector3.up * Mathf.Sign(velocity.y) * (hitInfo.distance - colliderHeight / 2));
 	        velocity = new Vector3(velocity.x, 0f, velocity.z);
-			CollideWithObject(hitInfo, Vector3.up);
+			CollideWithObject(hitInfo, trajectory);
 	    }
 
 	    // Otherwise we're not grounded (temporary?)
@@ -297,9 +300,10 @@ public class PlayerController3 : MonoBehaviour
 		// If any rays connected move the player and set grounded to true since we're now on the ground
 		if (connected)
 		{
+			trajectory = velocity.x * Vector3.right;
 			transform.Translate(Vector3.right * Mathf.Sign(velocity.x) * (hitInfo.distance - colliderWidth / 2));
 			velocity = new Vector3(0f, velocity.y, velocity.z);
-			CollideWithObject(hitInfo, Vector3.right);
+			CollideWithObject(hitInfo, trajectory);
 		}
 
         #endregion Checking X Axis
@@ -356,9 +360,10 @@ public class PlayerController3 : MonoBehaviour
 		// If any rays connected move the player and set grounded to true since we're now on the ground
 		if (connected)
 		{
+			trajectory = velocity.z * Vector3.forward;
 			transform.Translate(Vector3.forward * Mathf.Sign(velocity.z) * (hitInfo.distance - colliderDepth / 2));
 			velocity = new Vector3(velocity.x, velocity.y, 0f);
-			CollideWithObject(hitInfo, Vector3.forward);
+			CollideWithObject(hitInfo, trajectory);
 		}
        	
         #endregion Checking Z Axis
@@ -428,18 +433,24 @@ public class PlayerController3 : MonoBehaviour
 	}
 
 	// Used to check collisions with special objects
-	private void CollideWithObject(RaycastHit hitInfo, Vector3 side) {
+	// Make this more object oriented? Collidable interface?
+	private void CollideWithObject(RaycastHit hitInfo, Vector3 trajectory) {
 		GameObject other = hitInfo.collider.gameObject;
 		float colliderDim = 0;
-		if (side == Vector3.up || side == Vector3.down)
+		if (trajectory.normalized == Vector3.up || trajectory.normalized == Vector3.down)
 			colliderDim = colliderHeight;
-		if (side == Vector3.right || side == Vector3.left)
+		if (trajectory.normalized == Vector3.right || trajectory.normalized == Vector3.left)
 			colliderDim = colliderWidth;
-		if (side == Vector3.forward || side == Vector3.back)
+		if (trajectory.normalized == Vector3.forward || trajectory.normalized == Vector3.back)
 			colliderDim = colliderDepth;
 		// Bounce Pad
-		if (side == Vector3.up && other.GetComponent<BouncePad>()) {
+		if (trajectory.normalized == Vector3.down && other.GetComponent<BouncePad>()) {
 			velocity.y += other.GetComponent<BouncePad>().GetBouncePower();
+		}
+		// Crate
+		if (trajectory.normalized != Vector3.down && other.GetComponent<Crate>()) {
+			other.transform.Translate(trajectory * Time.deltaTime);
+			transform.Translate(trajectory * Time.deltaTime);
 		}
 	}
 
@@ -448,6 +459,10 @@ public class PlayerController3 : MonoBehaviour
 			zlockFlag = true;
 		else if (Check2DIntersect())
 			InputManager.instance.SetFailFlag();
+	}
+
+	public void Grab(Crate crate) {
+		
 	}
 
 }

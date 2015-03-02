@@ -45,15 +45,6 @@ public class Crate : MonoBehaviour {
 		bool connected = false;
 		Ray ray;
 		
-		// Check for collisions below the player if he/she is not moving up
-		//if (grounded || falling)
-		//{
-		// Check each of the four corners and the center of the collider
-		// TODO: Store coordinates in an array to do this as a loop
-		
-		// True if any ray hits a collider
-		//bool connected = false;
-		
 		// Set the raycast distance to check as far as the player will fall this frame
 		distance = (colliderHeight / 2) + Mathf.Abs(velocity.y * Time.deltaTime);
 		
@@ -94,10 +85,10 @@ public class Crate : MonoBehaviour {
 			connected = Physics.Raycast(ray, out hitInfo, distance);
 		}
 		
-		// If any rays connected move the player and set grounded to true since we're now on the ground
+		// If any rays connected move the crate and set grounded to true since we're now on the ground
 		if (connected)
 		{
-			if (velocity.y > 0)
+			if (velocity.y < 0)
 				grounded = true;
 			transform.Translate(Vector3.up * Mathf.Sign(velocity.y) * (hitInfo.distance - colliderHeight / 2));
 			velocity = new Vector3(velocity.x, 0f, velocity.z);
@@ -151,7 +142,7 @@ public class Crate : MonoBehaviour {
 			connected = Physics.Raycast(ray, out hitInfo, distance);
 		}
 		
-		// If any rays connected move the player and set grounded to true since we're now on the ground
+		// If any rays connected move the crate and set grounded to true since we're now on the ground
 		if (connected)
 		{
 			transform.Translate(Vector3.right * Mathf.Sign(velocity.x) * (hitInfo.distance - colliderWidth / 2));
@@ -209,7 +200,7 @@ public class Crate : MonoBehaviour {
 			connected = Physics.Raycast(ray, out hitInfo, distance);
 		}
 		
-		// If any rays connected move the player and set grounded to true since we're now on the ground
+		// If any rays connected move the crate and set grounded to true since we're now on the ground
 		if (connected)
 		{
 			transform.Translate(Vector3.forward * Mathf.Sign(velocity.z) * (hitInfo.distance - colliderDepth / 2));
