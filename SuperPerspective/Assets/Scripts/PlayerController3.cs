@@ -441,6 +441,10 @@ public class PlayerController3 : MonoBehaviour
 		if (side == Vector3.up && other.GetComponent<BouncePad>()) {
 			velocity.y += other.GetComponent<BouncePad>().GetBouncePower();
 		}
+		//Switch
+		if(other.GetComponent<Switch>()){
+			other.GetComponent<Switch>().CollisionWithPlayer();
+		}
 	}
 
 	public void Flip(PerspectiveType persp) {
