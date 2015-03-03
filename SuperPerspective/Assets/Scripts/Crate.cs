@@ -10,7 +10,13 @@ public class Crate : MonoBehaviour {
 	private Vector3 velocity;
 	private bool grounded;
 	private float colliderHeight, colliderWidth, colliderDepth;
-	float Margin = 0.05f;
+	private float Margin = 0.05f;
+
+	private PlayerController3 player;
+
+	private bool grabbed;
+
+	private PerspectiveType persp = PerspectiveType.p3D;
 
 	void Start() {
 		grounded = false;
@@ -18,6 +24,12 @@ public class Crate : MonoBehaviour {
 		colliderHeight = collider.bounds.max.y - collider.bounds.min.y;
 		colliderWidth = collider.bounds.max.x - collider.bounds.min.x;
 		colliderDepth = collider.bounds.max.z - collider.bounds.min.z;
+
+		player = GameObject.Find("NewPlayer").GetComponent<PlayerController3>();
+
+		// Register CheckGrab to grab input event
+		InputManager.instance.GrabPressed += CheckGrab;
+		InputManager.instance.perspectiveShiftEvent += Shift;
 	}
 
 	void FixedUpdate() {
@@ -212,12 +224,31 @@ public class Crate : MonoBehaviour {
 	}
 
 	void LateUpdate () {
+		if (grabbed && !PlayerInRange()) {
+			player.Grab(null);
+			grabbed = false;
+		}
 		transform.Translate(velocity * Time.deltaTime);
 	}
 
-	public void AddVelocity(float x, float y, float z) {
-		velocity.x += x;
-		velocity.y += y;
-		velocity.z += z;
+	public void CheckGrab() {
+		if (!grabbed && PlayerInRange()) {
+			player.Grab(this);
+			grabbed = true;
+		} else if (grabbed) {
+			player.Grab(null);
+			grabbed = false;
+		}
+	}
+
+	private void Shift(PerspectiveType p) {
+		persp = p;
+	}
+
+	private bool PlayerInRange() {
+		if (persp == PerspectiveType.p3D)
+			return Mathf.Abs(player.transform.position.y - transform.position.y) <= colliderHeight / 2 && Mathf.Abs (player.transform.position.x - transform.position.x) <= colliderWidth / 2 + player.collider.bounds.size.x / 2 + Margin && Mathf.Abs (player.transform.position.z - transform.position.z) <= collider.bounds.size.z / 2 + player.collider.bounds.size.z / 2 + Margin;
+		else
+			return Mathf.Abs(player.transform.position.y - transform.position.y) <= colliderHeight / 2 && Mathf.Abs (player.transform.position.x - transform.position.x) <= colliderWidth / 2 + player.collider.bounds.size.x / 2 + Margin;
 	}
 }

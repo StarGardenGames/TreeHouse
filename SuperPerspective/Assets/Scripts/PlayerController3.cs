@@ -42,7 +42,10 @@ public class PlayerController3 : MonoBehaviour
 	private float zlock = int.MinValue;
 	private bool zlockFlag;
 
+	private PerspectiveType persp = PerspectiveType.p3D;
+
 	private Crate crate = null;
+	private Vector3 grabAxis = Vector3.zero;
     #endregion
 
     #region MonoBehavior Implementation
@@ -372,7 +375,12 @@ public class PlayerController3 : MonoBehaviour
 
 	// LateUpdate is used to actually move the position of the player
 	void LateUpdate () {
-        transform.Translate(velocity * Time.deltaTime);
+		if (crate != null) {
+			crate.transform.Translate(Vector3.Dot (velocity, grabAxis) * grabAxis * 0.5f * Time.deltaTime);
+			transform.Translate(velocity * 0.5f * Time.deltaTime);
+		} else {
+			transform.Translate(velocity * Time.deltaTime);
+		}
     }
 
 	#endregion
@@ -449,8 +457,9 @@ public class PlayerController3 : MonoBehaviour
 		}
 		// Crate
 		if (trajectory.normalized != Vector3.down && other.GetComponent<Crate>()) {
-			other.transform.Translate(trajectory * Time.deltaTime);
-			transform.Translate(trajectory * Time.deltaTime);
+			other.transform.Translate(trajectory * 0.5f * Time.deltaTime);
+			//transform.Translate(trajectory * Time.deltaTime);
+			velocity += trajectory * 0.5f;
 		}
 	}
 
@@ -459,10 +468,18 @@ public class PlayerController3 : MonoBehaviour
 			zlockFlag = true;
 		else if (Check2DIntersect())
 			InputManager.instance.SetFailFlag();
+		this.persp = persp;
 	}
 
 	public void Grab(Crate crate) {
-		
+		this.crate = crate;
+		if (crate == null)
+			return;
+		if (persp == PerspectiveType.p2D || Mathf.Abs (crate.transform.position.x - transform.position.x) > Mathf.Abs (crate.transform.position.z - transform.position.z)) {
+			grabAxis = Vector3.right;
+		} else {
+			grabAxis = Vector3.forward;
+		}
 	}
 
 }
