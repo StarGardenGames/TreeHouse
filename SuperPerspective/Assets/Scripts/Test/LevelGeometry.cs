@@ -38,7 +38,7 @@ public class LevelGeometry : MonoBehaviour
 	void Start () 
     {
         // Register to perspective shift event
-        InputManager.instance.perspectiveShiftEvent += AdjustCollider;
+        GameStateManager.instance.PerspectiveShiftEvent += AdjustCollider;
 	}
 
     #endregion Monobehavior Implementation
@@ -48,15 +48,15 @@ public class LevelGeometry : MonoBehaviour
 
     
     // Adjusts the collider to the appropriate shape when the perspective shift event occurs.
-    private void AdjustCollider(PerspectiveType p)
+    private void AdjustCollider()
     {
-        if (p == PerspectiveType.p2D)
+        if (GameStateManager.instance.targetState == "2D")
         {
             // Stretch the collider's Z depth and center z value to match parent platform
             boxCollider.center = new Vector3(0f, 0f, (parentPlatform.transform.position.z - transform.position.z) * zScaleRatioWorld);
             boxCollider.size = new Vector3(colliderSize.x, colliderSize.y, zScaleRatioParent);
         }
-        else if (p == PerspectiveType.p3D)
+        else if (GameStateManager.instance.targetState == "3D")
         {
             // Return collider to initial state
             boxCollider.size = colliderSize;

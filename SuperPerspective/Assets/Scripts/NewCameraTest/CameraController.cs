@@ -1,14 +1,16 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+using SuperPerspective.Singleton;
+
 /// <summary>
-///     Determines if the camera should be in 3D or 2D state. In each state the camera
-///     attempts to follow an appropriate camera mount's position and rotation.
+///     TODO: Summarize this prolly?
 /// </summary>
-[RequireComponent(typeof(MatrixBlender))]
-[RequireComponent(typeof(Camera))]
-public class CameraController : MonoBehaviour
+[RequireComponent(typeof(MatrixBlender))]   // Required to blend the camera's view settings between states
+[RequireComponent(typeof(Camera))]          // The camera needs to actually be, you know, a camera
+public class CameraController : PersistentSingleton<CameraController>
 {
+    /*
     #region Properties & Variables
 
     // This is the camera component and matrix blender script
@@ -135,4 +137,5 @@ public class CameraController : MonoBehaviour
     }
 
     #endregion State Functions
+    */ 
 }

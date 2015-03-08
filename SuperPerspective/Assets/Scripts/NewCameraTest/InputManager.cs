@@ -17,11 +17,12 @@ public class InputManager : Singleton<InputManager>
     public event System.Action GrabPressed;         // Grab
 
     // Perspective change event
-    public event System.Action<PerspectiveType> perspectiveShiftEvent;
+    // TODO: emove this functionality since it's now in the camera script
+    public event System.Action ShiftPressedEvent;
     private PerspectiveType currentPerspective;
     
     // Game pause event
-    public event System.Action<bool> GamePaused;
+    public event System.Action PausePressedEvent;
 
     // Game's pause state
     private bool _paused = false;
@@ -30,6 +31,8 @@ public class InputManager : Singleton<InputManager>
         get { return _paused; }
     }
 
+    // Perspective shift properties
+    // TODO: Move this funcionality to the camera script
 	private const float FAIL_TIME = 0.5f;
 	private float flipTimer = 0;
 	private bool flipFailed = false;
@@ -65,20 +68,22 @@ public class InputManager : Singleton<InputManager>
 
         // Check perspective shift
         if (Input.GetButtonDown("PerspectiveShift"))
-            RaisePerspectiveShiftEvent();
+            RaiseShiftPressedEvent();
 
     }
 
 	void FixedUpdate() {
+        /*
 		if (flipFailed) {
 			if (flipTimer < FAIL_TIME) {
 				flipTimer += 1/50f;
 			} else {
-				RaisePerspectiveShiftEvent();
+                RaiseShiftPressedEvent();
 				flipTimer = 0;
 				flipFailed = false;
 			}
 		}
+        */
 	}
 
     #endregion MonobehaviorImplementation
@@ -136,36 +141,26 @@ public class InputManager : Singleton<InputManager>
     #region Event Raising Functions
 
     // Called when the player shifts perspective
-    private void RaisePerspectiveShiftEvent()
+    private void RaiseShiftPressedEvent()
     {
+        Debug.Log("InputManager - Shift Pressed");
         // Alert listeners of the new perspective
-        if (perspectiveShiftEvent != null)
+        if (ShiftPressedEvent != null)
         {
-            if (currentPerspective == PerspectiveType.p3D)
-            {
-                // Change to 2D
-                currentPerspective = PerspectiveType.p2D;
-                perspectiveShiftEvent(currentPerspective);
-
-            }
-            else if (currentPerspective == PerspectiveType.p2D)
-            {
-                // Change to 3D
-                currentPerspective = PerspectiveType.p3D;
-                perspectiveShiftEvent(currentPerspective);
-            }
+            ShiftPressedEvent();
         }
     }
 
     // Called when the player pauses the game
+    // TODO: Remove pause state tracking, it's now in the camera script
     private void RaiseGamePauseEvent()
     {
         // Change the pause state
         _paused = !_paused;
 
         // Alert listeners of the new pause state
-        if (GamePaused != null)
-            GamePaused(_paused);
+        if (PausePressedEvent != null)
+            PausePressedEvent();
     }
 
     // Called when the player presses the jump button
