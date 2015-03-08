@@ -1,11 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Switch : MonoBehaviour {
+public class PushSwitch : PlayerInteractable {
 
 	public Activatable[] triggers;//Activatable objects which this switch triggers
 
-	bool pressed = false; //whether switch is currently pressed
 	bool enabled = false; //whether switch is currently enabled
 
 	float distThresh = 1.5f; //distance threshhold where it will become unpressed
@@ -20,8 +19,12 @@ public class Switch : MonoBehaviour {
 		//calculate distance between switch and player
 		float dist = Vector3.Distance(transform.position, player.transform.position);
 		//become unpressed if distance is small enough
-		if(dist > distThresh)
-			pressed = false;
+		if(dist > distThresh && enabled){
+			enabled = false;
+			//update activatables
+			foreach(Activatable o in triggers)
+				o.setActivated(enabled);
+		}
 		//update color for debugging
 		if(enabled)
 			gameObject.renderer.material.color = Color.white;
@@ -29,14 +32,8 @@ public class Switch : MonoBehaviour {
 			gameObject.renderer.material.color = Color.red;
 	}
 
-	public void CollisionWithPlayer(){
-		if(!pressed)//only update switch if it's not already pressed;
-			Toggle();//toggle switch
-	}
-
-	void Toggle(){
-		pressed = true;//switch becomes pressed
-		enabled = !enabled;//enable toggles
+	public override void CollisionWithPlayer(){
+		enabled = true;//becomes enabled when it collides with player
 		//enabled is also updated for all activatable objects
 		foreach(Activatable o in triggers)
 			o.setActivated(enabled);
