@@ -110,7 +110,7 @@ public class MenuControl : MonoBehaviour {
 					string name = saveSlots[selectedSlot].transform.GetChild(0).GetComponent<Text>().text;
 					updateText(name + " is playing");
 					menuAlpha = .95f;
-					CameraControl.instance.MountToPlayer();
+					GameStateManager.instance.StartGame();
 					SaveManager.instance.loadSave();
 				}else{
 					for(int i = 0; i < numSaveSlots; i++)

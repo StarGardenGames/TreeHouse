@@ -88,6 +88,11 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
         CameraController2.instance.SetMount(MOUNT_GAMEPLAY_3D, VIEW_SETTINGS_GAMEPLAY_3D);
     }
 
+	//called by Main Menu when play button is pressed
+	public void GameStart(){
+
+	}
+
     // Enter transition state between 2D and 3D or vice-versa
     private void EnterTransition(string targetState)
     {

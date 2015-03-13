@@ -59,8 +59,6 @@ public class CheckpointManager : MonoBehaviour {
 
 		//move to destination if we fast travelled
 		if(destination != -1){
-			//manage camera
-			CameraControl.instance.SetMount(playerCam.GetComponent<Transform>());
 			//search for correct checkpoint
 			GameObject[] cps = GameObject.FindGameObjectsWithTag("Checkpoint");
 			GameObject player = GameObject.Find("Player");
@@ -90,7 +88,6 @@ public class CheckpointManager : MonoBehaviour {
 		if(destination != -1 && menuVisible){
 			menuAlpha = 1;
 			destination = -1;
-			CameraControl.instance.Snap();
 		}
 		//update alpha
 		menuAlpha += ((menuVisible)? (1/fadeTime) : -(1/fadeTime))*Time.deltaTime;
