@@ -21,9 +21,9 @@ public class Crate : MonoBehaviour {
 	void Start() {
 		grounded = false;
 		velocity = Vector3.zero;
-		colliderHeight = collider.bounds.max.y - collider.bounds.min.y;
-		colliderWidth = collider.bounds.max.x - collider.bounds.min.x;
-		colliderDepth = collider.bounds.max.z - collider.bounds.min.z;
+		colliderHeight = GetComponent<Collider>().bounds.max.y - GetComponent<Collider>().bounds.min.y;
+		colliderWidth = GetComponent<Collider>().bounds.max.x - GetComponent<Collider>().bounds.min.x;
+		colliderDepth = GetComponent<Collider>().bounds.max.z - GetComponent<Collider>().bounds.min.z;
 
 		player = GameObject.Find("NewPlayer").GetComponent<PlayerController3>();
 
@@ -61,14 +61,14 @@ public class Crate : MonoBehaviour {
 		distance = (colliderHeight / 2) + Mathf.Abs(velocity.y * Time.deltaTime);
 		
 		// Top Left (Min X, Max Z)
-		startPoint = new Vector3(collider.bounds.min.x + Margin, collider.bounds.center.y, collider.bounds.max.z - Margin);
+		startPoint = new Vector3(GetComponent<Collider>().bounds.min.x + Margin, GetComponent<Collider>().bounds.center.y, GetComponent<Collider>().bounds.max.z - Margin);
 		ray = new Ray(startPoint, Vector3.up * Mathf.Sign(velocity.y));
 		connected = Physics.Raycast(ray, out hitInfo, distance);
 		
 		// Top Right (Max X, Max Z)
 		if (!connected)
 		{
-			startPoint = new Vector3(collider.bounds.max.x - Margin, collider.bounds.center.y, collider.bounds.max.z - Margin);
+			startPoint = new Vector3(GetComponent<Collider>().bounds.max.x - Margin, GetComponent<Collider>().bounds.center.y, GetComponent<Collider>().bounds.max.z - Margin);
 			ray = new Ray(startPoint, Vector3.up * Mathf.Sign(velocity.y));
 			connected = Physics.Raycast(ray, out hitInfo, distance);
 		}
@@ -76,7 +76,7 @@ public class Crate : MonoBehaviour {
 		// Bottom Left (Min X, Min Z)
 		if (!connected)
 		{
-			startPoint = new Vector3(collider.bounds.min.x + Margin, collider.bounds.center.y, collider.bounds.min.z + Margin);
+			startPoint = new Vector3(GetComponent<Collider>().bounds.min.x + Margin, GetComponent<Collider>().bounds.center.y, GetComponent<Collider>().bounds.min.z + Margin);
 			ray = new Ray(startPoint, Vector3.up * Mathf.Sign(velocity.y));
 			connected = Physics.Raycast(ray, out hitInfo, distance);
 		}
@@ -84,7 +84,7 @@ public class Crate : MonoBehaviour {
 		// Bottom Right (Max X, Min Z)
 		if (!connected)
 		{
-			startPoint = new Vector3(collider.bounds.max.x - Margin, collider.bounds.center.y, collider.bounds.min.z + Margin);
+			startPoint = new Vector3(GetComponent<Collider>().bounds.max.x - Margin, GetComponent<Collider>().bounds.center.y, GetComponent<Collider>().bounds.min.z + Margin);
 			ray = new Ray(startPoint, Vector3.up * Mathf.Sign(velocity.y));
 			connected = Physics.Raycast(ray, out hitInfo, distance);
 		}
@@ -92,7 +92,7 @@ public class Crate : MonoBehaviour {
 		// Center (Center Y, Center Z)
 		if (!connected)
 		{
-			startPoint = new Vector3(collider.bounds.center.x, collider.bounds.center.y, collider.bounds.center.z);
+			startPoint = new Vector3(GetComponent<Collider>().bounds.center.x, GetComponent<Collider>().bounds.center.y, GetComponent<Collider>().bounds.center.z);
 			ray = new Ray(startPoint, Vector3.up * Mathf.Sign(velocity.y));
 			connected = Physics.Raycast(ray, out hitInfo, distance);
 		}
@@ -118,14 +118,14 @@ public class Crate : MonoBehaviour {
 		distance = (colliderWidth / 2) + Mathf.Abs(velocity.x * Time.deltaTime);
 		
 		// Bottom Front (Min Y, Max Z)
-		startPoint = new Vector3(collider.bounds.center.x, collider.bounds.min.y + Margin, collider.bounds.max.z - Margin);
+		startPoint = new Vector3(GetComponent<Collider>().bounds.center.x, GetComponent<Collider>().bounds.min.y + Margin, GetComponent<Collider>().bounds.max.z - Margin);
 		ray = new Ray(startPoint, Vector3.right * Mathf.Sign(velocity.x));
 		connected = Physics.Raycast(ray, out hitInfo, distance);
 		
 		// Top Front (Max Y, Max Z)
 		if (!connected)
 		{
-			startPoint = new Vector3(collider.bounds.center.x, collider.bounds.max.y - Margin, collider.bounds.max.z - Margin);
+			startPoint = new Vector3(GetComponent<Collider>().bounds.center.x, GetComponent<Collider>().bounds.max.y - Margin, GetComponent<Collider>().bounds.max.z - Margin);
 			ray = new Ray(startPoint, Vector3.right * Mathf.Sign(velocity.x));
 			connected = Physics.Raycast(ray, out hitInfo, distance);
 		}
@@ -133,7 +133,7 @@ public class Crate : MonoBehaviour {
 		// Bottom Back (Min Y, Min Z)
 		if (!connected)
 		{
-			startPoint = new Vector3(collider.bounds.center.x, collider.bounds.min.y + Margin, collider.bounds.min.z + Margin);
+			startPoint = new Vector3(GetComponent<Collider>().bounds.center.x, GetComponent<Collider>().bounds.min.y + Margin, GetComponent<Collider>().bounds.min.z + Margin);
 			ray = new Ray(startPoint, Vector3.right * Mathf.Sign(velocity.x));
 			connected = Physics.Raycast(ray, out hitInfo, distance);
 		}
@@ -141,7 +141,7 @@ public class Crate : MonoBehaviour {
 		// Top Back (Max Y, Min Z)
 		if (!connected)
 		{
-			startPoint = new Vector3(collider.bounds.center.x, collider.bounds.max.y - Margin, collider.bounds.min.z + Margin);
+			startPoint = new Vector3(GetComponent<Collider>().bounds.center.x, GetComponent<Collider>().bounds.max.y - Margin, GetComponent<Collider>().bounds.min.z + Margin);
 			ray = new Ray(startPoint, Vector3.right * Mathf.Sign(velocity.x));
 			connected = Physics.Raycast(ray, out hitInfo, distance);
 		}
@@ -149,7 +149,7 @@ public class Crate : MonoBehaviour {
 		// Center (Center Y, Center Z)
 		if (!connected)
 		{
-			startPoint = new Vector3(collider.bounds.center.x, collider.bounds.center.y, collider.bounds.center.z);
+			startPoint = new Vector3(GetComponent<Collider>().bounds.center.x, GetComponent<Collider>().bounds.center.y, GetComponent<Collider>().bounds.center.z);
 			ray = new Ray(startPoint, Vector3.right * Mathf.Sign(velocity.x));
 			connected = Physics.Raycast(ray, out hitInfo, distance);
 		}
@@ -176,14 +176,14 @@ public class Crate : MonoBehaviour {
 		distance = (colliderDepth / 2 + Mathf.Abs(velocity.z * Time.deltaTime));
 		
 		// Top Left (Min X, Max Y)
-		startPoint = new Vector3(collider.bounds.min.x + Margin, collider.bounds.max.y - Margin, collider.bounds.center.z);
+		startPoint = new Vector3(GetComponent<Collider>().bounds.min.x + Margin, GetComponent<Collider>().bounds.max.y - Margin, GetComponent<Collider>().bounds.center.z);
 		ray = new Ray(startPoint, Vector3.forward * Mathf.Sign(velocity.z));
 		connected = Physics.Raycast(ray, out hitInfo, distance);
 		
 		// Top Right (Max X, Max Y)
 		if (!connected)
 		{
-			startPoint = new Vector3(collider.bounds.max.x - Margin, collider.bounds.max.y - Margin, collider.bounds.center.z);
+			startPoint = new Vector3(GetComponent<Collider>().bounds.max.x - Margin, GetComponent<Collider>().bounds.max.y - Margin, GetComponent<Collider>().bounds.center.z);
 			ray = new Ray(startPoint, Vector3.forward * Mathf.Sign(velocity.z));
 			connected = Physics.Raycast(ray, out hitInfo, distance);
 		}
@@ -191,7 +191,7 @@ public class Crate : MonoBehaviour {
 		// Bottom Left (Min X, Min Y)
 		if (!connected)
 		{
-			startPoint = new Vector3(collider.bounds.min.x + Margin, collider.bounds.min.y + Margin, collider.bounds.center.z);
+			startPoint = new Vector3(GetComponent<Collider>().bounds.min.x + Margin, GetComponent<Collider>().bounds.min.y + Margin, GetComponent<Collider>().bounds.center.z);
 			ray = new Ray(startPoint, Vector3.forward * Mathf.Sign(velocity.z));
 			connected = Physics.Raycast(ray, out hitInfo, distance);
 		}
@@ -199,7 +199,7 @@ public class Crate : MonoBehaviour {
 		// Bottom Right (Max X, Min Y)
 		if (!connected)
 		{
-			startPoint = new Vector3(collider.bounds.max.x - Margin, collider.bounds.min.y + Margin, collider.bounds.center.z);
+			startPoint = new Vector3(GetComponent<Collider>().bounds.max.x - Margin, GetComponent<Collider>().bounds.min.y + Margin, GetComponent<Collider>().bounds.center.z);
 			ray = new Ray(startPoint, Vector3.forward * Mathf.Sign(velocity.z));
 			connected = Physics.Raycast(ray, out hitInfo, distance);
 		}
@@ -207,7 +207,7 @@ public class Crate : MonoBehaviour {
 		// Center (Center X, Center Y)
 		if (!connected)
 		{
-			startPoint = new Vector3(collider.bounds.center.x, collider.bounds.center.y, collider.bounds.center.z);
+			startPoint = new Vector3(GetComponent<Collider>().bounds.center.x, GetComponent<Collider>().bounds.center.y, GetComponent<Collider>().bounds.center.z);
 			ray = new Ray(startPoint, Vector3.forward * Mathf.Sign(velocity.z));
 			connected = Physics.Raycast(ray, out hitInfo, distance);
 		}
@@ -247,8 +247,8 @@ public class Crate : MonoBehaviour {
 
 	private bool PlayerInRange() {
 		if (persp == PerspectiveType.p3D)
-			return Mathf.Abs(player.transform.position.y - transform.position.y) <= colliderHeight / 2 && Mathf.Abs (player.transform.position.x - transform.position.x) <= colliderWidth / 2 + player.collider.bounds.size.x / 2 + Margin && Mathf.Abs (player.transform.position.z - transform.position.z) <= collider.bounds.size.z / 2 + player.collider.bounds.size.z / 2 + Margin;
+			return Mathf.Abs(player.transform.position.y - transform.position.y) <= colliderHeight / 2 && Mathf.Abs (player.transform.position.x - transform.position.x) <= colliderWidth / 2 + player.GetComponent<Collider>().bounds.size.x / 2 + Margin && Mathf.Abs (player.transform.position.z - transform.position.z) <= GetComponent<Collider>().bounds.size.z / 2 + player.GetComponent<Collider>().bounds.size.z / 2 + Margin;
 		else
-			return Mathf.Abs(player.transform.position.y - transform.position.y) <= colliderHeight / 2 && Mathf.Abs (player.transform.position.x - transform.position.x) <= colliderWidth / 2 + player.collider.bounds.size.x / 2 + Margin;
+			return Mathf.Abs(player.transform.position.y - transform.position.y) <= colliderHeight / 2 && Mathf.Abs (player.transform.position.x - transform.position.x) <= colliderWidth / 2 + player.GetComponent<Collider>().bounds.size.x / 2 + Margin;
 	}
 }

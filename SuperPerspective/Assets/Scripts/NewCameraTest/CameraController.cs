@@ -56,7 +56,7 @@ public class CameraController : MonoBehaviour
         aspect = (float)Screen.width / (float)Screen.height;
         ortho = Matrix4x4.Ortho(-orthographicSize * aspect, orthographicSize * aspect, -orthographicSize, orthographicSize, near, far);
         perspective = Matrix4x4.Perspective(fov, aspect, near, far);
-        camera.projectionMatrix = perspective;
+        GetComponent<Camera>().projectionMatrix = perspective;
 
         // Register the state switching function to the perspective shift event
         

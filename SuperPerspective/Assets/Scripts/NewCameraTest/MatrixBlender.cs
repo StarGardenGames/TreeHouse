@@ -17,15 +17,15 @@ public class MatrixBlender : MonoBehaviour
         float startTime = Time.time;
         while (Time.time - startTime < duration)
         {
-            camera.projectionMatrix = MatrixLerp(src, dest, (Time.time - startTime) / duration);
+            GetComponent<Camera>().projectionMatrix = MatrixLerp(src, dest, (Time.time - startTime) / duration);
             yield return 1;
         }
-        camera.projectionMatrix = dest;
+        GetComponent<Camera>().projectionMatrix = dest;
     }
 
     public Coroutine BlendToMatrix(Matrix4x4 targetMatrix, float duration)
     {
         StopAllCoroutines();
-        return StartCoroutine(LerpFromTo(camera.projectionMatrix, targetMatrix, duration));
+        return StartCoroutine(LerpFromTo(GetComponent<Camera>().projectionMatrix, targetMatrix, duration));
     }
 }

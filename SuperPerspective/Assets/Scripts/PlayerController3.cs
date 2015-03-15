@@ -21,7 +21,7 @@ public class PlayerController3 : MonoBehaviour
 
     // Verticle movement flags
     private bool grounded;
-    private bool falling;
+    public bool falling;
     private bool canJump;
     private bool lastInput;
     private float jumpPressedTime;
@@ -43,6 +43,9 @@ public class PlayerController3 : MonoBehaviour
 	private bool zlockFlag;
 
 	private PerspectiveType persp = PerspectiveType.p3D;
+
+	private Animator anim;
+	private GameObject model;
 
 	private Crate crate = null;
 	private Vector3 grabAxis = Vector3.zero;
@@ -66,12 +69,15 @@ public class PlayerController3 : MonoBehaviour
         velocity = Vector3.zero;
 
         // Get the collider dimensions to use for raycasting
-        colliderHeight = collider.bounds.max.y - collider.bounds.min.y;
-        colliderWidth = collider.bounds.max.x - collider.bounds.min.x;
-        colliderDepth = collider.bounds.max.z - collider.bounds.min.z;
+        colliderHeight = GetComponent<Collider>().bounds.max.y - GetComponent<Collider>().bounds.min.y;
+        colliderWidth = GetComponent<Collider>().bounds.max.x - GetComponent<Collider>().bounds.min.x;
+        colliderDepth = GetComponent<Collider>().bounds.max.z - GetComponent<Collider>().bounds.min.z;
 
 		//Register Flip method to the shift event
 		InputManager.instance.perspectiveShiftEvent += Flip;
+
+		anim = GetComponentInChildren<Animator>();
+		model = anim.gameObject;
 	}
 
     void Update()
@@ -93,14 +99,18 @@ public class PlayerController3 : MonoBehaviour
 
         // This only runs while the player is grounded, it allows the player to jump as soon as they land 
         //      even if they pressed the jump button while in midair if they were close enough to the ground
-        if (grounded && Time.time - jumpPressedTime < jumpMargin)
+        if (grounded && Time.time - jumpPressedTime < jumpMargin && crate == null)
         {
+			anim.SetTrigger("Jump");
             grounded = false;
             velocity = new Vector3(velocity.x, jump, velocity.z);
             jumpPressedTime = 0;
         }
 
         lastInput = input;
+
+		anim.SetBool("Falling", falling);
+		anim.SetBool("Grounded", velocity.y == 0);
     }
 
     // Collision detection and velocity calculations are done in the fixed update step
@@ -165,6 +175,19 @@ public class PlayerController3 : MonoBehaviour
 
         velocity.z = newVelocityZ;
 
+		bool walking = (Mathf.Abs(velocity.z) > 0.1 || Mathf.Abs(velocity.x) >= 0.1);
+		bool running = (Mathf.Abs(velocity.z) >= maxSpeed / 2 || Mathf.Abs(velocity.x) >= maxSpeed / 2);
+		anim.SetBool("Walking", walking && !running);
+		anim.SetBool("Running", running);
+		anim.SetBool("Pushing", false);
+		anim.SetBool("Pulling", walking && crate != null);
+		if (walking) {
+			if (crate == null)
+				model.transform.rotation = Quaternion.AngleAxis(Mathf.Rad2Deg * Mathf.Atan2(-velocity.z, velocity.x) + 90, Vector3.up);
+		}
+
+
+
         // ------------------------------------------------------------------------------------------------------
         // COLLISION CHECKING
         // ------------------------------------------------------------------------------------------------------
@@ -188,14 +211,14 @@ public class PlayerController3 : MonoBehaviour
 	    distance = (colliderHeight / 2) + Mathf.Abs(velocity.y * Time.deltaTime);
 
 	    // Top Left (Min X, Max Z)
-		startPoint = new Vector3(collider.bounds.min.x + Margin, collider.bounds.center.y, collider.bounds.max.z - Margin);
+		startPoint = new Vector3(GetComponent<Collider>().bounds.min.x + Margin, GetComponent<Collider>().bounds.center.y, GetComponent<Collider>().bounds.max.z - Margin);
 		ray = new Ray(startPoint, Vector3.up * Mathf.Sign(velocity.y));
 	    connected = Physics.Raycast(ray, out hitInfo, distance);
 
 	    // Top Right (Max X, Max Z)
 	    if (!connected)
 	    {
-			startPoint = new Vector3(collider.bounds.max.x - Margin, collider.bounds.center.y, collider.bounds.max.z - Margin);
+			startPoint = new Vector3(GetComponent<Collider>().bounds.max.x - Margin, GetComponent<Collider>().bounds.center.y, GetComponent<Collider>().bounds.max.z - Margin);
 			ray = new Ray(startPoint, Vector3.up * Mathf.Sign(velocity.y));
 	        connected = Physics.Raycast(ray, out hitInfo, distance);
 	    }
@@ -203,7 +226,7 @@ public class PlayerController3 : MonoBehaviour
 	    // Bottom Left (Min X, Min Z)
 	    if (!connected)
 	    {
-			startPoint = new Vector3(collider.bounds.min.x + Margin, collider.bounds.center.y, collider.bounds.min.z + Margin);
+			startPoint = new Vector3(GetComponent<Collider>().bounds.min.x + Margin, GetComponent<Collider>().bounds.center.y, GetComponent<Collider>().bounds.min.z + Margin);
 			ray = new Ray(startPoint, Vector3.up * Mathf.Sign(velocity.y));
 	        connected = Physics.Raycast(ray, out hitInfo, distance);
 	    }
@@ -211,7 +234,7 @@ public class PlayerController3 : MonoBehaviour
 	    // Bottom Right (Max X, Min Z)
 	    if (!connected)
 	    {
-			startPoint = new Vector3(collider.bounds.max.x - Margin, collider.bounds.center.y, collider.bounds.min.z + Margin);
+			startPoint = new Vector3(GetComponent<Collider>().bounds.max.x - Margin, GetComponent<Collider>().bounds.center.y, GetComponent<Collider>().bounds.min.z + Margin);
 			ray = new Ray(startPoint, Vector3.up * Mathf.Sign(velocity.y));
 	        connected = Physics.Raycast(ray, out hitInfo, distance);
 	    }
@@ -219,7 +242,7 @@ public class PlayerController3 : MonoBehaviour
 		// Center (Center Y, Center Z)
 		if (!connected)
 		{
-			startPoint = new Vector3(collider.bounds.center.x, collider.bounds.center.y, collider.bounds.center.z);
+			startPoint = new Vector3(GetComponent<Collider>().bounds.center.x, GetComponent<Collider>().bounds.center.y, GetComponent<Collider>().bounds.center.z);
 			ray = new Ray(startPoint, Vector3.up * Mathf.Sign(velocity.y));
 			connected = Physics.Raycast(ray, out hitInfo, distance);
 		}
@@ -229,7 +252,7 @@ public class PlayerController3 : MonoBehaviour
 	    {
 			if (velocity.y < 0) {
                 grounded = true;
-                falling = false;
+				falling = false;
                 canJump = true;
 				// Z-lock
 				if (hitInfo.collider.gameObject.GetComponent<LevelGeometry>())
@@ -264,14 +287,14 @@ public class PlayerController3 : MonoBehaviour
 		distance = (colliderWidth / 2) + Mathf.Abs(velocity.x * Time.deltaTime);
 		
 		// Bottom Front (Min Y, Max Z)
-		startPoint = new Vector3(collider.bounds.center.x, collider.bounds.min.y + Margin, collider.bounds.max.z);
+		startPoint = new Vector3(GetComponent<Collider>().bounds.center.x, GetComponent<Collider>().bounds.min.y + Margin, GetComponent<Collider>().bounds.max.z);
 		ray = new Ray(startPoint, Vector3.right * Mathf.Sign(velocity.x));
 		connected = Physics.Raycast(ray, out hitInfo, distance);
 		
 		// Top Front (Max Y, Max Z)
 		if (!connected)
 		{
-			startPoint = new Vector3(collider.bounds.center.x, collider.bounds.max.y, collider.bounds.max.z);
+			startPoint = new Vector3(GetComponent<Collider>().bounds.center.x, GetComponent<Collider>().bounds.max.y, GetComponent<Collider>().bounds.max.z);
 			ray = new Ray(startPoint, Vector3.right * Mathf.Sign(velocity.x));
 			connected = Physics.Raycast(ray, out hitInfo, distance);
 		}
@@ -279,7 +302,7 @@ public class PlayerController3 : MonoBehaviour
 		// Bottom Back (Min Y, Min Z)
 		if (!connected)
 		{
-			startPoint = new Vector3(collider.bounds.center.x, collider.bounds.min.y + Margin, collider.bounds.min.z);
+			startPoint = new Vector3(GetComponent<Collider>().bounds.center.x, GetComponent<Collider>().bounds.min.y + Margin, GetComponent<Collider>().bounds.min.z);
 			ray = new Ray(startPoint, Vector3.right * Mathf.Sign(velocity.x));
 			connected = Physics.Raycast(ray, out hitInfo, distance);
 		}
@@ -287,7 +310,7 @@ public class PlayerController3 : MonoBehaviour
 		// Top Back (Max Y, Min Z)
 		if (!connected)
 		{
-			startPoint = new Vector3(collider.bounds.center.x, collider.bounds.max.y - Margin, collider.bounds.min.z + Margin);
+			startPoint = new Vector3(GetComponent<Collider>().bounds.center.x, GetComponent<Collider>().bounds.max.y - Margin, GetComponent<Collider>().bounds.min.z + Margin);
 			ray = new Ray(startPoint, Vector3.right * Mathf.Sign(velocity.x));
 			connected = Physics.Raycast(ray, out hitInfo, distance);
 		}
@@ -295,7 +318,7 @@ public class PlayerController3 : MonoBehaviour
 		// Center (Center Y, Center Z)
 		if (!connected)
 		{
-			startPoint = new Vector3(collider.bounds.center.x, collider.bounds.center.y, collider.bounds.center.z);
+			startPoint = new Vector3(GetComponent<Collider>().bounds.center.x, GetComponent<Collider>().bounds.center.y, GetComponent<Collider>().bounds.center.z);
 			ray = new Ray(startPoint, Vector3.right * Mathf.Sign(velocity.x));
 			connected = Physics.Raycast(ray, out hitInfo, distance);
 		}
@@ -324,14 +347,14 @@ public class PlayerController3 : MonoBehaviour
 		distance = (colliderDepth / 2 + Mathf.Abs(velocity.z * Time.deltaTime));
 		
 		// Top Left (Min X, Max Y)
-		startPoint = new Vector3(collider.bounds.min.x + Margin, collider.bounds.max.y - Margin, collider.bounds.center.z);
+		startPoint = new Vector3(GetComponent<Collider>().bounds.min.x + Margin, GetComponent<Collider>().bounds.max.y - Margin, GetComponent<Collider>().bounds.center.z);
 		ray = new Ray(startPoint, Vector3.forward * Mathf.Sign(velocity.z));
 		connected = Physics.Raycast(ray, out hitInfo, distance);
 		
 		// Top Right (Max X, Max Y)
 		if (!connected)
 		{
-			startPoint = new Vector3(collider.bounds.max.x - Margin, collider.bounds.max.y - Margin, collider.bounds.center.z);
+			startPoint = new Vector3(GetComponent<Collider>().bounds.max.x - Margin, GetComponent<Collider>().bounds.max.y - Margin, GetComponent<Collider>().bounds.center.z);
 			ray = new Ray(startPoint, Vector3.forward * Mathf.Sign(velocity.z));
 			connected = Physics.Raycast(ray, out hitInfo, distance);
 		}
@@ -339,7 +362,7 @@ public class PlayerController3 : MonoBehaviour
 		// Bottom Left (Min X, Min Y)
 		if (!connected)
 		{
-			startPoint = new Vector3(collider.bounds.min.x + Margin, collider.bounds.min.y + Margin, collider.bounds.center.z);
+			startPoint = new Vector3(GetComponent<Collider>().bounds.min.x + Margin, GetComponent<Collider>().bounds.min.y + Margin, GetComponent<Collider>().bounds.center.z);
 			ray = new Ray(startPoint, Vector3.forward * Mathf.Sign(velocity.z));
 			connected = Physics.Raycast(ray, out hitInfo, distance);
 		}
@@ -347,7 +370,7 @@ public class PlayerController3 : MonoBehaviour
 		// Bottom Right (Max X, Min Y)
 		if (!connected)
 		{
-			startPoint = new Vector3(collider.bounds.max.x - Margin, collider.bounds.min.y + Margin, collider.bounds.center.z);
+			startPoint = new Vector3(GetComponent<Collider>().bounds.max.x - Margin, GetComponent<Collider>().bounds.min.y + Margin, GetComponent<Collider>().bounds.center.z);
 			ray = new Ray(startPoint, Vector3.forward * Mathf.Sign(velocity.z));
 			connected = Physics.Raycast(ray, out hitInfo, distance);
 		}
@@ -355,7 +378,7 @@ public class PlayerController3 : MonoBehaviour
 		// Center (Center X, Center Y)
 		if (!connected)
 		{
-			startPoint = new Vector3(collider.bounds.center.x, collider.bounds.center.y, collider.bounds.center.z);
+			startPoint = new Vector3(GetComponent<Collider>().bounds.center.x, GetComponent<Collider>().bounds.center.y, GetComponent<Collider>().bounds.center.z);
 			ray = new Ray(startPoint, Vector3.forward * Mathf.Sign(velocity.z));
 			connected = Physics.Raycast(ray, out hitInfo, distance);
 		}
@@ -401,14 +424,14 @@ public class PlayerController3 : MonoBehaviour
 		float gz = grnd.transform.lossyScale.z;
 		
 		// Top Left (Min X, Max Y)
-		Vector3 startPoint = new Vector3(collider.bounds.min.x + Margin, collider.bounds.max.y - Margin, collider.bounds.center.z - gz/2);
+		Vector3 startPoint = new Vector3(GetComponent<Collider>().bounds.min.x + Margin, GetComponent<Collider>().bounds.max.y - Margin, GetComponent<Collider>().bounds.center.z - gz/2);
 		Ray ray = new Ray(startPoint, Vector3.forward);
 		connected = Physics.Raycast(ray);
 		
 		// Top Right (Max X, Max Y)
 		if (!connected)
 		{
-			startPoint = new Vector3(collider.bounds.max.x - Margin, collider.bounds.max.y - Margin, collider.bounds.center.z - gz/2);
+			startPoint = new Vector3(GetComponent<Collider>().bounds.max.x - Margin, GetComponent<Collider>().bounds.max.y - Margin, GetComponent<Collider>().bounds.center.z - gz/2);
 			ray = new Ray(startPoint, Vector3.forward);
 			connected = Physics.Raycast(ray);
 		}
@@ -416,7 +439,7 @@ public class PlayerController3 : MonoBehaviour
 		// Bottom Left (Min X, Min Y)
 		if (!connected)
 		{
-			startPoint = new Vector3(collider.bounds.min.x + Margin, collider.bounds.min.y + Margin, collider.bounds.center.z - gz/2);
+			startPoint = new Vector3(GetComponent<Collider>().bounds.min.x + Margin, GetComponent<Collider>().bounds.min.y + Margin, GetComponent<Collider>().bounds.center.z - gz/2);
 			ray = new Ray(startPoint, Vector3.forward);
 			connected = Physics.Raycast(ray);
 		}
@@ -424,7 +447,7 @@ public class PlayerController3 : MonoBehaviour
 		// Bottom Right (Max X, Min Y)
 		if (!connected)
 		{
-			startPoint = new Vector3(collider.bounds.max.x - Margin, collider.bounds.min.y + Margin, collider.bounds.center.z - gz/2);
+			startPoint = new Vector3(GetComponent<Collider>().bounds.max.x - Margin, GetComponent<Collider>().bounds.min.y + Margin, GetComponent<Collider>().bounds.center.z - gz/2);
 			ray = new Ray(startPoint, Vector3.forward);
 			connected = Physics.Raycast(ray);
 		}
@@ -432,7 +455,7 @@ public class PlayerController3 : MonoBehaviour
 		// Center (Center X, Center Y)
 		if (!connected)
 		{
-			startPoint = new Vector3(collider.bounds.center.x, collider.bounds.center.y, collider.bounds.center.z - gz/2);
+			startPoint = new Vector3(GetComponent<Collider>().bounds.center.x, GetComponent<Collider>().bounds.center.y, GetComponent<Collider>().bounds.center.z - gz/2);
 			ray = new Ray(startPoint, Vector3.forward);
 			connected = Physics.Raycast(ray);
 		}
@@ -454,12 +477,16 @@ public class PlayerController3 : MonoBehaviour
 		// Bounce Pad
 		if (trajectory.normalized == Vector3.down && other.GetComponent<BouncePad>()) {
 			velocity.y += other.GetComponent<BouncePad>().GetBouncePower();
+			anim.SetTrigger("Jump");
 		}
 		// Crate
 		if (trajectory.normalized != Vector3.down && other.GetComponent<Crate>()) {
 			other.transform.Translate(trajectory * 0.5f * Time.deltaTime);
 			//transform.Translate(trajectory * Time.deltaTime);
 			velocity += trajectory * 0.5f;
+			anim.SetBool("Pushing", true);
+		} else {
+			anim.SetBool("Pushing", false);
 		}
 	}
 
