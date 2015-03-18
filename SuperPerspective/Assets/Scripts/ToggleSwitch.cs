@@ -24,9 +24,9 @@ public class ToggleSwitch : PlayerInteractable {
 			pressed = false;
 		//update color for debugging
 		if(enabled)
-			gameObject.renderer.material.color = Color.white;
+			gameObject.GetComponent<Renderer>().material.color = Color.white;
 		else
-			gameObject.renderer.material.color = Color.red;
+			gameObject.GetComponent<Renderer>().material.color = Color.red;
 	}
 
 	public override void CollisionWithPlayer(){

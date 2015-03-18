@@ -74,7 +74,7 @@ public class PlayerController3 : MonoBehaviour
         colliderDepth = GetComponent<Collider>().bounds.max.z - GetComponent<Collider>().bounds.min.z;
 
 		//Register Flip method to the shift event
-		InputManager.instance.perspectiveShiftEvent += Flip;
+		GameStateManager.instance.PerspectiveShiftEvent += Flip;
 
 		anim = GetComponentInChildren<Animator>();
 		model = anim.gameObject;

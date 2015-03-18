@@ -19,6 +19,7 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
     public string currentState { get; private set; }
     public string previousState { get; private set; }
     public string targetState { get; private set; }
+    public PerspectiveType currentPerspective { get; private set; }
     private const string STATE_GAMEPLAY_2D = "2D";
     private const string STATE_GAMEPLAY_3D = "3D";
     private const string STATE_MENU = "menu";
@@ -40,7 +41,7 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
 
     // Events to notify listeners of state changes
     public event System.Action<bool> GamePausedEvent;
-    public event System.Action PerspectiveShiftEvent;
+    public event System.Action<PerspectiveType> PerspectiveShiftEvent;
 
     #endregion Properties & Variables
 
@@ -186,6 +187,9 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
             // Find the target state to switch to
             string newPerspective = (currentState == STATE_GAMEPLAY_2D) ? STATE_GAMEPLAY_3D : STATE_GAMEPLAY_2D;
 
+            // Find the corresponding perspective to store for external reference
+            currentPerspective = (newPerspective == STATE_GAMEPLAY_2D) ? PerspectiveType.p2D : PerspectiveType.p3D;
+
             // Begin transition to that state (since this involves the shift animation we use the transition state)
             EnterTransition(newPerspective);
         }
@@ -239,8 +243,26 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
     private void RaisePerspectiveShiftEvent()
     {
         if (PerspectiveShiftEvent != null)
-            PerspectiveShiftEvent();
+            PerspectiveShiftEvent(currentPerspective);
     }
 
     #endregion Event Raising Functions
+
+    #region Public Interface
+
+    public void StartGame()
+    {
+
+    }
+    #endregion Public Interface
+
+}
+
+/// <summary>
+///     Enumeration to dictate which perspective the current state is in. 
+///     Objects can reference this and it is passed in shioft events so they know which behavior mode to execute.
+/// </summary>
+public enum PerspectiveType
+{
+    p3D, p2D
 }

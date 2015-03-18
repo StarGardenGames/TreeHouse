@@ -33,9 +33,4 @@ public class ShiftTester : Singleton<ShiftTester>
     }
 }
 
-public enum PerspectiveType
-{
-    p2D, p3D
-}
-
 

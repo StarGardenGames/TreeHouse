@@ -48,15 +48,15 @@ public class LevelGeometry : MonoBehaviour
 
     
     // Adjusts the collider to the appropriate shape when the perspective shift event occurs.
-    private void AdjustCollider()
+    private void AdjustCollider(PerspectiveType p)
     {
-        if (GameStateManager.instance.targetState == "2D")
+        if (p == PerspectiveType.p2D)
         {
             // Stretch the collider's Z depth and center z value to match parent platform
             boxCollider.center = new Vector3(0f, 0f, (parentPlatform.transform.position.z - transform.position.z) * zScaleRatioWorld);
             boxCollider.size = new Vector3(colliderSize.x, colliderSize.y, zScaleRatioParent);
         }
-        else if (GameStateManager.instance.targetState == "3D")
+        else if (p == PerspectiveType.p3D)
         {
             // Return collider to initial state
             boxCollider.size = colliderSize;

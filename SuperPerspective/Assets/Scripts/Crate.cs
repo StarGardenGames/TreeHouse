@@ -29,7 +29,7 @@ public class Crate : MonoBehaviour {
 
 		// Register CheckGrab to grab input event
 		InputManager.instance.GrabPressed += CheckGrab;
-		InputManager.instance.perspectiveShiftEvent += Shift;
+		GameStateManager.instance.PerspectiveShiftEvent += Shift;
 	}
 
 	void FixedUpdate() {
