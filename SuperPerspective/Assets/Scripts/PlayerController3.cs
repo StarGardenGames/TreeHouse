@@ -28,7 +28,7 @@ public class PlayerController3 : MonoBehaviour
 
     // Raycasting Variables
     public int verticalRays = 8;
-    float Margin = 0.05f;
+	float Margin = 0.05f;
     
     private Rect box;
     private float colliderHeight;
@@ -116,9 +116,7 @@ public class PlayerController3 : MonoBehaviour
     // Collision detection and velocity calculations are done in the fixed update step
     void FixedUpdate()
     {
-
-        
-
+		
 		if (zlockFlag) {
 			DoZLock();
 			zlockFlag = false;
@@ -191,18 +189,17 @@ public class PlayerController3 : MonoBehaviour
     }
 
 	public void CheckCollisions(){
-
-
 		// Used for raycasting
 		float distance;         // The distance of a ray
-		RaycastHit hitInfo;     // Stored the information if a ray registers a hit
-		
+		RaycastHit hitInfo;
+		Ray ray;
+
 		//reference variables
 		float minX 		= GetComponent<Collider>().bounds.min.x + Margin;
 		float centerX 	= GetComponent<Collider>().bounds.center.x;
 		float maxX 		= GetComponent<Collider>().bounds.max.x - Margin;
 		float minY 		= GetComponent<Collider>().bounds.min.y + Margin;
-		float centerY 	= GetComponent<Collider>().bounds.center.x;
+		float centerY 	= GetComponent<Collider>().bounds.center.y;
 		float maxY 		= GetComponent<Collider>().bounds.max.y - Margin;
 		float minZ 		= GetComponent<Collider>().bounds.min.z + Margin;
 		float centerZ	= GetComponent<Collider>().bounds.center.z;
@@ -235,9 +232,12 @@ public class PlayerController3 : MonoBehaviour
 		};
 		
 		//test all startpoints
-		for(int i = 0; i < startPoints.Length; i++)
-			connected = connected || isConnected(startPoints[i], 1, hitInfo, distance);
-		
+		Vector3 dir = Vector3.up * Mathf.Sign(velocity.y);
+		// must run outside loop once to ensure hitInfo is initialized
+		connected = Physics.Raycast(startPoints[0],dir, out hitInfo, distance);
+		for(int i = 1; i < startPoints.Length && !connected; i++)
+			connected = Physics.Raycast(startPoints[i],dir, out hitInfo, distance);
+
 		// If any rays connected move the player and set grounded to true since we're now on the ground
 		if (connected)
 		{
@@ -285,8 +285,9 @@ public class PlayerController3 : MonoBehaviour
 		startPoints[4] = new Vector3(centerX, centerY, centerZ);
 		
 		//test all startpoints
-		for(int i = 0; i < startPoints.Length; i++)
-			connected = connected || isConnected(startPoints[i], 0, hitInfo, distance);
+		dir = Vector3.right * Mathf.Sign(velocity.x);
+		for(int i = 0; i < startPoints.Length && !connected; i++)
+			connected = Physics.Raycast(startPoints[i], dir, out hitInfo, distance);
 		
 		// If any rays connected move the player and set grounded to true since we're now on the ground
 		if (connected)
@@ -319,8 +320,9 @@ public class PlayerController3 : MonoBehaviour
 		startPoints[4] = new Vector3(centerX, centerY, centerZ);
 		
 		//loop through and check all startpoints
-		for(int i = 0; i < startPoints.Length; i++)
-			connected = connected || isConnected(startPoints[i], 2, hitInfo, distance);
+		dir = Vector3.forward * Mathf.Sign(velocity.z);
+		for(int i = 0; i < startPoints.Length && !connected; i++)
+			connected = Physics.Raycast(startPoints[i], dir, out hitInfo, distance);
 		
 		// If any rays connected move the player and set grounded to true since we're now on the ground
 		if (connected)
@@ -332,21 +334,6 @@ public class PlayerController3 : MonoBehaviour
 		}
 		
 		#endregion Checking Z Axis
-	}
-	
-	public bool isConnected(Vector3 startPoint, int axis, RaycastHit hitInfo, float distance){
-		//determine direction
-		Vector3 dir = Vector3.zero;
-		dir[axis] = Mathf.Sign(velocity[axis]);
-		if(hitInfo == null)
-			dir[axis] = Mathf.Abs(dir[axis]);
-		//compute ray
-		Ray ray = new Ray(startPoint, dir);
-		//return output
-		if(hitInfo == null)
-			return Physics.Raycast(ray);
-		else
-			return Physics.Raycast(ray, out hitInfo, distance);
 	}
 
 	// LateUpdate is used to actually move the position of the player
@@ -396,7 +383,7 @@ public class PlayerController3 : MonoBehaviour
 
 		//check all startpoints
 		for(int i = 0; i < startPoints.Length; i++)
-			connected = connected || isConnected(startPoints[i], 2, null, 0);
+			connected = connected || Physics.Raycast(startPoints[i], Vector3.forward);
 		
 		return connected;
 	}
