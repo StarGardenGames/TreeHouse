@@ -488,6 +488,10 @@ public class PlayerController3 : MonoBehaviour
 		} else {
 			anim.SetBool("Pushing", false);
 		}
+  		//Collision w/ PlayerInteractable
+		foreach(PlayerInteractable c in other.GetComponents<PlayerInteractable>()){
+			c.CollisionWithPlayer();
+		}
 	}
 
 	public void Flip(PerspectiveType persp) {
