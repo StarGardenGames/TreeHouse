@@ -117,10 +117,7 @@ public class PlayerController3 : MonoBehaviour
     void FixedUpdate()
     {
 
-        // Used for raycasting
-        Vector3 startPoint;     // The starting point of a ray  
-        float distance;         // The distance of a ray
-        RaycastHit hitInfo;     // Stored the information if a ray registers a hit
+        
 
 		if (zlockFlag) {
 			DoZLock();
@@ -186,143 +183,111 @@ public class PlayerController3 : MonoBehaviour
 				model.transform.rotation = Quaternion.AngleAxis(Mathf.Rad2Deg * Mathf.Atan2(-velocity.z, velocity.x) + 90, Vector3.up);
 		}
 
+		// ------------------------------------------------------------------------------------------------------
+		// COLLISION CHECKING
+		// ------------------------------------------------------------------------------------------------------
+		CheckCollisions();
+	
+    }
+
+	public void CheckCollisions(){
 
 
-        // ------------------------------------------------------------------------------------------------------
-        // COLLISION CHECKING
-        // ------------------------------------------------------------------------------------------------------
-
-        // First determine if the player is not moving up, if not the check for collisions below
-        #region Checking Below
+		// Used for raycasting
+		float distance;         // The distance of a ray
+		RaycastHit hitInfo;     // Stored the information if a ray registers a hit
+		
+		//reference variables
+		float minX 		= GetComponent<Collider>().bounds.min.x + Margin;
+		float centerX 	= GetComponent<Collider>().bounds.center.x;
+		float maxX 		= GetComponent<Collider>().bounds.max.x - Margin;
+		float minY 		= GetComponent<Collider>().bounds.min.y + Margin;
+		float centerY 	= GetComponent<Collider>().bounds.center.x;
+		float maxY 		= GetComponent<Collider>().bounds.max.y - Margin;
+		float minZ 		= GetComponent<Collider>().bounds.min.z + Margin;
+		float centerZ	= GetComponent<Collider>().bounds.center.z;
+		float maxZ 		= GetComponent<Collider>().bounds.max.z - Margin;
+		
+		// First determine if the player is not moving up, if not the check for collisions below
+		#region Checking Below
 		bool connected = false;
-		Ray ray;
 		Vector3 trajectory;
-
-        // Check for collisions below the player if he/she is not moving up
-        //if (grounded || falling)
-        //{
-            // Check each of the four corners and the center of the collider
-            // TODO: Store coordinates in an array to do this as a loop
-
-            // True if any ray hits a collider
-            //bool connected = false;
-
-            // Set the raycast distance to check as far as the player will fall this frame
-	    distance = (colliderHeight / 2) + Mathf.Abs(velocity.y * Time.deltaTime);
-
-	    // Top Left (Min X, Max Z)
-		startPoint = new Vector3(GetComponent<Collider>().bounds.min.x + Margin, GetComponent<Collider>().bounds.center.y, GetComponent<Collider>().bounds.max.z - Margin);
-		ray = new Ray(startPoint, Vector3.up * Mathf.Sign(velocity.y));
-	    connected = Physics.Raycast(ray, out hitInfo, distance);
-
-	    // Top Right (Max X, Max Z)
-	    if (!connected)
-	    {
-			startPoint = new Vector3(GetComponent<Collider>().bounds.max.x - Margin, GetComponent<Collider>().bounds.center.y, GetComponent<Collider>().bounds.max.z - Margin);
-			ray = new Ray(startPoint, Vector3.up * Mathf.Sign(velocity.y));
-	        connected = Physics.Raycast(ray, out hitInfo, distance);
-	    }
-
-	    // Bottom Left (Min X, Min Z)
-	    if (!connected)
-	    {
-			startPoint = new Vector3(GetComponent<Collider>().bounds.min.x + Margin, GetComponent<Collider>().bounds.center.y, GetComponent<Collider>().bounds.min.z + Margin);
-			ray = new Ray(startPoint, Vector3.up * Mathf.Sign(velocity.y));
-	        connected = Physics.Raycast(ray, out hitInfo, distance);
-	    }
-
-	    // Bottom Right (Max X, Min Z)
-	    if (!connected)
-	    {
-			startPoint = new Vector3(GetComponent<Collider>().bounds.max.x - Margin, GetComponent<Collider>().bounds.center.y, GetComponent<Collider>().bounds.min.z + Margin);
-			ray = new Ray(startPoint, Vector3.up * Mathf.Sign(velocity.y));
-	        connected = Physics.Raycast(ray, out hitInfo, distance);
-	    }
-
-		// Center (Center Y, Center Z)
-		if (!connected)
+		
+		// Check for collisions below the player if he/she is not moving up
+		//if (grounded || falling)
+		//{
+		// Check each of the four corners and the center of the collider
+		// TODO: Store coordinates in an array to do this as a loop
+		
+		// True if any ray hits a collider
+		//bool connected = false;
+		
+		// Set the raycast distance to check as far as the player will fall this frame
+		distance = (colliderHeight / 2) + Mathf.Abs(velocity.y * Time.deltaTime);
+		
+		//array of startpoints
+		Vector3[] startPoints = {
+			new Vector3(minX, centerY, maxZ),
+			new Vector3(maxX, centerY, maxZ),
+			new Vector3(minX, centerY, minZ),
+			new Vector3(maxX, centerY, minZ),
+			new Vector3(centerX, centerY, centerZ)
+		};
+		
+		//test all startpoints
+		for(int i = 0; i < startPoints.Length; i++)
+			connected = connected || isConnected(startPoints[i], 1, hitInfo, distance);
+		
+		// If any rays connected move the player and set grounded to true since we're now on the ground
+		if (connected)
 		{
-			startPoint = new Vector3(GetComponent<Collider>().bounds.center.x, GetComponent<Collider>().bounds.center.y, GetComponent<Collider>().bounds.center.z);
-			ray = new Ray(startPoint, Vector3.up * Mathf.Sign(velocity.y));
-			connected = Physics.Raycast(ray, out hitInfo, distance);
-		}
-
-	    // If any rays connected move the player and set grounded to true since we're now on the ground
-	    if (connected)
-	    {
 			if (velocity.y < 0) {
-                grounded = true;
+				grounded = true;
 				falling = false;
-                canJump = true;
+				canJump = true;
 				// Z-lock
 				if (hitInfo.collider.gameObject.GetComponent<LevelGeometry>())
 					zlock = hitInfo.transform.position.z;
 				else
 					zlock = int.MinValue;
 			}
-
+			
 			trajectory = velocity.y * Vector3.up;
 			transform.Translate(Vector3.up * Mathf.Sign(velocity.y) * (hitInfo.distance - colliderHeight / 2));
-	        velocity = new Vector3(velocity.x, 0f, velocity.z);
+			velocity = new Vector3(velocity.x, 0f, velocity.z);
 			CollideWithObject(hitInfo, trajectory);
-	    }
-
-	    // Otherwise we're not grounded (temporary?)
-	    else
-	        grounded = false;
-        //}
-
-        #endregion Checking Below
-
-        // Third check the player's velocity along the X axis and check for collisions in that direction is non-zero
-        #region Checking X Axis
-
-        // TODO: Write final movement and collision code
-        // NOTE: This is temporary movement code with no collision detection
-
+		}
+		
+		// Otherwise we're not grounded (temporary?)
+		else
+			grounded = false;
+		//}
+		
+		#endregion Checking Below
+		
+		// Third check the player's velocity along the X axis and check for collisions in that direction is non-zero
+		#region Checking X Axis
+		
+		// TODO: Write final movement and collision code
+		// NOTE: This is temporary movement code with no collision detection
+		
 		// True if any ray hits a collider
 		connected = false;
 		
 		// Set the raycast distance to check as far as the player will move this frame
 		distance = (colliderWidth / 2) + Mathf.Abs(velocity.x * Time.deltaTime);
 		
-		// Bottom Front (Min Y, Max Z)
-		startPoint = new Vector3(GetComponent<Collider>().bounds.center.x, GetComponent<Collider>().bounds.min.y + Margin, GetComponent<Collider>().bounds.max.z);
-		ray = new Ray(startPoint, Vector3.right * Mathf.Sign(velocity.x));
-		connected = Physics.Raycast(ray, out hitInfo, distance);
+		//setup startPoints, note /**/ means margin wasn't applied previously
+		startPoints[0] = new Vector3(centerX, minY, maxZ/**/);
+		startPoints[1] = new Vector3(centerX, maxY/**/, maxZ/**/);
+		startPoints[2] = new Vector3(centerX, minY, minZ/**/);
+		startPoints[3] = new Vector3(centerX, maxY, minZ);
+		startPoints[4] = new Vector3(centerX, centerY, centerZ);
 		
-		// Top Front (Max Y, Max Z)
-		if (!connected)
-		{
-			startPoint = new Vector3(GetComponent<Collider>().bounds.center.x, GetComponent<Collider>().bounds.max.y, GetComponent<Collider>().bounds.max.z);
-			ray = new Ray(startPoint, Vector3.right * Mathf.Sign(velocity.x));
-			connected = Physics.Raycast(ray, out hitInfo, distance);
-		}
+		//test all startpoints
+		for(int i = 0; i < startPoints.Length; i++)
+			connected = connected || isConnected(startPoints[i], 0, hitInfo, distance);
 		
-		// Bottom Back (Min Y, Min Z)
-		if (!connected)
-		{
-			startPoint = new Vector3(GetComponent<Collider>().bounds.center.x, GetComponent<Collider>().bounds.min.y + Margin, GetComponent<Collider>().bounds.min.z);
-			ray = new Ray(startPoint, Vector3.right * Mathf.Sign(velocity.x));
-			connected = Physics.Raycast(ray, out hitInfo, distance);
-		}
-		
-		// Top Back (Max Y, Min Z)
-		if (!connected)
-		{
-			startPoint = new Vector3(GetComponent<Collider>().bounds.center.x, GetComponent<Collider>().bounds.max.y - Margin, GetComponent<Collider>().bounds.min.z + Margin);
-			ray = new Ray(startPoint, Vector3.right * Mathf.Sign(velocity.x));
-			connected = Physics.Raycast(ray, out hitInfo, distance);
-		}
-
-		// Center (Center Y, Center Z)
-		if (!connected)
-		{
-			startPoint = new Vector3(GetComponent<Collider>().bounds.center.x, GetComponent<Collider>().bounds.center.y, GetComponent<Collider>().bounds.center.z);
-			ray = new Ray(startPoint, Vector3.right * Mathf.Sign(velocity.x));
-			connected = Physics.Raycast(ray, out hitInfo, distance);
-		}
-
 		// If any rays connected move the player and set grounded to true since we're now on the ground
 		if (connected)
 		{
@@ -331,58 +296,32 @@ public class PlayerController3 : MonoBehaviour
 			velocity = new Vector3(0f, velocity.y, velocity.z);
 			CollideWithObject(hitInfo, trajectory);
 		}
-
-        #endregion Checking X Axis
-
-        // Fourth do the same along the Z axis  
-        #region Checking Z Axis
-
-        // TODO: Write final movement and collision code
-        // NOTE: This is temporary movement code with no collision detection
-
+		
+		#endregion Checking X Axis
+		
+		// Fourth do the same along the Z axis  
+		#region Checking Z Axis
+		
+		// TODO: Write final movement and collision code
+		// NOTE: This is temporary movement code with no collision detection
+		
 		// True if any ray hits a collider
 		connected = false;
 		
 		// Set the raycast distance to check as far as the player will move this frame
 		distance = (colliderDepth / 2 + Mathf.Abs(velocity.z * Time.deltaTime));
 		
-		// Top Left (Min X, Max Y)
-		startPoint = new Vector3(GetComponent<Collider>().bounds.min.x + Margin, GetComponent<Collider>().bounds.max.y - Margin, GetComponent<Collider>().bounds.center.z);
-		ray = new Ray(startPoint, Vector3.forward * Mathf.Sign(velocity.z));
-		connected = Physics.Raycast(ray, out hitInfo, distance);
+		//setup startPoints arary
+		startPoints[0] = new Vector3(minX, maxY, centerZ);
+		startPoints[1] = new Vector3(maxX, maxY, centerZ);
+		startPoints[2] = new Vector3(minX, minY, centerZ);
+		startPoints[3] = new Vector3(maxX, minY, centerZ);
+		startPoints[4] = new Vector3(centerX, centerY, centerZ);
 		
-		// Top Right (Max X, Max Y)
-		if (!connected)
-		{
-			startPoint = new Vector3(GetComponent<Collider>().bounds.max.x - Margin, GetComponent<Collider>().bounds.max.y - Margin, GetComponent<Collider>().bounds.center.z);
-			ray = new Ray(startPoint, Vector3.forward * Mathf.Sign(velocity.z));
-			connected = Physics.Raycast(ray, out hitInfo, distance);
-		}
+		//loop through and check all startpoints
+		for(int i = 0; i < startPoints.Length; i++)
+			connected = connected || isConnected(startPoints[i], 2, hitInfo, distance);
 		
-		// Bottom Left (Min X, Min Y)
-		if (!connected)
-		{
-			startPoint = new Vector3(GetComponent<Collider>().bounds.min.x + Margin, GetComponent<Collider>().bounds.min.y + Margin, GetComponent<Collider>().bounds.center.z);
-			ray = new Ray(startPoint, Vector3.forward * Mathf.Sign(velocity.z));
-			connected = Physics.Raycast(ray, out hitInfo, distance);
-		}
-		
-		// Bottom Right (Max X, Min Y)
-		if (!connected)
-		{
-			startPoint = new Vector3(GetComponent<Collider>().bounds.max.x - Margin, GetComponent<Collider>().bounds.min.y + Margin, GetComponent<Collider>().bounds.center.z);
-			ray = new Ray(startPoint, Vector3.forward * Mathf.Sign(velocity.z));
-			connected = Physics.Raycast(ray, out hitInfo, distance);
-		}
-
-		// Center (Center X, Center Y)
-		if (!connected)
-		{
-			startPoint = new Vector3(GetComponent<Collider>().bounds.center.x, GetComponent<Collider>().bounds.center.y, GetComponent<Collider>().bounds.center.z);
-			ray = new Ray(startPoint, Vector3.forward * Mathf.Sign(velocity.z));
-			connected = Physics.Raycast(ray, out hitInfo, distance);
-		}
-
 		// If any rays connected move the player and set grounded to true since we're now on the ground
 		if (connected)
 		{
@@ -391,10 +330,24 @@ public class PlayerController3 : MonoBehaviour
 			velocity = new Vector3(velocity.x, velocity.y, 0f);
 			CollideWithObject(hitInfo, trajectory);
 		}
-       	
-        #endregion Checking Z Axis
-
-    }
+		
+		#endregion Checking Z Axis
+	}
+	
+	public bool isConnected(Vector3 startPoint, int axis, RaycastHit hitInfo, float distance){
+		//determine direction
+		Vector3 dir = Vector3.zero;
+		dir[axis] = Mathf.Sign(velocity[axis]);
+		if(hitInfo == null)
+			dir[axis] = Mathf.Abs(dir[axis]);
+		//compute ray
+		Ray ray = new Ray(startPoint, dir);
+		//return output
+		if(hitInfo == null)
+			return Physics.Raycast(ray);
+		else
+			return Physics.Raycast(ray, out hitInfo, distance);
+	}
 
 	// LateUpdate is used to actually move the position of the player
 	void LateUpdate () {
@@ -422,43 +375,28 @@ public class PlayerController3 : MonoBehaviour
 
 		GameObject grnd = GameObject.Find("Ground");
 		float gz = grnd.transform.lossyScale.z;
-		
-		// Top Left (Min X, Max Y)
-		Vector3 startPoint = new Vector3(GetComponent<Collider>().bounds.min.x + Margin, GetComponent<Collider>().bounds.max.y - Margin, GetComponent<Collider>().bounds.center.z - gz/2);
-		Ray ray = new Ray(startPoint, Vector3.forward);
-		connected = Physics.Raycast(ray);
-		
-		// Top Right (Max X, Max Y)
-		if (!connected)
-		{
-			startPoint = new Vector3(GetComponent<Collider>().bounds.max.x - Margin, GetComponent<Collider>().bounds.max.y - Margin, GetComponent<Collider>().bounds.center.z - gz/2);
-			ray = new Ray(startPoint, Vector3.forward);
-			connected = Physics.Raycast(ray);
-		}
-		
-		// Bottom Left (Min X, Min Y)
-		if (!connected)
-		{
-			startPoint = new Vector3(GetComponent<Collider>().bounds.min.x + Margin, GetComponent<Collider>().bounds.min.y + Margin, GetComponent<Collider>().bounds.center.z - gz/2);
-			ray = new Ray(startPoint, Vector3.forward);
-			connected = Physics.Raycast(ray);
-		}
-		
-		// Bottom Right (Max X, Min Y)
-		if (!connected)
-		{
-			startPoint = new Vector3(GetComponent<Collider>().bounds.max.x - Margin, GetComponent<Collider>().bounds.min.y + Margin, GetComponent<Collider>().bounds.center.z - gz/2);
-			ray = new Ray(startPoint, Vector3.forward);
-			connected = Physics.Raycast(ray);
-		}
-		
-		// Center (Center X, Center Y)
-		if (!connected)
-		{
-			startPoint = new Vector3(GetComponent<Collider>().bounds.center.x, GetComponent<Collider>().bounds.center.y, GetComponent<Collider>().bounds.center.z - gz/2);
-			ray = new Ray(startPoint, Vector3.forward);
-			connected = Physics.Raycast(ray);
-		}
+
+		//reference variables
+		float minX 		= GetComponent<Collider>().bounds.min.x + Margin;
+		float centerX 	= GetComponent<Collider>().bounds.center.x;
+		float maxX 		= GetComponent<Collider>().bounds.max.x - Margin;
+		float minY 		= GetComponent<Collider>().bounds.min.y + Margin;
+		float centerY 	= GetComponent<Collider>().bounds.center.x;
+		float maxY 		= GetComponent<Collider>().bounds.max.y - Margin;
+		float centerZ	= GetComponent<Collider>().bounds.center.z - gz/2;
+
+		//array of startpoints
+		Vector3[] startPoints = {
+			new Vector3(minX, maxY, centerZ),
+			new Vector3(maxX, maxY, centerZ),
+			new Vector3(minX, minY, centerZ),
+			new Vector3(maxX, minY, centerZ),
+			new Vector3(centerX, centerY, centerZ)
+		};
+
+		//check all startpoints
+		for(int i = 0; i < startPoints.Length; i++)
+			connected = connected || isConnected(startPoints[i], 2, null, 0);
 		
 		return connected;
 	}
@@ -512,5 +450,4 @@ public class PlayerController3 : MonoBehaviour
 			grabAxis = Vector3.forward;
 		}
 	}
-
 }
