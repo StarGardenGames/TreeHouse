@@ -18,7 +18,7 @@ public class SaveManager : MonoBehaviour {
 	void Start(){
 		string pr = PlayerPrefs.GetString(currentSave + "_pointsReached");
 		if(pr == "" || pr.Length!=CheckpointManager.instance.getNumCheckpoints())
-			for(int i = 0; i < 3; i++ )
+			for(int i = 0; i < 3; i++)
 				resetSave(i);
 	}
 

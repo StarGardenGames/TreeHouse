@@ -67,7 +67,6 @@ public class EdgeManager : MonoBehaviour {
 		Vector3 halfScale = terrain[i].transform.localScale * .5f;
 		Vector3 p0 = terrain[i].transform.position - halfScale;
 		Vector3 p1 = terrain[i].transform.position + halfScale;
-		//Debug.Log("(overlap) : ["+p0.x+","+p0.y+","+p0.z+"] __ ["+p1.x+","+p1.y+","+p1.z+"]");
 		//result
 		Vector3[] region = new Vector3[2];
 		bool overlap = true;

@@ -7,11 +7,77 @@ public class Edge : MonoBehaviour {
 	
 	int overlapIndex; //how many of the overlaps that we've checked
 
+	Vector3[] cuboid;
 
-	public void Init(int or, float width, float depth){
-		Init(or, width, depth, 0);
+	int status = 0; //0: no overlap, 1: lined up, 2: latched, 3: rested latch
 
+	public void FixedUpdate(){
+		//if locked on
+		if(status >= 2){
+			//check if rested latch can be entered
+			if(status == 2 && !GrabButtonDown())
+				status = 3;
+			//if player is trying to let go
+			if(ReleaseButtonDown())
+				PlayerController3.instance.ReleaseEdge();
+			//if player is trying to get up
+			if(status == 3 && GrabButtonDown()){
+				Vector3 playerPos = PlayerController3.instance.gameObject.transform.position;
+				Vector3 playerScale = PlayerController3.instance.gameObject.transform.localScale;
+				playerPos.y += playerScale.y;
+				switch(or){
+				case 0: playerPos.x -= playerScale.x; break;
+				case 1: playerPos.z -= playerScale.z; break;
+				case 2: playerPos.x += playerScale.x; break;
+				case 3: playerPos.z += playerScale.z; break;
+				}
+				PlayerController3.instance.gameObject.transform.position = playerPos;
+				PlayerController3.instance.ReleaseEdge();
+			}
+		//if player is overlapping
+		}else if(isOverlaping(cuboid, PlayerController3.instance.getCuboid()) && GrabButtonDown()){
+			Vector3 playerPos = PlayerController3.instance.gameObject.transform.position;
+			if((or%2==0 && playerPos.x == transform.position.x) || (or%2==1 && playerPos.z == transform.position.z)){
+				if(PlayerController3.instance.getCuboid()[1].y > cuboid[1].y){
+					status = 1;
+				}else if(status == 1){
+					status = 2;
+					PlayerController3.instance.LockToEdge(this);
+				}
+			}
+		//if nothing is overlapping
+		}else
+			status = 0;
 	}
+
+	public bool GrabButtonDown(){
+		switch(or){
+		case 0: return (InputManager.instance.GetForwardMovement() < 0); break;
+		case 1: return (InputManager.instance.GetSideMovement() > 0); break;
+		case 2: return (InputManager.instance.GetForwardMovement() > 0); break;
+		case 3: return (InputManager.instance.GetSideMovement() < 0); break;
+		default: return false;
+		}
+	}
+
+	public bool ReleaseButtonDown(){
+		switch(or){
+		case 0: return (InputManager.instance.GetForwardMovement() > 0); break;
+		case 1: return (InputManager.instance.GetSideMovement() < 0); break;
+		case 2: return (InputManager.instance.GetForwardMovement() < 0); break;
+		case 3: return (InputManager.instance.GetSideMovement() > 0); break;
+		default: return false;
+		}
+	}
+
+	public bool isOverlaping(Vector3[] c1, Vector3[] c2){
+		bool ans = true;
+		for(int i = 0; i < 3; i++){
+			ans = ans && c1[0][i] <= c2[1][i] && c2[0][i] <= c1[1][i];
+		}
+		return ans;
+	}
+
 	//inits edge
 	//args0: orientation of game object (0-3: right,back,left,front)
 	//args1: width of terrain
@@ -35,6 +101,16 @@ public class Edge : MonoBehaviour {
 
 		//overlaps
 		checkOverlaps();
+
+		//init cubiod
+		Vector3 halfScale = gameObject.transform.localScale;
+		cuboid = new Vector3[2];
+		cuboid[0] = gameObject.transform.position - halfScale;
+		cuboid[1] = gameObject.transform.position + halfScale;
+	}
+
+	public void Init(int or, float width, float depth){
+		Init(or, width, depth, 0);
 	}
 
 	public void checkOverlaps(){
@@ -65,30 +141,18 @@ public class Edge : MonoBehaviour {
 			cubTop[1] = cubBot[1] + new Vector3(0,edgeSize,edgeSize);
 			break;
 		}
-		/*if(or == 2){
-		Debug.Log("["+cubBot[0].x+","+cubBot[0].y+","+cubBot[0].z+"] __ ["+cubBot[1].x+","+cubBot[1].y+","+cubBot[1].z+"]");
-		Debug.Log("["+cubTop[0].x+","+cubTop[0].y+","+cubTop[0].z+"] __ ["+cubTop[1].x+","+cubTop[1].y+","+cubTop[1].z+"]");
-		}
-		string name = "";
-		switch(or){
-		case 0: name = "right"; break;
-		case 1: name = "back"; break;
-		case 2: name = "left"; break;
-		case 3: name = "front"; break;
-		}*/
+
 		//find overlaps
 		for(int i = overlapIndex; i < t.Length; i++){
 			Vector3[] overBot = EdgeManager.instance.GetOverlap(i,cubBot);
 			Vector3[] overTop = EdgeManager.instance.GetOverlap(i,cubTop);
 			if(overBot == null && overTop == null){
-				//Debug.Log("--["+name+"] No Overlaps with "+i);
 				continue;
 			}
 			//find range of overlap
 			float min = 0;
 			float max = 0;
 			if(overBot != null){
-				//Debug.Log("--["+name+"]Overlap Bot with "+i);
 				if(or%2==0){
 					min = overBot[0][2];
 					max = overBot[1][2];
@@ -98,9 +162,6 @@ public class Edge : MonoBehaviour {
 				}
 			}
 			if(overTop != null){
-				//Debug.Log("--["+name+"]Overlap Top with "+i);
-				//Debug.Log("["+overBot[0].x+","+overBot[0].y+","+cubBot[0].z+"] __ ["+cubBot[1].x+","+cubBot[1].y+","+cubBot[1].z+"]");
-				//Debug.Log("["+overTop[0].x+","+overTop[0].y+","+overTop[0].z+"] __ ["+overTop[1].x+","+overTop[1].y+","+overTop[1].z+"]");
 				if(or%2==0){
 					min = ((overBot == null)? overTop[0][2] : Mathf.Min(overTop[0][2],overBot[0][2]));
 					max = ((overBot == null)? overTop[1][2] : Mathf.Max(overTop[1][2],overBot[1][2]));
@@ -182,5 +243,13 @@ public class Edge : MonoBehaviour {
 			}else
 				Destroy(this);
 		}
+	}
+
+	public void resetStatus(){
+		status = 0;
+	}
+
+	public int getOrientation(){
+		return or;
 	}
 }
