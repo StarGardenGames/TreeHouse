@@ -11,6 +11,10 @@ public class Edge : MonoBehaviour {
 
 	int status = 0; //0: no overlap, 1: lined up, 2: latched, 3: rested latch
 
+	bool validIn2D;
+
+	PlayerController3 player;
+
 	public void FixedUpdate(){
 		//if locked on
 		if(status >= 2){
@@ -19,11 +23,11 @@ public class Edge : MonoBehaviour {
 				status = 3;
 			//if player is trying to let go
 			if(ReleaseButtonDown())
-				PlayerController3.instance.ReleaseEdge();
+				player.ReleaseEdge();
 			//if player is trying to get up
 			if(status == 3 && GrabButtonDown()){
-				Vector3 playerPos = PlayerController3.instance.gameObject.transform.position;
-				Vector3 playerScale = PlayerController3.instance.gameObject.transform.localScale;
+				Vector3 playerPos = player.gameObject.transform.position;
+				Vector3 playerScale = player.gameObject.transform.localScale;
 				playerPos.y += playerScale.y;
 				switch(or){
 				case 0: playerPos.x -= playerScale.x; break;
@@ -31,23 +35,27 @@ public class Edge : MonoBehaviour {
 				case 2: playerPos.x += playerScale.x; break;
 				case 3: playerPos.z += playerScale.z; break;
 				}
-				PlayerController3.instance.gameObject.transform.position = playerPos;
-				PlayerController3.instance.ReleaseEdge();
+				player.gameObject.transform.position = playerPos;
+				player.ReleaseEdge();
 			}
 		//if player is overlapping
-		}else if(isOverlaping(cuboid, PlayerController3.instance.getCuboid()) && GrabButtonDown()){
-			Vector3 playerPos = PlayerController3.instance.gameObject.transform.position;
+		}else if(isOverlaping(cuboid, player.getCuboid()) && (player.is3D() || validIn2D) && GrabButtonDown()){
+			Vector3 playerPos = player.gameObject.transform.position;
 			if((or%2==0 && playerPos.x == transform.position.x) || (or%2==1 && playerPos.z == transform.position.z)){
-				if(PlayerController3.instance.getCuboid()[1].y > cuboid[1].y){
+				if(player.getCuboid()[1].y > cuboid[1].y){
 					status = 1;
 				}else if(status == 1){
 					status = 2;
-					PlayerController3.instance.LockToEdge(this);
+					player.LockToEdge(this);
 				}
 			}
 		//if nothing is overlapping
 		}else
 			status = 0;
+
+		//check for making the player let go
+		if(status != 0 && !player.is3D() && !validIn2D)
+			player.ReleaseEdge();
 	}
 
 	public bool GrabButtonDown(){
@@ -73,6 +81,8 @@ public class Edge : MonoBehaviour {
 	public bool isOverlaping(Vector3[] c1, Vector3[] c2){
 		bool ans = true;
 		for(int i = 0; i < 3; i++){
+			if(i == 2 && !player.is3D())
+				continue;
 			ans = ans && c1[0][i] <= c2[1][i] && c2[0][i] <= c1[1][i];
 		}
 		return ans;
@@ -85,6 +95,8 @@ public class Edge : MonoBehaviour {
 	//args3: bool[] showing overlapping terrains
 	//args4: how many of the terrains have been checked
 	public void Init(int or, float width, float depth, int overlapIndex){
+		//init player reference
+		player = PlayerController3.instance;
 		//scale
 		Vector3 scale = gameObject.transform.localScale;
 		if(or%2 == 0)//if left or right
@@ -242,6 +254,17 @@ public class Edge : MonoBehaviour {
 				gameObject.transform.localScale = scale;
 			}else
 				Destroy(this);
+		}
+
+		//determine valid in 2D
+		if(or%2 == 1)
+			validIn2D = false;
+		else{
+			for(int i = overlapIndex; i < t.Length; i++){
+				bool overBot = EdgeManager.instance.CheckOverlap2D(i,cubBot);
+				bool overTop = EdgeManager.instance.CheckOverlap2D(i,cubTop);
+				validIn2D = !overBot && !overTop;
+			}
 		}
 	}
 

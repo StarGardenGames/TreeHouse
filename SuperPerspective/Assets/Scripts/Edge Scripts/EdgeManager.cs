@@ -3,8 +3,6 @@ using System.Collections;
 
 public class EdgeManager : MonoBehaviour {
 
-	int index = 0;
-
 	public static EdgeManager instance;
 
 	public GameObject edgePrefab;
@@ -82,6 +80,21 @@ public class EdgeManager : MonoBehaviour {
 			return null;
 		else
 			return region;
-		index++;
+	}
+
+	public bool CheckOverlap2D(int i, Vector3[] c){
+		//compute corners
+		Vector3 halfScale = terrain[i].transform.localScale * .5f;
+		Vector3 p0 = terrain[i].transform.position - halfScale;
+		Vector3 p1 = terrain[i].transform.position + halfScale;
+		//result
+		bool overlap = true;
+		//check overlaps in all 3 dimenions
+		for(int k = 0; k < 3; k++){
+			overlap = overlap && 
+				p0[k] < c[1][k] &&
+					p1[k] > c[0][k];
+		}
+		return overlap;
 	}
 }

@@ -527,4 +527,8 @@ public class PlayerController3 : MonoBehaviour
 			grabbedEdge.resetStatus();
 		grabbedEdge = null;
 	}
+
+	public bool is3D(){
+		return persp == PerspectiveType.p3D;
+	}
 }
