@@ -121,7 +121,6 @@ public class CameraController2 : PersistentSingleton<CameraController2>
     #endregion Helper Functions
 }
 
-// TODO: Consider moving the CameraMatrixTypes helper class to the GameplayStateManager.cs file for organization purposes.
 /// <summary>
 ///     Helper class to get frequently used view settings matrices
 ///     Referenced from gameplay state manager
