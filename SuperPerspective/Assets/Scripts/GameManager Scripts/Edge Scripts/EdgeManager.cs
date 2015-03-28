@@ -7,8 +7,10 @@ public class EdgeManager : MonoBehaviour {
 
 	public GameObject edgePrefab;
 
-	public GameObject[] terrain;
+	private GameObject[] terrain;
 
+	int index = 0;
+	
 	void Start () {
 		//sigleton
 		if(instance == null)
@@ -53,6 +55,13 @@ public class EdgeManager : MonoBehaviour {
 			backEdge.GetComponent<Edge>().Init( 1, w - xx, d - zz);
 			leftEdge.GetComponent<Edge>().Init( 2, w - xx, d - zz);
 			frontEdge.GetComponent<Edge>().Init( 3, w - xx, d - zz);
+			
+			rightEdge.GetComponent<Edge>().edgeIndex = "orig_"+index;
+			backEdge.GetComponent<Edge>().edgeIndex = "orig_"+(index + 1);
+			leftEdge.GetComponent<Edge>().edgeIndex = "orig_" + (index + 2);
+			frontEdge.GetComponent<Edge>().edgeIndex = "orig_"+(index + 3);
+			
+			index += 4;
 		}
 	}
 
@@ -82,6 +91,11 @@ public class EdgeManager : MonoBehaviour {
 			return region;
 	}
 
+	public int getGlobalIndex(){
+		index ++;
+		return index-1;
+	}
+	
 	public bool CheckOverlap2D(int i, Vector3[] c){
 		//compute corners
 		Vector3 halfScale = terrain[i].transform.localScale * .5f;
@@ -89,12 +103,16 @@ public class EdgeManager : MonoBehaviour {
 		Vector3 p1 = terrain[i].transform.position + halfScale;
 		//result
 		bool overlap = true;
-		//check overlaps in all 3 dimenions
-		for(int k = 0; k < 3; k++){
+		//check overlaps in 2 dimensions dimenions
+		for(int k = 0; k < 2; k++){
 			overlap = overlap && 
 				p0[k] < c[1][k] &&
 					p1[k] > c[0][k];
 		}
 		return overlap;
+	}
+	
+	public GameObject[] getTerrain(){
+		return terrain;
 	}
 }

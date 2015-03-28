@@ -60,14 +60,16 @@ public class PlayerController3 : MonoBehaviour
 
     #region MonoBehavior Implementation
 
-    // Initialization
-	void Start () {
-		//sigleton
+	//setup singleton
+	void Awake(){
 		if(instance == null)
 			instance = this;
 		else if(instance!= this)
 			Destroy(this);
-
+	}
+	
+    // Initialization
+	void Start () {
         // Set player as falling (they should immediately register a hit)
         grounded = false;
         falling = true;

@@ -7,6 +7,8 @@ public class SaveManager : MonoBehaviour {
 
 	public static int currentSave = 0;
 	public static int recentPoint = 0;
+	
+	int numSaveSlots = 3;
 
 	void Awake(){
 		if(instance == null)
@@ -75,5 +77,9 @@ public class SaveManager : MonoBehaviour {
 		PlayerPrefs.SetString(i + "_pointsReached",pointsReached);
 		PlayerPrefs.SetInt(i + "_recentPoint",-1);
 		PlayerPrefs.SetString(i+"_name","");
+	}
+	
+	public int getNumSaveSlots(){
+		return numSaveSlots;
 	}
 }

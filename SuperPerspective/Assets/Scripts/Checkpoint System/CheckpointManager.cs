@@ -8,7 +8,6 @@ public class CheckpointManager : MonoBehaviour {
 
 	public Canvas menu;
 	public GameObject marker;
-	public Camera playerCam;
 	Image map;
 
 	public static CheckpointManager instance;
