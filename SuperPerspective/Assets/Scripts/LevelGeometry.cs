@@ -16,6 +16,7 @@ public class LevelGeometry : MonoBehaviour
     private Vector3 colliderSize;       // Stores the collider's beginning size, usually (1, 1, 1)
     private float zScaleRatioParent;    // Ratio of this object's z scale to the parent platform's
     private float zScaleRatioWorld;     // Ratio of this object's z scale to the world
+	private Vector3 startCenter;
 
     #endregion Properties & Variables
 
@@ -27,18 +28,25 @@ public class LevelGeometry : MonoBehaviour
         // Get the BoxCollider component
         boxCollider = GetComponent<BoxCollider>();
 
-        // Store the ratio of our scale to the parent's
-        zScaleRatioParent = parentPlatform.transform.lossyScale.z / transform.lossyScale.z;
-        zScaleRatioWorld = (1 / transform.lossyScale.z);
+		if (parentPlatform == null) {
+			parentPlatform = GameObject.Find("Ground");
+		}
 
-        // Store the normal collider bounds and center
-        colliderSize = new Vector3(1f, 1f, 1f);
+        // Store the ratio of our scale to the parent's
+		zScaleRatioParent = parentPlatform.transform.lossyScale.z / transform.lossyScale.z;
+		zScaleRatioWorld = (1 / transform.lossyScale.z);
+
+		// Get the collider's actual center and size
+		startCenter = boxCollider.center;
+		colliderSize = boxCollider.size;
     }
 	
 	void Start () 
     {
         // Register to perspective shift event
         GameStateManager.instance.PerspectiveShiftEvent += AdjustCollider;
+
+		AdjustCollider(PerspectiveType.p2D);
 	}
 
     #endregion Monobehavior Implementation
@@ -53,14 +61,14 @@ public class LevelGeometry : MonoBehaviour
         if (p == PerspectiveType.p2D)
         {
             // Stretch the collider's Z depth and center z value to match parent platform
-            boxCollider.center = new Vector3(0f, 0f, (parentPlatform.transform.position.z - transform.position.z) * zScaleRatioWorld);
-            boxCollider.size = new Vector3(colliderSize.x, colliderSize.y, zScaleRatioParent);
+			boxCollider.center = startCenter + new Vector3(0f, 0f, (parentPlatform.transform.position.z - transform.position.z - startCenter.z) * zScaleRatioWorld);
+	        boxCollider.size = new Vector3(colliderSize.x, colliderSize.y, zScaleRatioParent);
         }
         else if (p == PerspectiveType.p3D)
         {
             // Return collider to initial state
             boxCollider.size = colliderSize;
-            boxCollider.center = Vector2.zero;
+            boxCollider.center = startCenter;
         }
     }
 

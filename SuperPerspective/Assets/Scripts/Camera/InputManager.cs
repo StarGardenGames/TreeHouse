@@ -19,7 +19,6 @@ public class InputManager : Singleton<InputManager>
     // Perspective change event
     // TODO: emove this functionality since it's now in the camera script
     public event System.Action ShiftPressedEvent;
-    private PerspectiveType currentPerspective;
     
     // Game pause event
     public event System.Action PausePressedEvent;
@@ -41,11 +40,6 @@ public class InputManager : Singleton<InputManager>
 
 
     #region Monobehavior Implementation
-
-    // Use this for initialization
-	void Start () {
-	    currentPerspective = PerspectiveType.p3D;
-	}
 	
 	// listens to player input and raises events for listeners.
 	void Update () {
@@ -94,7 +88,7 @@ public class InputManager : Singleton<InputManager>
     // Returns the player's movement on the horizontal axis in 2D and the vertical axis in 3D 
     public float GetForwardMovement()
     {
-        if (currentPerspective == PerspectiveType.p3D)
+        if (GameStateManager.instance.currentPerspective == PerspectiveType.p3D)
         {
             return Input.GetAxis("Vertical");
         }
@@ -107,7 +101,7 @@ public class InputManager : Singleton<InputManager>
     // Returns the player's movement on the horizontal axis in 3D and zero in 2D
     public float GetSideMovement()
     {
-        if (currentPerspective == PerspectiveType.p3D)
+		if (GameStateManager.instance.currentPerspective == PerspectiveType.p3D)
             return Input.GetAxis("Horizontal");
         else
             return 0f;
@@ -143,7 +137,6 @@ public class InputManager : Singleton<InputManager>
     // Called when the player shifts perspective
     private void RaiseShiftPressedEvent()
     {
-        Debug.Log("InputManager - Shift Pressed");
         // Alert listeners of the new perspective
         if (ShiftPressedEvent != null)
         {

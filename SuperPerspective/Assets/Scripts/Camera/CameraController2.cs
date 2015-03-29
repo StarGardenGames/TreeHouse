@@ -29,6 +29,7 @@ public class CameraController2 : PersistentSingleton<CameraController2>
     float shiftThreshold = .5f;     // Use to determine if the camera is close enough to the mount's position and rotation to consider the shift complete
 
     // Event to alert Gameplay State Manager of completed shift
+	public event System.Action ShiftStartEvent;
     public event System.Action ShiftCompleteEvent;
     private bool shiftComplete = false;
 
@@ -79,12 +80,19 @@ public class CameraController2 : PersistentSingleton<CameraController2>
 
     #region Event Raising
 
-    // Alert listeners (Gameplay state manager) that the perspective shift is complete
-    private void RaiseShiftCompleteEvent()
+    // Alert listeners that the perspective shift has started
+    private void RaiseShiftStartEvent()
     {
-        if (ShiftCompleteEvent != null)
-            ShiftCompleteEvent();
+        if (ShiftStartEvent != null)
+            ShiftStartEvent();
     }
+
+	// Alert listeners (Gameplay state manager) that the perspective shift is complete
+	private void RaiseShiftCompleteEvent()
+	{
+		if (ShiftCompleteEvent != null)
+			ShiftCompleteEvent();
+	}
 
     #endregion Event Raising
 
@@ -98,6 +106,7 @@ public class CameraController2 : PersistentSingleton<CameraController2>
         shiftComplete = false;
         if (blender != null)
             blender.BlendToMatrix(targetMatrix, cameraBlendSpeed);
+		RaiseShiftStartEvent();
     }
 
     #endregion Public Interface

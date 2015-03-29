@@ -63,6 +63,7 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
         // TODO: Change the game's starting state to dynamic behavior at some point
         // Start the game in 2D state
         currentState = STATE_GAMEPLAY_2D;
+		currentPerspective = PerspectiveType.p2D;
         CameraController2.instance.SetMount(MOUNT_GAMEPLAY_2D, VIEW_SETTINGS_GAMEPLAY_2D);
 
         // Register event handlers to InputManagers

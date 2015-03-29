@@ -8,11 +8,14 @@ public class Crate : MonoBehaviour {
 	private const float decelleration = 15;
 
 	private Vector3 velocity;
+	private Vector3 trajectory;
 	private bool grounded;
 	private float colliderHeight, colliderWidth, colliderDepth;
 	private float Margin = 0.05f;
 
 	private PlayerController3 player;
+
+	private CollisionChecker colCheck;
 
 	private bool grabbed;
 
@@ -28,199 +31,33 @@ public class Crate : MonoBehaviour {
 		player = GameObject.Find("NewPlayer").GetComponent<PlayerController3>();
 
 		// Register CheckGrab to grab input event
-		InputManager.instance.GrabPressed += CheckGrab;
+		InputManager.instance.InteractPressed += CheckGrab;
 		GameStateManager.instance.PerspectiveShiftEvent += Shift;
+		colCheck = new CollisionChecker (GetComponent<Collider> ());
 	}
 
 	void FixedUpdate() {
-		Vector3 startPoint;     // The starting point of a ray  
-		float distance;         // The distance of a ray
-		RaycastHit hitInfo;     // Stored the information if a ray registers a hit
-
 		if (!grounded)
 			velocity = new Vector3(velocity.x, Mathf.Max(velocity.y - gravity, -terminalVelocity), velocity.z);
 
-		float newVelocityX = velocity.x;
-		if (velocity.x != 0) {
+		float newVelocityX = velocity.x, newVelocityZ = velocity.z;
+		if (velocity.x != 0)
+		{
 			int modifier = velocity.x > 0 ? -1 : 1;
-			newVelocityX += Mathf.Min (decelleration, Mathf.Abs (velocity.x)) * modifier;
+			newVelocityX += Mathf.Min(decelleration, Mathf.Abs(velocity.x)) * modifier;
 		}
-		velocity.x = newVelocityX;
-		
-		float newVelocityZ = velocity.z;
-		if (velocity.z != 0) {
+
+		if (velocity.z != 0)
+		{
 			int modifier = velocity.z > 0 ? -1 : 1;
-			newVelocityZ += Mathf.Min (decelleration, Mathf.Abs (velocity.z)) * modifier;
-		}
-		velocity.z = newVelocityZ;
-
-		bool connected = false;
-		Ray ray;
-		
-		// Set the raycast distance to check as far as the player will fall this frame
-		distance = (colliderHeight / 2) + Mathf.Abs(velocity.y * Time.deltaTime);
-		
-		// Top Left (Min X, Max Z)
-		startPoint = new Vector3(GetComponent<Collider>().bounds.min.x + Margin, GetComponent<Collider>().bounds.center.y, GetComponent<Collider>().bounds.max.z - Margin);
-		ray = new Ray(startPoint, Vector3.up * Mathf.Sign(velocity.y));
-		connected = Physics.Raycast(ray, out hitInfo, distance);
-		
-		// Top Right (Max X, Max Z)
-		if (!connected)
-		{
-			startPoint = new Vector3(GetComponent<Collider>().bounds.max.x - Margin, GetComponent<Collider>().bounds.center.y, GetComponent<Collider>().bounds.max.z - Margin);
-			ray = new Ray(startPoint, Vector3.up * Mathf.Sign(velocity.y));
-			connected = Physics.Raycast(ray, out hitInfo, distance);
-		}
-		
-		// Bottom Left (Min X, Min Z)
-		if (!connected)
-		{
-			startPoint = new Vector3(GetComponent<Collider>().bounds.min.x + Margin, GetComponent<Collider>().bounds.center.y, GetComponent<Collider>().bounds.min.z + Margin);
-			ray = new Ray(startPoint, Vector3.up * Mathf.Sign(velocity.y));
-			connected = Physics.Raycast(ray, out hitInfo, distance);
-		}
-		
-		// Bottom Right (Max X, Min Z)
-		if (!connected)
-		{
-			startPoint = new Vector3(GetComponent<Collider>().bounds.max.x - Margin, GetComponent<Collider>().bounds.center.y, GetComponent<Collider>().bounds.min.z + Margin);
-			ray = new Ray(startPoint, Vector3.up * Mathf.Sign(velocity.y));
-			connected = Physics.Raycast(ray, out hitInfo, distance);
-		}
-		
-		// Center (Center Y, Center Z)
-		if (!connected)
-		{
-			startPoint = new Vector3(GetComponent<Collider>().bounds.center.x, GetComponent<Collider>().bounds.center.y, GetComponent<Collider>().bounds.center.z);
-			ray = new Ray(startPoint, Vector3.up * Mathf.Sign(velocity.y));
-			connected = Physics.Raycast(ray, out hitInfo, distance);
-		}
-		
-		// If any rays connected move the crate and set grounded to true since we're now on the ground
-		if (connected)
-		{
-			if (velocity.y < 0)
-				grounded = true;
-			transform.Translate(Vector3.up * Mathf.Sign(velocity.y) * (hitInfo.distance - colliderHeight / 2));
-			velocity = new Vector3(velocity.x, 0f, velocity.z);
-		}
-		
-		// Otherwise we're not grounded (temporary?)
-		else
-			grounded = false;
-
-		#region Checking X Axis
-		// True if any ray hits a collider
-		connected = false;
-		
-		// Set the raycast distance to check as far as the player will move this frame
-		distance = (colliderWidth / 2) + Mathf.Abs(velocity.x * Time.deltaTime);
-		
-		// Bottom Front (Min Y, Max Z)
-		startPoint = new Vector3(GetComponent<Collider>().bounds.center.x, GetComponent<Collider>().bounds.min.y + Margin, GetComponent<Collider>().bounds.max.z - Margin);
-		ray = new Ray(startPoint, Vector3.right * Mathf.Sign(velocity.x));
-		connected = Physics.Raycast(ray, out hitInfo, distance);
-		
-		// Top Front (Max Y, Max Z)
-		if (!connected)
-		{
-			startPoint = new Vector3(GetComponent<Collider>().bounds.center.x, GetComponent<Collider>().bounds.max.y - Margin, GetComponent<Collider>().bounds.max.z - Margin);
-			ray = new Ray(startPoint, Vector3.right * Mathf.Sign(velocity.x));
-			connected = Physics.Raycast(ray, out hitInfo, distance);
-		}
-		
-		// Bottom Back (Min Y, Min Z)
-		if (!connected)
-		{
-			startPoint = new Vector3(GetComponent<Collider>().bounds.center.x, GetComponent<Collider>().bounds.min.y + Margin, GetComponent<Collider>().bounds.min.z + Margin);
-			ray = new Ray(startPoint, Vector3.right * Mathf.Sign(velocity.x));
-			connected = Physics.Raycast(ray, out hitInfo, distance);
-		}
-		
-		// Top Back (Max Y, Min Z)
-		if (!connected)
-		{
-			startPoint = new Vector3(GetComponent<Collider>().bounds.center.x, GetComponent<Collider>().bounds.max.y - Margin, GetComponent<Collider>().bounds.min.z + Margin);
-			ray = new Ray(startPoint, Vector3.right * Mathf.Sign(velocity.x));
-			connected = Physics.Raycast(ray, out hitInfo, distance);
-		}
-		
-		// Center (Center Y, Center Z)
-		if (!connected)
-		{
-			startPoint = new Vector3(GetComponent<Collider>().bounds.center.x, GetComponent<Collider>().bounds.center.y, GetComponent<Collider>().bounds.center.z);
-			ray = new Ray(startPoint, Vector3.right * Mathf.Sign(velocity.x));
-			connected = Physics.Raycast(ray, out hitInfo, distance);
-		}
-		
-		// If any rays connected move the crate and set grounded to true since we're now on the ground
-		if (connected)
-		{
-			transform.Translate(Vector3.right * Mathf.Sign(velocity.x) * (hitInfo.distance - colliderWidth / 2));
-			velocity = new Vector3(0f, velocity.y, velocity.z);
-		}
-		
-		#endregion Checking X Axis
-		
-		// Fourth do the same along the Z axis  
-		#region Checking Z Axis
-		
-		// TODO: Write final movement and collision code
-		// NOTE: This is temporary movement code with no collision detection
-		
-		// True if any ray hits a collider
-		connected = false;
-		
-		// Set the raycast distance to check as far as the player will move this frame
-		distance = (colliderDepth / 2 + Mathf.Abs(velocity.z * Time.deltaTime));
-		
-		// Top Left (Min X, Max Y)
-		startPoint = new Vector3(GetComponent<Collider>().bounds.min.x + Margin, GetComponent<Collider>().bounds.max.y - Margin, GetComponent<Collider>().bounds.center.z);
-		ray = new Ray(startPoint, Vector3.forward * Mathf.Sign(velocity.z));
-		connected = Physics.Raycast(ray, out hitInfo, distance);
-		
-		// Top Right (Max X, Max Y)
-		if (!connected)
-		{
-			startPoint = new Vector3(GetComponent<Collider>().bounds.max.x - Margin, GetComponent<Collider>().bounds.max.y - Margin, GetComponent<Collider>().bounds.center.z);
-			ray = new Ray(startPoint, Vector3.forward * Mathf.Sign(velocity.z));
-			connected = Physics.Raycast(ray, out hitInfo, distance);
-		}
-		
-		// Bottom Left (Min X, Min Y)
-		if (!connected)
-		{
-			startPoint = new Vector3(GetComponent<Collider>().bounds.min.x + Margin, GetComponent<Collider>().bounds.min.y + Margin, GetComponent<Collider>().bounds.center.z);
-			ray = new Ray(startPoint, Vector3.forward * Mathf.Sign(velocity.z));
-			connected = Physics.Raycast(ray, out hitInfo, distance);
-		}
-		
-		// Bottom Right (Max X, Min Y)
-		if (!connected)
-		{
-			startPoint = new Vector3(GetComponent<Collider>().bounds.max.x - Margin, GetComponent<Collider>().bounds.min.y + Margin, GetComponent<Collider>().bounds.center.z);
-			ray = new Ray(startPoint, Vector3.forward * Mathf.Sign(velocity.z));
-			connected = Physics.Raycast(ray, out hitInfo, distance);
-		}
-		
-		// Center (Center X, Center Y)
-		if (!connected)
-		{
-			startPoint = new Vector3(GetComponent<Collider>().bounds.center.x, GetComponent<Collider>().bounds.center.y, GetComponent<Collider>().bounds.center.z);
-			ray = new Ray(startPoint, Vector3.forward * Mathf.Sign(velocity.z));
-			connected = Physics.Raycast(ray, out hitInfo, distance);
-		}
-		
-		// If any rays connected move the crate and set grounded to true since we're now on the ground
-		if (connected)
-		{
-			transform.Translate(Vector3.forward * Mathf.Sign(velocity.z) * (hitInfo.distance - colliderDepth / 2));
-			velocity = new Vector3(velocity.x, velocity.y, 0f);
+			newVelocityZ += Mathf.Min(decelleration, Mathf.Abs(velocity.z)) * modifier;
 		}
 
-		#endregion Checking Z Axis
+		colliderHeight = GetComponent<Collider>().bounds.max.y - GetComponent<Collider>().bounds.min.y;
+		colliderWidth = GetComponent<Collider>().bounds.max.x - GetComponent<Collider>().bounds.min.x;
+		colliderDepth = GetComponent<Collider>().bounds.max.z - GetComponent<Collider>().bounds.min.z;
 
+		CheckCollisions ();
 	}
 
 	void LateUpdate () {
@@ -231,6 +68,81 @@ public class Crate : MonoBehaviour {
 		transform.Translate(velocity * Time.deltaTime);
 	}
 
+	public void CheckCollisions() {
+		#region Checking Below
+
+		// If any rays connected move the player and set grounded to true since we're now on the ground
+		RaycastHit hitInfo = colCheck.CheckYCollision (velocity, Margin);
+
+		if (hitInfo.collider != null)
+		{
+			if (velocity.y < 0) {
+				grounded = true;
+			}
+			
+			trajectory = velocity.y * Vector3.up;
+			transform.Translate(Vector3.up * Mathf.Sign(velocity.y) * (hitInfo.distance - colliderHeight / 2));
+			velocity = new Vector3(velocity.x, 0f, velocity.z);
+			CollideWithObject(hitInfo, trajectory);
+		}
+		
+		// Otherwise we're not grounded (temporary?)
+		else
+			grounded = false;
+		//}
+		
+		#endregion Checking Below
+
+		// Third check the player's velocity along the X axis and check for collisions in that direction is non-zero
+		#region Checking X Axis
+
+		// If any rays connected move the player and set grounded to true since we're now on the ground
+		hitInfo = colCheck.CheckXCollision (velocity, Margin);
+		
+		if (hitInfo.collider != null)
+		{
+			trajectory = velocity.x * Vector3.right;
+			transform.Translate(Vector3.right * Mathf.Sign(velocity.x) * (hitInfo.distance - colliderWidth / 2));
+			velocity = new Vector3(0f, velocity.y, velocity.z);
+			CollideWithObject(hitInfo, trajectory);
+		}
+		
+		#endregion Checking X Axis
+		
+		// Fourth do the same along the Z axis  
+		#region Checking Z Axis
+
+		// If any rays connected move the player and set grounded to true since we're now on the ground
+		hitInfo = colCheck.CheckZCollision (velocity, Margin);
+		
+		if (hitInfo.collider != null)
+		{
+			trajectory = velocity.z * Vector3.forward;
+			transform.Translate(Vector3.forward * Mathf.Sign(velocity.z) * (hitInfo.distance - colliderDepth / 2));
+			velocity = new Vector3(velocity.x, velocity.y, 0f);
+			CollideWithObject(hitInfo, trajectory);
+		}
+		
+		#endregion Checking Z Axis
+	}
+
+	// Used to check collisions with special objects
+	// Make this more object oriented? Collidable interface?
+	private void CollideWithObject(RaycastHit hitInfo, Vector3 trajectory) {
+		GameObject other = hitInfo.collider.gameObject;
+		float colliderDim = 0;
+		if (trajectory.normalized == Vector3.up || trajectory.normalized == Vector3.down)
+			colliderDim = colliderHeight;
+		if (trajectory.normalized == Vector3.right || trajectory.normalized == Vector3.left)
+			colliderDim = colliderWidth;
+		if (trajectory.normalized == Vector3.forward || trajectory.normalized == Vector3.back)
+			colliderDim = colliderDepth;
+		//Collision w/ PlayerInteractable
+		foreach(PlayerInteractable c in other.GetComponents<PlayerInteractable>()){
+			c.CollisionWithPlayer();
+		}
+	}
+
 	public void CheckGrab() {
 		if (!grabbed && PlayerInRange()) {
 			player.Grab(this);
@@ -239,6 +151,10 @@ public class Crate : MonoBehaviour {
 			player.Grab(null);
 			grabbed = false;
 		}
+	}
+
+	public void SetVelocity(Vector3 velocity) {
+		this.velocity = velocity;
 	}
 
 	private void Shift(PerspectiveType p) {

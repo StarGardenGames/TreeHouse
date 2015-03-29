@@ -13,6 +13,7 @@ public class PerspectiveShift : MonoBehaviour {
 		//Tell the camera to the flip when flip is pressed
 		if (Input.GetButtonDown("Flip") && !CameraControl.instance.IsFlipping() && CameraControl.instance.isLockedToPlayer()) {
 			CameraControl.instance.Flip();
+			Debug.Log("ASDFASDF");
 		}
 	}
 }
