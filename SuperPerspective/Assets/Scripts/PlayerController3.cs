@@ -12,7 +12,7 @@ public class PlayerController3 : MonoBehaviour
 	//singleton
 	public static PlayerController3 instance;
 
-    // Movement parameters
+    // Movement Parameters
     public float acceleration;
     public float decelleration;
     public float maxSpeed;
@@ -20,6 +20,7 @@ public class PlayerController3 : MonoBehaviour
     public float terminalVelocity;
     public float jump;
     public float jumpMargin;
+    private bool _paused;
 
     // Layer mask used for collision checks
     private int layerMask;  // Not needed?
@@ -29,7 +30,7 @@ public class PlayerController3 : MonoBehaviour
     public bool falling;
     private bool canJump;
     private bool lastInput;
-    private float jumpPressedTime;
+    private float jumpPressedTime;  
 
     // Raycasting Variables
     public int verticalRays = 8;
@@ -58,6 +59,7 @@ public class PlayerController3 : MonoBehaviour
 	//Vars for edge grabbing
 	private Vector3[] cuboid;
 	Edge grabbedEdge = null;
+
     #endregion
 
     #region MonoBehavior Implementation
@@ -72,7 +74,9 @@ public class PlayerController3 : MonoBehaviour
 	
     // Initialization
 	void Start () {
-        // Set player as falling (they should immediately register a hit)
+
+        // Set player as falling 
+        // TODO: Since the player often falls through the ground we should cast a ray down and immediately place then on the ground.
         grounded = false;
         falling = true;
         canJump = false;
@@ -99,169 +103,191 @@ public class PlayerController3 : MonoBehaviour
 		cuboid = new Vector3[2];
 
 		colCheck = new CollisionChecker (GetComponent<Collider> ());
+
+        // Register event handlers
+        GameStateManager.instance.GamePausedEvent += OnPauseGame;
 	}
 
     void Update()
     {
-
-        // See if the player is pressing the jump button this frame
-        bool input = InputManager.instance.JumpStatus();
-
-        // If this is the first frame the button was pressed then store the current time
-        if (input && !lastInput)
+        if (!_paused)
         {
-            jumpPressedTime = Time.time;
-        }
-        // If the player didn't press the jump key this frame store time as 0
-        else if (!input)
-        {
-            jumpPressedTime = 0;
-        }
+            // See if the player is pressing the jump button this frame
+            bool input = InputManager.instance.JumpStatus();
 
-        // This only runs while the player is grounded, it allows the player to jump as soon as they land 
-        //      even if they pressed the jump button while in midair if they were close enough to the ground
-        if ((grounded || grabbedEdge!=null) && Time.time - jumpPressedTime < jumpMargin && crate == null)
-        {
-			anim.SetTrigger("Jump");
-            grounded = false;
-            velocity = new Vector3(velocity.x, jump, velocity.z);
-            jumpPressedTime = 0;
-			ReleaseEdge();	
+            // If this is the first frame the button was pressed then store the current time
+            if (input && !lastInput)
+            {
+                jumpPressedTime = Time.time;
+            }
+            // If the player didn't press the jump key this frame store time as 0
+            else if (!input)
+            {
+                jumpPressedTime = 0;
+            }
+
+            // This only runs while the player is grounded, it allows the player to jump as soon as they land 
+            //      even if they pressed the jump button while in midair if they were close enough to the ground
+            if ((grounded || grabbedEdge != null) && Time.time - jumpPressedTime < jumpMargin && crate == null)
+            {
+                anim.SetTrigger("Jump");
+                grounded = false;
+                velocity = new Vector3(velocity.x, jump, velocity.z);
+                jumpPressedTime = 0;
+                ReleaseEdge();
+            }
+
+            lastInput = input;
+
+            anim.SetBool("Falling", falling);
+            anim.SetBool("Grounded", velocity.y == 0);
         }
-
-        lastInput = input;
-
-		anim.SetBool("Falling", falling);
-		anim.SetBool("Grounded", velocity.y == 0);
     }
 
     // Collision detection and velocity calculations are done in the fixed update step
     void FixedUpdate()
     {
-		//update cuboid for edges
-		Vector3 halfScale = gameObject.transform.localScale;
-		cuboid[0] = gameObject.transform.position - halfScale;
-		cuboid[1] = gameObject.transform.position + halfScale;
+        if (!_paused)
+        {
+            //update cuboid for edges
+            Vector3 halfScale = gameObject.transform.localScale;
+            cuboid[0] = gameObject.transform.position - halfScale;
+            cuboid[1] = gameObject.transform.position + halfScale;
 
-		if (zlockFlag) {
-			DoZLock();
-			zlockFlag = false;
-		}
-		
-        // ------------------------------------------------------------------------------------------------------
-        // VERTICAL MOVEMENT VELOCITY CALCULATIONS
-        // ------------------------------------------------------------------------------------------------------
-		if(grabbedEdge == null){
-	        // Apply Gravity
-			if (!grounded)
-				velocity = new Vector3(velocity.x, Mathf.Max(velocity.y - gravity, -terminalVelocity), velocity.z);
+            if (zlockFlag)
+            {
+                DoZLock();
+                zlockFlag = false;
+            }
 
-	        // Determine if the player is falling
-	        if (velocity.y < 0f)
-	            falling = true;
-		}else{
-			//if holding on to edge set velocity to 0 and set falling to false
-			velocity.y = 0;
-			falling = false;
-		}
+            // ------------------------------------------------------------------------------------------------------
+            // VERTICAL MOVEMENT VELOCITY CALCULATIONS
+            // ------------------------------------------------------------------------------------------------------
+            if (grabbedEdge == null)
+            {
+                // Apply Gravity
+                if (!grounded)
+                    velocity = new Vector3(velocity.x, Mathf.Max(velocity.y - gravity, -terminalVelocity), velocity.z);
 
-        // ------------------------------------------------------------------------------------------------------
-        // X-AXIS MOVEMENT VELOCITY CALCULATIONS
-        // ------------------------------------------------------------------------------------------------------
-		float newVelocityX = velocity.x;
-		//if we're either not on an edge, or on an edge which allows x movement
-		if(grabbedEdge == null || grabbedEdge.getOrientation()%2 == 1){
-			float xAxis = InputManager.instance.GetForwardMovement();
-	        if (xAxis != 0)
-	        {
-	            newVelocityX += acceleration * Mathf.Sign(xAxis);
-	            newVelocityX = Mathf.Clamp(newVelocityX, -maxSpeed * Mathf.Abs(xAxis), maxSpeed * Mathf.Abs(xAxis));
-	        }
-	        else if (velocity.x != 0)
-	        {
-	            int modifier = velocity.x > 0 ? -1 : 1;
-	            newVelocityX += Mathf.Min(decelleration, Mathf.Abs(velocity.x)) * modifier;
-	        }
+                // Determine if the player is falling
+                if (velocity.y < 0f)
+                    falling = true;
+            }
+            else
+            {
+                //if holding on to edge set velocity to 0 and set falling to false
+                velocity.y = 0;
+                falling = false;
+            }
 
-			//clamp movement if we're on edge
-			if(grabbedEdge != null){
-				float newX = gameObject.transform.position.x;
-				float edgeX = grabbedEdge.gameObject.transform.position.x;
-				float edgeScale = grabbedEdge.gameObject.transform.localScale.x;
-				float minBound = edgeX - edgeScale * .5f;
-				float maxBound = edgeX + edgeScale * .5f;
-				if(!(minBound <= newX && newX <= maxBound)){
-					newX = Mathf.Clamp(newX, minBound, maxBound);
-					newVelocityX = 0;
-					Vector3 pos = gameObject.transform.position;
-					pos.x = newX;
-					gameObject.transform.position = pos;
-				}
-			}
-		}else{
-			//if we're latched to a wall which doesn't allow x axis movement don't move along x axis
-			newVelocityX = 0;
-		}
+            // ------------------------------------------------------------------------------------------------------
+            // X-AXIS MOVEMENT VELOCITY CALCULATIONS
+            // ------------------------------------------------------------------------------------------------------
+            float newVelocityX = velocity.x;
+            //if we're either not on an edge, or on an edge which allows x movement
+            if (grabbedEdge == null || grabbedEdge.getOrientation() % 2 == 1)
+            {
+                float xAxis = InputManager.instance.GetForwardMovement();
+                if (xAxis != 0)
+                {
+                    newVelocityX += acceleration * Mathf.Sign(xAxis);
+                    newVelocityX = Mathf.Clamp(newVelocityX, -maxSpeed * Mathf.Abs(xAxis), maxSpeed * Mathf.Abs(xAxis));
+                }
+                else if (velocity.x != 0)
+                {
+                    int modifier = velocity.x > 0 ? -1 : 1;
+                    newVelocityX += Mathf.Min(decelleration, Mathf.Abs(velocity.x)) * modifier;
+                }
 
-        velocity.x = newVelocityX;
+                //clamp movement if we're on edge
+                if (grabbedEdge != null)
+                {
+                    float newX = gameObject.transform.position.x;
+                    float edgeX = grabbedEdge.gameObject.transform.position.x;
+                    float edgeScale = grabbedEdge.gameObject.transform.localScale.x;
+                    float minBound = edgeX - edgeScale * .5f;
+                    float maxBound = edgeX + edgeScale * .5f;
+                    if (!(minBound <= newX && newX <= maxBound))
+                    {
+                        newX = Mathf.Clamp(newX, minBound, maxBound);
+                        newVelocityX = 0;
+                        Vector3 pos = gameObject.transform.position;
+                        pos.x = newX;
+                        gameObject.transform.position = pos;
+                    }
+                }
+            }
+            else
+            {
+                //if we're latched to a wall which doesn't allow x axis movement don't move along x axis
+                newVelocityX = 0;
+            }
 
-        // ------------------------------------------------------------------------------------------------------
-        // Z-AXIS MOVEMENT VELOCITY CALCULATIONS
-        // ------------------------------------------------------------------------------------------------------
-		float newVelocityZ = velocity.z;
-		//if we're either not on an edge or on an edge which allows z movement
-		if((grabbedEdge == null || grabbedEdge.getOrientation()%2 == 0)){
-	        float zAxis = -InputManager.instance.GetSideMovement();
-	        
-	        if (zAxis != 0)
-	        {
-	            newVelocityZ += acceleration * Mathf.Sign(zAxis);
-	            newVelocityZ = Mathf.Clamp(newVelocityZ, -maxSpeed * Mathf.Abs(zAxis), maxSpeed * Mathf.Abs(zAxis));
-	        }
-	        else if (velocity.z != 0)
-	        {
-	            int modifier = velocity.z > 0 ? -1 : 1;
-	            newVelocityZ += Mathf.Min(decelleration, Mathf.Abs(velocity.z)) * modifier;
-	        }
+            velocity.x = newVelocityX;
 
-			//clamp movement if we're on edge
-			if(grabbedEdge != null){
-				float newZ = gameObject.transform.position.z;
-				float edgeZ = grabbedEdge.gameObject.transform.position.z;
-				float edgeScale = grabbedEdge.gameObject.transform.localScale.z;
-				float minBound = edgeZ - edgeScale * .5f;
-				float maxBound = edgeZ + edgeScale * .5f;
-				if(!(minBound <= newZ && newZ <= maxBound)){
-					newZ = Mathf.Clamp(newZ, minBound, maxBound);
-					newVelocityZ = 0;
-					Vector3 pos = gameObject.transform.position;
-					pos.z = newZ;
-					gameObject.transform.position = pos;
-				}
-			}
-		}else{
-			//if we're latched to a wall which doesn't allow z movement
-			newVelocityZ = 0;
-		}
+            // ------------------------------------------------------------------------------------------------------
+            // Z-AXIS MOVEMENT VELOCITY CALCULATIONS
+            // ------------------------------------------------------------------------------------------------------
+            float newVelocityZ = velocity.z;
+            //if we're either not on an edge or on an edge which allows z movement
+            if ((grabbedEdge == null || grabbedEdge.getOrientation() % 2 == 0))
+            {
+                float zAxis = -InputManager.instance.GetSideMovement();
 
-        velocity.z = newVelocityZ;
+                if (zAxis != 0)
+                {
+                    newVelocityZ += acceleration * Mathf.Sign(zAxis);
+                    newVelocityZ = Mathf.Clamp(newVelocityZ, -maxSpeed * Mathf.Abs(zAxis), maxSpeed * Mathf.Abs(zAxis));
+                }
+                else if (velocity.z != 0)
+                {
+                    int modifier = velocity.z > 0 ? -1 : 1;
+                    newVelocityZ += Mathf.Min(decelleration, Mathf.Abs(velocity.z)) * modifier;
+                }
 
-		bool walking = (Mathf.Abs(velocity.z) > 0.1 || Mathf.Abs(velocity.x) >= 0.1);
-		bool running = (Mathf.Abs(velocity.z) >= maxSpeed / 2 || Mathf.Abs(velocity.x) >= maxSpeed / 2);
-		anim.SetBool("Walking", walking && !running && crate == null);
-		anim.SetBool("Running", running && crate == null);
-		anim.SetBool("Pushing", false);
-		anim.SetBool("Pulling", walking && crate != null);
-		if (walking) {
-			if (crate == null)
-				model.transform.rotation = Quaternion.AngleAxis(Mathf.Rad2Deg * Mathf.Atan2(-velocity.z, velocity.x) + 90, Vector3.up);
+                //clamp movement if we're on edge
+                if (grabbedEdge != null)
+                {
+                    float newZ = gameObject.transform.position.z;
+                    float edgeZ = grabbedEdge.gameObject.transform.position.z;
+                    float edgeScale = grabbedEdge.gameObject.transform.localScale.z;
+                    float minBound = edgeZ - edgeScale * .5f;
+                    float maxBound = edgeZ + edgeScale * .5f;
+                    if (!(minBound <= newZ && newZ <= maxBound))
+                    {
+                        newZ = Mathf.Clamp(newZ, minBound, maxBound);
+                        newVelocityZ = 0;
+                        Vector3 pos = gameObject.transform.position;
+                        pos.z = newZ;
+                        gameObject.transform.position = pos;
+                    }
+                }
+            }
+            else
+            {
+                //if we're latched to a wall which doesn't allow z movement
+                newVelocityZ = 0;
+            }
 
-		}
-		// ------------------------------------------------------------------------------------------------------
-		// COLLISION CHECKING
-		// ------------------------------------------------------------------------------------------------------
-		CheckCollisions();
-	
+            velocity.z = newVelocityZ;
+
+            bool walking = (Mathf.Abs(velocity.z) > 0.1 || Mathf.Abs(velocity.x) >= 0.1);
+            bool running = (Mathf.Abs(velocity.z) >= maxSpeed / 2 || Mathf.Abs(velocity.x) >= maxSpeed / 2);
+            anim.SetBool("Walking", walking && !running && crate == null);
+            anim.SetBool("Running", running && crate == null);
+            anim.SetBool("Pushing", false);
+            anim.SetBool("Pulling", walking && crate != null);
+            if (walking)
+            {
+                if (crate == null)
+                    model.transform.rotation = Quaternion.AngleAxis(Mathf.Rad2Deg * Mathf.Atan2(-velocity.z, velocity.x) + 90, Vector3.up);
+
+            }
+            // ------------------------------------------------------------------------------------------------------
+            // COLLISION CHECKING
+            // ------------------------------------------------------------------------------------------------------
+            CheckCollisions();
+        }
     }
 
 	public void CheckCollisions(){
@@ -292,8 +318,6 @@ public class PlayerController3 : MonoBehaviour
 		else
 			grounded = false;
 		//}
-		
-		#endregion Checking Below
 		
 		// Third check the player's velocity along the X axis and check for collisions in that direction is non-zero
 		#region Checking X Axis
@@ -328,15 +352,23 @@ public class PlayerController3 : MonoBehaviour
 
 	// LateUpdate is used to actually move the position of the player
 	void LateUpdate () {
-		if (crate != null) {
-			crate.transform.Translate(Vector3.Dot (velocity, grabAxis) * grabAxis * 0.5f * Time.deltaTime);
-			transform.Translate(velocity * 0.5f * Time.deltaTime);
-		} else {
-			transform.Translate(velocity * Time.deltaTime);
-		}
+        if (!_paused)
+        {
+            if (crate != null)
+            {
+                crate.transform.Translate(Vector3.Dot(velocity, grabAxis) * grabAxis * 0.5f * Time.deltaTime);
+                transform.Translate(velocity * 0.5f * Time.deltaTime);
+            }
+            else
+            {
+                transform.Translate(velocity * Time.deltaTime);
+            }
+        }
     }
 
-	private void DoZLock() {
+    #endregion Monobehavior Implementation
+
+    private void DoZLock() {
 		if (crate != null)
 			zlock = crate.transform.position.z;
 		if (zlock > int.MinValue) {
@@ -449,5 +481,14 @@ public class PlayerController3 : MonoBehaviour
 
 	public bool is3D(){
 		return GameStateManager.instance.currentPerspective== PerspectiveType.p3D;
-	}
+    }
+
+    #region Event Handlers
+
+    private void OnPauseGame(bool p)
+    {
+        _paused = p;
+    }
+
+    #endregion EventHandlers
 }

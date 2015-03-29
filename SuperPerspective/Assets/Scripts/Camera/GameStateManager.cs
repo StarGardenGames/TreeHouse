@@ -57,7 +57,7 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
         MOUNT_GAMEPLAY_2D = GameObject.Find("2DCameraMount").transform;
         MOUNT_GAMEPLAY_3D = GameObject.Find("3DCameraMount").transform;
         //MOUNT_PAUSED = GameObject.Find("PauseMount").transform;             // Consider switching this to be more dynamic in future
-        //MOUNT_MENU = GameObject.Find("MenuMount").transform;                // Consider switching this to be more dynamic in future
+        MOUNT_MENU = GameObject.Find("MenuMount").transform;                // Consider switching this to be more dynamic in future
 
         // TODO: Change this line of code to use the final player object name and script name
         // Find Player and Main Camera
@@ -170,15 +170,16 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
     // Determine if the pause event should be aised. Do nothing if in a menu 
     private void HandlePausePressed()
     {
+        Debug.Log("MENU");
         if (currentState == STATE_GAMEPLAY_2D || currentState == STATE_GAMEPLAY_3D)
         {
             // If the current state is a gameplay state pause the game
-            EnterPause();
+            EnterMenu();
         }
-        else if (currentState == STATE_PAUSED)
+        else if (currentState == STATE_MENU)
         {
             // If the current state is paused then unpause
-            ExitPause();
+            ExitMenu();
         }
     }
 
