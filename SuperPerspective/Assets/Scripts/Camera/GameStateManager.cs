@@ -10,6 +10,9 @@ using SuperPerspective.Singleton;
 /// </summary>
 public class GameStateManager : PersistentSingleton<GameStateManager>
 {
+	//suppress warnings
+	#pragma warning disable 414, 649
+	
     #region Properties & Variables
 
     // Object references for the Player and the Main Camera

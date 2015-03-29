@@ -4,18 +4,19 @@ using UnityEngine.UI;
 
 public class MenuControl : MonoBehaviour {
 	
+	//suppress warnings
+	#pragma warning disable 414
+	
 	public Canvas menu;
 
 	Button[] saveSlots;
 	Toggle[] options;
-	InputField[] inputs;
 	Button[] resets;
 	Text menuStatus;
 	
 	int slotSelected = -1;
 	
 	int numMenuButtons = 3;
-	int numSaveSlots = 3;
 	int numOptions = 2;
 	
 	bool[] slotHasData;
@@ -33,41 +34,42 @@ public class MenuControl : MonoBehaviour {
 	
 	bool canvasDestroyed = false;
 	
+	string[] saveNames = {
+		"Inductive Reasoner",
+		"Dexterous Traveller",
+		"Intuitive Thinker"
+	};
+	
 	// Use this for initialization
 	void Start () {
+		int numSlots = SaveManager.instance.getNumSaveSlots();
 		//init saveslots[]
-		saveSlots = new Button[numSaveSlots];
+		saveSlots = new Button[numSlots];
 		for (int i = 0; i < saveSlots.Length; i++) 
 			saveSlots[i] = menu.transform.GetChild(i+numMenuButtons).GetComponent<Button>();
 		
 		//init options[]
 		options = new Toggle[numOptions];
 		for(int i = 0; i < options.Length; i++)
-			options[i] = menu.transform.GetChild(i+numMenuButtons+numSaveSlots).GetComponent<Toggle>();
-		
-		//init inputs
-		inputs = new InputField[numSaveSlots];
-		for(int i = 0; i<numSaveSlots; i++)
-			inputs[i] = menu.transform.GetChild(i+numMenuButtons+numSaveSlots+numOptions).GetComponent<InputField>();
+			options[i] = menu.transform.GetChild(i+numMenuButtons+numSlots).GetComponent<Toggle>();
 		
 		//init resets
-		resets = new Button[numSaveSlots];
-		for(int i = 0; i<numSaveSlots; i++)
-			resets[i] = menu.transform.GetChild(i+numMenuButtons+(numSaveSlots*2)+numOptions).GetComponent<Button>();
+		resets = new Button[numSlots];
+		for(int i = 0; i<numSlots; i++)
+			resets[i] = menu.transform.GetChild(i+numMenuButtons+numSlots+numOptions).GetComponent<Button>();
 		
 		//init text
-		menuStatus = menu.transform.GetChild(numMenuButtons+numSaveSlots*3+numOptions).GetComponent<Text>();
+		menuStatus = menu.transform.GetChild(numMenuButtons+numSlots*2+numOptions).GetComponent<Text>();
 		
 		//init data
-		slotHasData = new bool[numSaveSlots];
+		slotHasData = new bool[SaveManager.instance.getNumSaveSlots()];
 
 		getSaveNames();
 
 		//disable submenus
 		setSaveMenuActive(false);
 		setOptionMenuActive(false);
-		for(int i = 0; i < numSaveSlots; i++){	
-			inputs[i].gameObject.SetActive(false);
+		for(int i = 0; i < numSlots; i++){	
 			resets[i].gameObject.SetActive(false);
 		}
 	}
@@ -75,14 +77,10 @@ public class MenuControl : MonoBehaviour {
 	// Update is called once per frame
 	void FixedUpdate () {
 		//ensure that saves remain censistant
-		for(int i = 0; i < numSaveSlots; i++)
-		if(inputs[i].IsActive() && resets[i].IsActive()){
-			if(slotHasData[i])
-				inputs[i].gameObject.SetActive(false);
-			else{
-				resets[i].gameObject.SetActive(false);
-			}
-		}
+		for(int i = 0; i < SaveManager.instance.getNumSaveSlots(); i++)
+			if(resets[i].IsActive() && !slotHasData[i])
+					resets[i].gameObject.SetActive(false);
+			
 		
 		//update text transparency
 		if(textAlpha > 0)
@@ -113,8 +111,13 @@ public class MenuControl : MonoBehaviour {
 					GameStateManager.instance.StartGame();
 					SaveManager.instance.loadSave();
 				}else{
-					for(int i = 0; i < numSaveSlots; i++)
-						inputs[i].gameObject.SetActive(i == selectedSlot);
+					string name = saveNames[selectedSlot];
+					SaveManager.instance.setSaveName(selectedSlot,name);
+					slotHasData[selectedSlot] = true;
+					Text t = saveSlots[selectedSlot].transform.GetChild(0).GetComponent<Text>();
+					t.text = name;
+					resets[selectedSlot].gameObject.SetActive(true);
+					updateText(name + " is playing");
 				}
 			}else{
 				//reset save
@@ -127,9 +130,6 @@ public class MenuControl : MonoBehaviour {
 				slotHasData[selectedSlot] = false;
 				//reset button no longer active
 				resets[selectedSlot].gameObject.SetActive(false);
-				//input becomes
-				Text t2 = inputs[selectedSlot].transform.Find("Text").GetComponent<Text>();
-				t2.text = "";
 			}
 		} else {
 			switch (item) {
@@ -147,18 +147,6 @@ public class MenuControl : MonoBehaviour {
 				break;
 			}
 		}
-	}
-	
-	public void SlotNameEntered(string name){
-		if(name == "" || name == defaultSaveName)
-			return;
-		SaveManager.instance.setSaveName(selectedSlot,name);
-		slotHasData[selectedSlot] = true;
-		Text t = saveSlots[selectedSlot].transform.GetChild(0).GetComponent<Text>();
-		t.text = name;
-		inputs[selectedSlot].gameObject.SetActive(false);
-		resets[selectedSlot].gameObject.SetActive(true);
-		updateText(name + " is playing");
 	}
 
 	void getSaveNames(){
@@ -178,15 +166,15 @@ public class MenuControl : MonoBehaviour {
 	}
 	
 	void setSaveMenuActive(bool status){
+		//update visibility of save slots
 		for(int i = 0; i < saveSlots.Length; i++)
 			saveSlots[i].gameObject.SetActive(status);
+		//no slots are selected if menu isn't active
 		if(!status)
 			selectedSlot = -1;
-		for(int i = 0; i < 3; i++){
+		//update visibility of reset buttons for slots that have data
+		for(int i = 0; i < 3; i++)
 			resets[i].gameObject.SetActive(status && slotHasData[i]);
-			if(status == false)
-				inputs[i].gameObject.SetActive(status);
-		}
 	}
 	
 	void updateText(string str){

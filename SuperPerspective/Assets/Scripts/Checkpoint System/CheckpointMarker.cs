@@ -8,7 +8,7 @@ public class CheckpointMarker : Button {
 	public Sprite sprHover;
 	public Sprite sprSelected;
 	
-	void OnPointerEnter(PointerEventData data){
+	public override void OnPointerEnter(PointerEventData data){
 		Debug.Log("Enter");
 		gameObject.GetComponent<Image>().sprite = sprHover;
 	}
@@ -17,7 +17,7 @@ public class CheckpointMarker : Button {
 		gameObject.GetComponent<Image>().sprite = sprDef;
 	}
 
-	void OnPointerClick(PointerEventData data){
+	public override void OnPointerClick(PointerEventData data){
 		Debug.Log("Clicked");
 	}
 }

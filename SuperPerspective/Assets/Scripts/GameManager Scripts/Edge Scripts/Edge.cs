@@ -2,6 +2,8 @@
 using System.Collections;
 
 public class Edge : MonoBehaviour {
+	//suppress warnings
+	#pragma warning disable 162
 
 	int or = 0; //orientation of game object (0-3: right,back,left,front)
 	
@@ -11,11 +13,17 @@ public class Edge : MonoBehaviour {
 
 	int status = 0; //0: no overlap, 1: lined up, 2: latched, 3: rested latch
 
-	bool validIn2D;
+	bool validIn2D = true;
 
 	PlayerController3 player;
+	
+	bool init = false;//indicates whether Edge has been initiated
+	
+	public string edgeIndex = "n/a";
 
 	public void FixedUpdate(){
+		if(!init)
+			return;
 		//if locked on
 		if(status >= 2){
 			//check if rested latch can be entered
@@ -54,8 +62,10 @@ public class Edge : MonoBehaviour {
 			status = 0;
 
 		//check for making the player let go
-		if(status != 0 && !player.is3D() && !validIn2D)
+		if(status != 0 && !player.is3D() && !validIn2D){
 			player.ReleaseEdge();
+			Debug.Log("Player Release");
+		}	
 	}
 
 	public bool GrabButtonDown(){
@@ -119,6 +129,9 @@ public class Edge : MonoBehaviour {
 		cuboid = new Vector3[2];
 		cuboid[0] = gameObject.transform.position - halfScale;
 		cuboid[1] = gameObject.transform.position + halfScale;
+		
+		//initialization has been completed
+		init = true;
 	}
 
 	public void Init(int or, float width, float depth){
@@ -127,7 +140,7 @@ public class Edge : MonoBehaviour {
 
 	public void checkOverlaps(){
 		//reference to terrain in edgemanager
-		GameObject[] t = EdgeManager.instance.terrain;
+		GameObject[] t = EdgeManager.instance.getTerrain();
 		//create corners
 		Vector3[] cubBot = new Vector3[2];
 		Vector3 halfScale = gameObject.transform.localScale * .5f;
@@ -191,6 +204,7 @@ public class Edge : MonoBehaviour {
 				float newZ = (max + posZ + halfScaleZ) * .5f;
 				Vector3 newPos = new Vector3(gameObject.transform.position.x,gameObject.transform.position.y,newZ);
 				GameObject newEdge = Instantiate(EdgeManager.instance.edgePrefab, newPos, Quaternion.identity) as GameObject;
+				newEdge.GetComponent<Edge>().edgeIndex = "split_"+EdgeManager.instance.getGlobalIndex();
 				float newDepth = posZ + halfScaleZ - max;
 				if(newDepth <=0)
 					Destroy(newEdge);
@@ -203,7 +217,7 @@ public class Edge : MonoBehaviour {
 				gameObject.transform.position = myPos;
 				float myDepth = min - (posZ - halfScaleZ);
 				if(myDepth <= 0){
-					Destroy(this);
+					Destroy(this.gameObject);
 					break;
 				}else{
 					Vector3 myScale = gameObject.transform.localScale;
@@ -218,6 +232,7 @@ public class Edge : MonoBehaviour {
 				float newX = (max + posX + halfScaleX) * .5f;
 				Vector3 newPos = new Vector3(newX,gameObject.transform.position.y,gameObject.transform.position.z);
 				GameObject newEdge = Instantiate(EdgeManager.instance.edgePrefab, newPos, Quaternion.identity) as GameObject;
+				newEdge.GetComponent<Edge>().edgeIndex = "split_"+EdgeManager.instance.getGlobalIndex();
 				float newWidth = posX + halfScaleX - max;
 				if(newWidth <= 0)
 					Destroy(newEdge);
@@ -230,7 +245,7 @@ public class Edge : MonoBehaviour {
 				gameObject.transform.position = myPos;
 				float myWidth = min - (posX - halfScaleX);
 				if(myWidth <= 0){
-					Destroy(this);
+					Destroy(this.gameObject);
 					break;
 				}else{
 					Vector3 myScale = gameObject.transform.localScale;
@@ -263,7 +278,7 @@ public class Edge : MonoBehaviour {
 			for(int i = overlapIndex; i < t.Length; i++){
 				bool overBot = EdgeManager.instance.CheckOverlap2D(i,cubBot);
 				bool overTop = EdgeManager.instance.CheckOverlap2D(i,cubTop);
-				validIn2D = !overBot && !overTop;
+				validIn2D = validIn2D && !overBot && !overTop;
 			}
 		}
 	}

@@ -9,6 +9,9 @@ using SuperPerspective.Singleton;
 /// </summary>
 public class InputManager : Singleton<InputManager>
 {
+	//suppress warnings
+	#pragma warning disable 414
+	
     #region Properties & Variables
 
     // Button press events

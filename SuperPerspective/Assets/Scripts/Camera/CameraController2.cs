@@ -10,6 +10,10 @@ using SuperPerspective.Singleton;
 [RequireComponent(typeof(Camera))]          // The camera needs to actually be, you know, a camera
 public class CameraController2 : PersistentSingleton<CameraController2>
 {
+	
+	//suppress warnings
+	#pragma warning disable 472
+	
     #region Properties & Variables
 
     // This is the camera component and matrix blender script (see above)
@@ -37,8 +41,8 @@ public class CameraController2 : PersistentSingleton<CameraController2>
 
 
     #region Monobehavior Implementation
-
-    void Awake()
+	
+    public override void Awake()
     {
         // Get the MatrixBlender script
         blender = gameObject.GetComponent<MatrixBlender>();

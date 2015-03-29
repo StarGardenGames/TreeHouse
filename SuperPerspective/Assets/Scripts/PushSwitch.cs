@@ -1,41 +1,39 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class PushSwitch : PlayerInteractable {
+public class PushSwitch : Interactable {
 
 	public Activatable[] triggers;//Activatable objects which this switch triggers
 
-	bool enabled = false; //whether switch is currently enabled
+	bool pushed = false; //whether switch is currently pushed
 
 	float distThresh = 1.5f; //distance threshhold where it will become unpressed
-	GameObject player; //stores player gameobject
-		//NOTE: used to calculate distance to determine if it's pressed
-
-	void Start(){
-		player = GameObject.Find("NewPlayer");//needs to be updated depending on player name
-	}
 
 	void Update(){
 		//calculate distance between switch and player
 		float dist = Vector3.Distance(transform.position, player.transform.position);
 		//become unpressed if distance is small enough
-		if(dist > distThresh && enabled){
-			enabled = false;
+		if(dist > distThresh && pushed){
+			pushed = false;
 			//update activatables
 			foreach(Activatable o in triggers)
-				o.setActivated(enabled);
+				o.setActivated(pushed);
 		}
 		//update color for debugging
-		if(enabled)
+		if(pushed)
 			gameObject.GetComponent<Renderer>().material.color = Color.white;
 		else
 			gameObject.GetComponent<Renderer>().material.color = Color.red;
 	}
 
-	public override void CollisionWithPlayer(){
-		enabled = true;//becomes enabled when it collides with player
-		//enabled is also updated for all activatable objects
+	public override void EnterCollisionWithGeneral(){
+		pushed = true;//becomes pushed when it collides with player
+		//pushed is also updated for all activatable objects
 		foreach(Activatable o in triggers)
-			o.setActivated(enabled);
+			o.setActivated(pushed);
+	}
+	
+	public override void ExitCollisionWithGeneral(){
+		
 	}
 }

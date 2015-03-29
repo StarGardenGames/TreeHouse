@@ -4,6 +4,8 @@ using System.Collections;
 [RequireComponent(typeof(LineRenderer))]
 public class PlayerController3 : MonoBehaviour
 {
+	//suppress warnings
+	#pragma warning disable 1691,168,219,414
 
     #region Properties & Variables
 
@@ -60,14 +62,16 @@ public class PlayerController3 : MonoBehaviour
 
     #region MonoBehavior Implementation
 
-    // Initialization
-	void Start () {
-		//sigleton
+	//setup singleton
+	void Awake(){
 		if(instance == null)
 			instance = this;
 		else if(instance!= this)
 			Destroy(this);
-
+	}
+	
+    // Initialization
+	void Start () {
         // Set player as falling (they should immediately register a hit)
         grounded = false;
         falling = true;
@@ -400,9 +404,8 @@ public class PlayerController3 : MonoBehaviour
 			anim.SetBool("Pushing", false);
 		}
   		//Collision w/ PlayerInteractable
-		foreach(PlayerInteractable c in other.GetComponents<PlayerInteractable>()){
-			c.CollisionWithPlayer();
-		}
+		foreach(Interactable c in other.GetComponents<Interactable>())
+			c.EnterCollisionWithPlayer();
 	}
 
 	public void Flip() {
