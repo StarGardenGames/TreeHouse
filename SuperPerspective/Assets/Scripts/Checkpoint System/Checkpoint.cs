@@ -1,19 +1,13 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Checkpoint : PlayerInteractable {
+public class Checkpoint : ActiveInteractable {
 
 	public int id;
-	public bool triggered = false;
+	public bool triggered = false;	
 	
-	public override void PlayerEnteredRange(){
-		triggered = true;
+	public override void Triggered(){
 		CheckpointManager.instance.showMenu(id);
 	}
-	
-	public override void PlayerExitedRange(){
-		triggered = false;
-	}
-	
 	
 }

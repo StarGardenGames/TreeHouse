@@ -2,6 +2,8 @@
 using System.Collections;
 
 public class Edge : MonoBehaviour {
+	//suppress warnings
+	#pragma warning disable 162
 
 	int or = 0; //orientation of game object (0-3: right,back,left,front)
 	

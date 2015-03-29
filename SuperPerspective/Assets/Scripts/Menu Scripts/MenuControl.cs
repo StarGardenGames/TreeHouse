@@ -4,6 +4,9 @@ using UnityEngine.UI;
 
 public class MenuControl : MonoBehaviour {
 	
+	//suppress warnings
+	#pragma warning disable 414
+	
 	public Canvas menu;
 
 	Button[] saveSlots;

@@ -4,6 +4,9 @@ using UnityEngine.UI;
 using System.IO;
 
 public class CheckpointManager : MonoBehaviour {
+	//suppress warnings
+	#pragma warning disable 414
+	
 	static int destination = -1;
 
 	public Canvas menu;
