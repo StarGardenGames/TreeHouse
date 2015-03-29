@@ -5,6 +5,8 @@ public class CollisionChecker {
 
 	Collider col;
 	float colliderWidth, colliderHeight, colliderDepth;
+	
+	#pragma warning disable 219
 
 	public CollisionChecker(Collider col) {
 		this.col = col;
@@ -34,10 +36,10 @@ public class CollisionChecker {
 		// Set the raycast distance to check as far as the player will move this frame
 		float distance = (colliderWidth / 2) + Mathf.Abs(velocity.x * Time.deltaTime);
 		
-		//setup startPoints, note /**/ means margin wasn't applied previously
-		startPoints[0] = new Vector3(centerX, minY, maxZ/**/);
-		startPoints[1] = new Vector3(centerX, maxY/**/, maxZ/**/);
-		startPoints[2] = new Vector3(centerX, minY, minZ/**/);
+		//setup startPoints
+		startPoints[0] = new Vector3(centerX, minY, maxZ);
+		startPoints[1] = new Vector3(centerX, maxY, maxZ);
+		startPoints[2] = new Vector3(centerX, minY, minZ);
 		startPoints[3] = new Vector3(centerX, maxY, minZ);
 		startPoints[4] = new Vector3(centerX, centerY, centerZ);
 		

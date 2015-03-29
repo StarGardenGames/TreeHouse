@@ -3,6 +3,8 @@ using System.Collections;
 
 public class Crate : MonoBehaviour {
 
+	#pragma warning disable 219
+
 	private const float gravity = 1.5f;
 	private const float terminalVelocity = 60;
 	private const float decelleration = 15;
@@ -138,8 +140,8 @@ public class Crate : MonoBehaviour {
 		if (trajectory.normalized == Vector3.forward || trajectory.normalized == Vector3.back)
 			colliderDim = colliderDepth;
 		//Collision w/ PlayerInteractable
-		foreach(PlayerInteractable c in other.GetComponents<PlayerInteractable>()){
-			c.CollisionWithPlayer();
+		foreach(Interactable c in other.GetComponents<Interactable>()){
+			c.EnterCollisionWithGeneral();
 		}
 	}
 

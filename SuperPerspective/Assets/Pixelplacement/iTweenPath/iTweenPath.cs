@@ -25,6 +25,7 @@ using System.Collections.Generic;
 [AddComponentMenu("Pixelplacement/iTweenPath")]
 public class iTweenPath : MonoBehaviour
 {
+	#pragma warning disable 618
 	public string pathName ="";
 	public Color pathColor = Color.cyan;
 	public List<Vector3> nodes = new List<Vector3>(){Vector3.zero, Vector3.zero};

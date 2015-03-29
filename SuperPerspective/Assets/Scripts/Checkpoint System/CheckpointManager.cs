@@ -60,27 +60,14 @@ public class CheckpointManager : MonoBehaviour {
 		}
 
 		//move to destination if we fast travelled
-		if(destination != -1){
-			//search for correct checkpoint
-			GameObject[] cps = GameObject.FindGameObjectsWithTag("Checkpoint");
-			GameObject player = GameObject.Find("Player");
-			bool checkpointFound = false;
-			for(int i = 0; i < cps.Length; i++){
-				if(cps[i].GetComponent<Checkpoint>().id == destination){
-					player.transform.position = cps[i].transform.position;
-					checkpointFound = true;
-				}
-			}
-			if(!checkpointFound){
-				Debug.Log("You Lied >:( (i.e. Destination scene does not contain the correct checkpoint)");
-			}
-		}
-
-
+		//movePlayerTo(destination);
 	}
 
 	// Use this for initialization
 	void Start () {
+		//register interact button to leaving the menu
+		InputManager.instance.InteractPressed += exitMenu;
+		//init menu
 		initMenu();
 	}
 	
@@ -114,6 +101,8 @@ public class CheckpointManager : MonoBehaviour {
 	}
 
 	public void exitMenu(){
+		if(menuAlpha<.5f)
+			return;
 		menuVisible = false;
 		for(int i = 0; i < buttons.Length; i++)
 			buttons[i].SetActive(false);
@@ -142,10 +131,29 @@ public class CheckpointManager : MonoBehaviour {
 		}
 	}
 
+	void movePlayerTo(int dest){
+		if(destination == -1)
+			return;
+		//search for correct checkpoint
+		GameObject[] cps = GameObject.FindGameObjectsWithTag("Checkpoint");
+		GameObject player = GameObject.Find("NewPlayer");
+		bool checkpointFound = false;
+		for(int i = 0; i < cps.Length; i++){
+			if(cps[i].GetComponent<Checkpoint>().id == destination){
+				player.transform.position = cps[i].transform.position;
+				checkpointFound = true;
+			}
+		}
+		if(!checkpointFound){
+			Debug.Log("You Lied >:( (i.e. Destination scene does not contain the correct checkpoint)");
+		}
+	}
+	
 	public void goToCheckPoint(int id){
 		destination = id;
 		exitMenu();
-		Application.LoadLevel(scenes[id]);
+		movePlayerTo(destination);
+		//Application.LoadLevel(scenes[id]);
 	}
 
 	public void setPointReached(bool[] p){
