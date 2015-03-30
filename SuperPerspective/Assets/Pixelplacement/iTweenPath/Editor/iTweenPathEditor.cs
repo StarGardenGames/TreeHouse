@@ -26,6 +26,7 @@ using System.Collections;
 [CustomEditor(typeof(iTweenPath))]
 public class iTweenPathEditor : Editor
 {
+	#pragma warning disable 618
 	iTweenPath _target;
 	GUIStyle style = new GUIStyle();
 	public static int count = 0;

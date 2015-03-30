@@ -16,8 +16,8 @@ public class NotificationController : MonoBehaviour {
 	
 	//update visibility of planes
 	void FixedUpdate () {
-		plane3D.enabled = visible &&  PlayerController3.instance.is3D();
-		plane2D.enabled = visible && !PlayerController3.instance.is3D();
+		plane3D.enabled = visible &&  PlayerController.instance.is3D();
+		plane2D.enabled = visible && !PlayerController.instance.is3D();
 	}
 	
 	public void updateVisible(bool visible){

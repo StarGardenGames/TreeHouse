@@ -2,7 +2,7 @@
 using System.Collections;
 
 [RequireComponent(typeof(LineRenderer))]
-public class PlayerController3 : MonoBehaviour
+public class PlayerController : MonoBehaviour
 {
 	//suppress warnings
 	#pragma warning disable 1691,168,219,414
@@ -10,7 +10,7 @@ public class PlayerController3 : MonoBehaviour
     #region Properties & Variables
 
 	//singleton
-	public static PlayerController3 instance;
+	public static PlayerController instance;
 
     // Movement parameters
     public float acceleration;
@@ -54,6 +54,9 @@ public class PlayerController3 : MonoBehaviour
 
 	private Crate crate = null;
 	private Vector3 grabAxis = Vector3.zero;
+	
+	//direction of player
+	private float orientation = 0;
 
 	//Vars for edge grabbing
 	private Vector3[] cuboid;
@@ -253,9 +256,10 @@ public class PlayerController3 : MonoBehaviour
 		anim.SetBool("Pushing", false);
 		anim.SetBool("Pulling", walking && crate != null);
 		if (walking) {
-			if (crate == null)
-				model.transform.rotation = Quaternion.AngleAxis(Mathf.Rad2Deg * Mathf.Atan2(-velocity.z, velocity.x) + 90, Vector3.up);
-
+			if (crate == null){
+				orientation = Mathf.Rad2Deg * Mathf.Atan2(-velocity.z, velocity.x) + 90;
+				model.transform.rotation = Quaternion.AngleAxis(orientation, Vector3.up);
+			}
 		}
 		// ------------------------------------------------------------------------------------------------------
 		// COLLISION CHECKING
@@ -449,5 +453,9 @@ public class PlayerController3 : MonoBehaviour
 
 	public bool is3D(){
 		return GameStateManager.instance.currentPerspective== PerspectiveType.p3D;
+	}
+	
+	public float getOrientation(){
+		return orientation;
 	}
 }

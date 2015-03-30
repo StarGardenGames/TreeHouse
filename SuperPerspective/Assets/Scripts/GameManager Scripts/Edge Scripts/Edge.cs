@@ -15,7 +15,7 @@ public class Edge : MonoBehaviour {
 
 	bool validIn2D = true;
 
-	PlayerController3 player;
+	PlayerController player;
 	
 	bool init = false;//indicates whether Edge has been initiated
 	
@@ -105,8 +105,10 @@ public class Edge : MonoBehaviour {
 	//args3: bool[] showing overlapping terrains
 	//args4: how many of the terrains have been checked
 	public void Init(int or, float width, float depth, int overlapIndex){
+		//set parent
+		transform.parent = EdgeManager.instance.transform;
 		//init player reference
-		player = PlayerController3.instance;
+		player = PlayerController.instance;
 		//scale
 		Vector3 scale = gameObject.transform.localScale;
 		if(or%2 == 0)//if left or right

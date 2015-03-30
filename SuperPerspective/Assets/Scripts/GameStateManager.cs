@@ -16,7 +16,7 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
     #region Properties & Variables
 
     // Object references for the Player and the Main Camera
-    PlayerController3 playerController;
+    PlayerController playerController;
 
     // State variables
     public string currentState { get; private set; }
@@ -61,7 +61,7 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
 
         // TODO: Change this line of code to use the final player object name and script name
         // Find Player and Main Camera
-        playerController = GameObject.Find("NewPlayer").GetComponent<PlayerController3>();
+        playerController = GameObject.Find("Player").GetComponent<PlayerController>();
 
         // TODO: Change the game's starting state to dynamic behavior at some point
         // Start the game in 2D state

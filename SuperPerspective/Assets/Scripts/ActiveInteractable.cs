@@ -2,10 +2,13 @@
 using System.Collections;
 
 //can be activated by player
-public class ActiveInteractable : Interactable {
+public class ActiveInteractable : MonoBehaviour {
 	
 	//suppress warnings
 	#pragma warning disable 414
+	
+	//player
+	protected GameObject player;
 	
 	//main ActiveInteractable
 	static ActiveInteractable main;
@@ -17,16 +20,25 @@ public class ActiveInteractable : Interactable {
 	static bool notiShown = false;
 	static float notiDist = -1;
 	static ActiveInteractable selected = null;
+	static int frameCount = 0;
+	
 	//variables to determine whether player can trigger
 	bool inRange = false;
 	bool playerFacing = false;
 	bool canTrigger = false;
 	
+	//used to create a fixedlateupdate effect
+	bool fixedCalled = false;
+	
 	//distance for inRange
 	float range = 3.0f;
 	
-	public override void Start(){
-		base.Start();
+	//how much error there can be in the angle for it to be valid
+	float angleBuffer = 80;
+	
+	void Start(){
+		//find player
+		player = PlayerController.instance.gameObject;
 		//become main if no one else has become it yet
 		if(main == null)
 			main = this;
@@ -41,11 +53,10 @@ public class ActiveInteractable : Interactable {
 		InputManager.instance.InteractPressed += InteractPressed;
 	}
 		
-	public override void FixedUpdate(){
-		base.FixedUpdate();
+	void FixedUpdate(){
 		//check distance and determine if range methods need to be called
 		float dist = 0;
-		if(player.GetComponent<PlayerController3>().is3D())
+		if(player.GetComponent<PlayerController>().is3D())
 			dist = Vector3.Distance(transform.position, player.transform.position);
 		else
 			dist = Vector2.Distance(new Vector2(transform.position.x,transform.position.y),
@@ -53,7 +64,24 @@ public class ActiveInteractable : Interactable {
 		//update inRange
 		inRange = dist < range;
 		//update player facing
-		playerFacing = true;
+			//get orientation from player
+		float playerOrientation = player.GetComponent<PlayerController>().getOrientation();
+			//calculate angle between interactable and player
+		float playerAngle = Vector2.Angle(new Vector2(transform.position.x - player.transform.position.x,
+			transform.position.z - player.transform.position.z),Vector2.up);
+		float playerAngle2 = Vector2.Angle(new Vector2(transform.position.x - player.transform.position.x,
+			transform.position.z - player.transform.position.z),Vector2.right);
+			//adjust angle to be between 0 and 360
+		if(90 < playerAngle2 && playerAngle2 < 270)
+			playerAngle = 360 - playerAngle;
+			//calculate difference and modify so that it's in the correct range 
+		float angleDiff = Mathf.Abs(playerOrientation - playerAngle);
+		angleDiff += 360;
+		angleDiff %= 360;
+		if(angleDiff > 180)
+			angleDiff = 360 - angleDiff;
+			//determine whether player is facing interactable
+		playerFacing = angleDiff < angleBuffer;
 		//update canTrigger
 		canTrigger = inRange && playerFacing;
 		//update notiShown
@@ -63,11 +91,14 @@ public class ActiveInteractable : Interactable {
 			notiMarker.updateVisible(true);
 			notiDist = dist;
 		}
+		
+		fixedCalled = true;
 	}
 	
 	void LateUpdate(){
 		//perform static actions
-		if(main == this){
+		if(main == this && fixedCalled){
+			frameCount++;
 			//make notification invisible if no interactables could trigger it
 			if(!notiShown){
 				notiMarker.updateVisible(false);
@@ -75,6 +106,8 @@ public class ActiveInteractable : Interactable {
 			}
 			//prepare for next frame
 			notiShown = false;
+			
+			fixedCalled = false;
 		}
 	}
 	

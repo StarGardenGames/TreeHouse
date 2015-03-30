@@ -136,7 +136,7 @@ public class CheckpointManager : MonoBehaviour {
 			return;
 		//search for correct checkpoint
 		GameObject[] cps = GameObject.FindGameObjectsWithTag("Checkpoint");
-		GameObject player = GameObject.Find("NewPlayer");
+		GameObject player = GameObject.Find("Player");
 		bool checkpointFound = false;
 		for(int i = 0; i < cps.Length; i++){
 			if(cps[i].GetComponent<Checkpoint>().id == destination){

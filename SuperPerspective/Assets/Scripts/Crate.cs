@@ -15,7 +15,7 @@ public class Crate : MonoBehaviour {
 	private float colliderHeight, colliderWidth, colliderDepth;
 	private float Margin = 0.05f;
 
-	private PlayerController3 player;
+	private PlayerController player;
 
 	private CollisionChecker colCheck;
 
@@ -30,7 +30,7 @@ public class Crate : MonoBehaviour {
 		colliderWidth = GetComponent<Collider>().bounds.max.x - GetComponent<Collider>().bounds.min.x;
 		colliderDepth = GetComponent<Collider>().bounds.max.z - GetComponent<Collider>().bounds.min.z;
 
-		player = GameObject.Find("NewPlayer").GetComponent<PlayerController3>();
+		player = GameObject.Find("Player").GetComponent<PlayerController>();
 
 		// Register CheckGrab to grab input event
 		InputManager.instance.InteractPressed += CheckGrab;

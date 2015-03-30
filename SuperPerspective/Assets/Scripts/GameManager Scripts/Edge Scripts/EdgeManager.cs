@@ -37,7 +37,7 @@ public class EdgeManager : MonoBehaviour {
 		Vector3 posFront = new Vector3 (0, 0, -.5f);
 
 		Vector3 posTop = new Vector3(0,.5f,0);
-
+		
 		for(int i = 0; i < terrain.Length; i++){
 			//width, height, and depth of terrain, modified for edge
 			float w = terrain[i].transform.lossyScale.x + xx;

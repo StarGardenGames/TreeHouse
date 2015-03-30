@@ -2,7 +2,7 @@
 using System.Collections;
 
 //represents classes which interact with player
-public class Interactable : MonoBehaviour {
+public class PassiveInteractable : MonoBehaviour {
 	//player
 	protected GameObject player;
 			
