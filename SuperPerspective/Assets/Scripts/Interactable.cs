@@ -22,17 +22,17 @@ public class Interactable : MonoBehaviour {
 	
 	//called by player when object collides with it
 	public virtual void EnterCollisionWithPlayer(){
-		EnterCollisionWithGeneral();
+		EnterCollisionWithGeneral(player);
 	}
 	
 	//called by player when it leaves collision
 	public virtual void ExitCollisionWithPlayer(){
-		ExitCollisionWithGeneral();
+		ExitCollisionWithGeneral(player);
 	}
 	
 	//called when something in general collides with
-	public virtual void EnterCollisionWithGeneral(){}
+	public virtual void EnterCollisionWithGeneral(GameObject other){}
 	
 	//called when something in general collidios with 
-	public virtual void ExitCollisionWithGeneral(){}
+	public virtual void ExitCollisionWithGeneral(GameObject other){}
 }

@@ -1,22 +1,20 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class PushSwitch : Interactable {
+public class PushSwitchOld : Interactable {
 
 	public Activatable[] triggers;//Activatable objects which this switch triggers
-
+	
 	bool pushed = false; //whether switch is currently pushed
-
+	
 	Collider pusher = null;
-
-	Renderer rune;
-
+	
 	void Update(){
 		//update color for debugging
 		if (pushed) {
-			transform.localScale = new Vector3(0.8f, 1, 0.8f);
+			gameObject.GetComponent<Renderer> ().material.color = Color.white;
 		} else {
-			transform.localScale = new Vector3(1, 1, 1);
+			gameObject.GetComponent<Renderer> ().material.color = Color.red;
 		}
 		Bounds check;
 		if (pusher != null) {
@@ -25,14 +23,6 @@ public class PushSwitch : Interactable {
 			if (!check.Intersects (GetComponent<Collider> ().bounds))
 				ExitCollisionWithGeneral (pusher.gameObject);
 		}
-	}
-
-	void FixedUpdate() {
-		rune = GetComponentInChildren<Renderer>();
-		if (!pushed)
-			rune.transform.RotateAround (transform.position, Vector3.up, 1);
-		else
-			rune.transform.RotateAround (transform.position, Vector3.up, 2);
 	}
 
 	public override void EnterCollisionWithGeneral(GameObject other){

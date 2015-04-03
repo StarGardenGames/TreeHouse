@@ -15,11 +15,13 @@ public class Crate : MonoBehaviour {
 	private float colliderHeight, colliderWidth, colliderDepth;
 	private float Margin = 0.05f;
 
+	private Vector3 startPos;
+
 	private PlayerController player;
 
 	private CollisionChecker colCheck;
 
-	private bool grabbed;
+	private bool grabbed, respawnFlag = false;
 
 	private PerspectiveType persp = PerspectiveType.p3D;
 
@@ -35,12 +37,16 @@ public class Crate : MonoBehaviour {
 		// Register CheckGrab to grab input event
 		InputManager.instance.InteractPressed += CheckGrab;
 		GameStateManager.instance.PerspectiveShiftEvent += Shift;
+		CameraController2.instance.ShiftStartEvent += checkBreak;
 		colCheck = new CollisionChecker (GetComponent<Collider> ());
+		startPos = transform.position;
 	}
 
 	void FixedUpdate() {
 		if (!grounded)
 			velocity = new Vector3(velocity.x, Mathf.Max(velocity.y - gravity, -terminalVelocity), velocity.z);
+
+		CheckCollisions ();
 
 		float newVelocityX = velocity.x, newVelocityZ = velocity.z;
 		if (velocity.x != 0)
@@ -48,18 +54,20 @@ public class Crate : MonoBehaviour {
 			int modifier = velocity.x > 0 ? -1 : 1;
 			newVelocityX += Mathf.Min(decelleration, Mathf.Abs(velocity.x)) * modifier;
 		}
-
+		velocity.x = newVelocityX;
+	
 		if (velocity.z != 0)
 		{
 			int modifier = velocity.z > 0 ? -1 : 1;
 			newVelocityZ += Mathf.Min(decelleration, Mathf.Abs(velocity.z)) * modifier;
 		}
+		velocity.z = newVelocityZ;
 
-		colliderHeight = GetComponent<Collider>().bounds.max.y - GetComponent<Collider>().bounds.min.y;
-		colliderWidth = GetComponent<Collider>().bounds.max.x - GetComponent<Collider>().bounds.min.x;
-		colliderDepth = GetComponent<Collider>().bounds.max.z - GetComponent<Collider>().bounds.min.z;
-
-		CheckCollisions ();
+		if (GetComponent<Collider> ().enabled) {
+			colliderHeight = GetComponent<Collider> ().bounds.max.y - GetComponent<Collider> ().bounds.min.y;
+			colliderWidth = GetComponent<Collider> ().bounds.max.x - GetComponent<Collider> ().bounds.min.x;
+			colliderDepth = GetComponent<Collider> ().bounds.max.z - GetComponent<Collider> ().bounds.min.z;
+		}
 	}
 
 	void LateUpdate () {
@@ -68,6 +76,14 @@ public class Crate : MonoBehaviour {
 			grabbed = false;
 		}
 		transform.Translate(velocity * Time.deltaTime);
+		if (respawnFlag && Vector2.Distance(new Vector2(startPos.x, startPos.y), new Vector2(player.transform.position.x, player.transform.position.y)) > colliderWidth) {
+			Vector3 pos = transform.position;
+			pos = startPos + Vector3.up;
+			transform.position = pos;
+			GetComponent<Collider>().enabled = true;
+			GetComponentInChildren<Renderer>().enabled = true;
+			respawnFlag = false;
+		}
 	}
 
 	public void CheckCollisions() {
@@ -83,8 +99,14 @@ public class Crate : MonoBehaviour {
 			}
 			
 			trajectory = velocity.y * Vector3.up;
-			transform.Translate(Vector3.up * Mathf.Sign(velocity.y) * (hitInfo.distance - colliderHeight / 2));
-			velocity = new Vector3(velocity.x, 0f, velocity.z);
+			if (hitInfo.collider.gameObject.tag != "Intangible") {
+				transform.Translate(Vector3.up * Mathf.Sign(velocity.y) * (hitInfo.distance - colliderHeight / 2));
+				velocity = new Vector3(velocity.x, 0f, velocity.z);
+			} else {
+				hitInfo.collider.gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
+				CheckCollisions();
+				hitInfo.collider.gameObject.layer = LayerMask.NameToLayer("normalCollisions");
+			}
 			CollideWithObject(hitInfo, trajectory);
 		}
 		
@@ -104,8 +126,14 @@ public class Crate : MonoBehaviour {
 		if (hitInfo.collider != null)
 		{
 			trajectory = velocity.x * Vector3.right;
-			transform.Translate(Vector3.right * Mathf.Sign(velocity.x) * (hitInfo.distance - colliderWidth / 2));
-			velocity = new Vector3(0f, velocity.y, velocity.z);
+			if (hitInfo.collider.gameObject.tag != "Intangible") {
+				transform.Translate(Vector3.right * Mathf.Sign(velocity.x) * (hitInfo.distance - colliderWidth / 2));
+				velocity = new Vector3(0f, velocity.y, velocity.z);
+			} else {
+				hitInfo.collider.gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
+				CheckCollisions();
+				hitInfo.collider.gameObject.layer = LayerMask.NameToLayer("normalCollisions");
+			}
 			CollideWithObject(hitInfo, trajectory);
 		}
 		
@@ -120,12 +148,54 @@ public class Crate : MonoBehaviour {
 		if (hitInfo.collider != null)
 		{
 			trajectory = velocity.z * Vector3.forward;
-			transform.Translate(Vector3.forward * Mathf.Sign(velocity.z) * (hitInfo.distance - colliderDepth / 2));
-			velocity = new Vector3(velocity.x, velocity.y, 0f);
+			if (hitInfo.collider.gameObject.tag != "Intangible") {
+				transform.Translate(Vector3.forward * Mathf.Sign(velocity.z) * (hitInfo.distance - colliderDepth / 2));
+				velocity = new Vector3(velocity.x, velocity.y, 0f);
+			} else {
+				hitInfo.collider.gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
+				CheckCollisions();
+				hitInfo.collider.gameObject.layer = LayerMask.NameToLayer("normalCollisions");
+			}
 			CollideWithObject(hitInfo, trajectory);
 		}
 		
 		#endregion Checking Z Axis
+	}
+
+	public bool Check2DIntersect() {
+		// True if any ray hits a collider
+		bool connected = false;
+		
+		//reference variables
+		float minX 		= GetComponent<Collider>().bounds.min.x + Margin;
+		float centerX 	= GetComponent<Collider>().bounds.center.x;
+		float maxX 		= GetComponent<Collider>().bounds.max.x - Margin;
+		float minY 		= GetComponent<Collider>().bounds.min.y + Margin;
+		float centerY 	= GetComponent<Collider>().bounds.center.y;
+		float maxY 		= GetComponent<Collider>().bounds.max.y - Margin;
+		float centerZ   = GetComponent<Collider>().bounds.center.z;
+		
+		//array of startpoints
+		Vector3[] startPoints = {
+			new Vector3(minX, maxY, centerZ),
+			new Vector3(maxX, maxY, centerZ),
+			new Vector3(minX, minY, centerZ),
+			new Vector3(maxX, minY, centerZ),
+			new Vector3(centerX, centerY, centerZ)
+		};
+		
+		//check all startpoints
+		for (int i = 0; i < startPoints.Length; i++) {
+			connected = connected || Physics.Raycast (startPoints [i], Vector3.forward) || Physics.Raycast (startPoints [i], -Vector3.forward);
+		}
+
+		return connected;
+	}
+
+	void checkBreak() {
+		if (GameStateManager.instance.currentPerspective == PerspectiveType.p2D && Check2DIntersect()) {
+			respawnFlag = true;
+		}
 	}
 
 	// Used to check collisions with special objects
@@ -141,7 +211,7 @@ public class Crate : MonoBehaviour {
 			colliderDim = colliderDepth;
 		//Collision w/ PlayerInteractable
 		foreach(Interactable c in other.GetComponents<Interactable>()){
-			c.EnterCollisionWithGeneral();
+			c.EnterCollisionWithGeneral(gameObject);
 		}
 	}
 
@@ -155,18 +225,23 @@ public class Crate : MonoBehaviour {
 		}
 	}
 
-	public void SetVelocity(Vector3 velocity) {
-		this.velocity = velocity;
+	public void SetVelocity(float x, float z) {
+		velocity.x = x;
+		velocity.z = z;
 	}
 
 	private void Shift(PerspectiveType p) {
 		persp = p;
+		if (respawnFlag) {
+			GetComponent<Collider>().enabled = false;
+			GetComponentInChildren<Renderer>().enabled = false;
+		}
 	}
 
 	private bool PlayerInRange() {
 		if (persp == PerspectiveType.p3D)
-			return Mathf.Abs(player.transform.position.y - transform.position.y) <= colliderHeight / 2 && Mathf.Abs (player.transform.position.x - transform.position.x) <= colliderWidth / 2 + player.GetComponent<Collider>().bounds.size.x / 2 + Margin && Mathf.Abs (player.transform.position.z - transform.position.z) <= GetComponent<Collider>().bounds.size.z / 2 + player.GetComponent<Collider>().bounds.size.z / 2 + Margin;
+			return Mathf.Abs(player.transform.position.y - transform.position.y) <= colliderHeight / 2 && Mathf.Abs (player.transform.position.x - transform.position.x) <= colliderWidth / 2 + player.GetComponent<Collider>().bounds.size.x / 2 + Margin * 4 && Mathf.Abs (player.transform.position.z - transform.position.z) <= GetComponent<Collider>().bounds.size.z / 2 + player.GetComponent<Collider>().bounds.size.z / 2 + Margin * 4;
 		else
-			return Mathf.Abs(player.transform.position.y - transform.position.y) <= colliderHeight / 2 && Mathf.Abs (player.transform.position.x - transform.position.x) <= colliderWidth / 2 + player.GetComponent<Collider>().bounds.size.x / 2 + Margin;
+			return Mathf.Abs(player.transform.position.y - transform.position.y) <= colliderHeight / 2 && Mathf.Abs (player.transform.position.x - transform.position.x) <= colliderWidth / 2 + player.GetComponent<Collider>().bounds.size.x / 2 + Margin * 4;
 	}
 }

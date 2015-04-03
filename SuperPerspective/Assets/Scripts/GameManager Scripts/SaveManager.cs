@@ -69,7 +69,9 @@ public class SaveManager : MonoBehaviour {
 	}
 
 	public void resetSave(int i){
-		int numCheckpoints = CheckpointManager.instance.getNumCheckpoints();
+		int numCheckpoints = 0;
+		if (CheckpointManager.instance != null)
+			numCheckpoints = CheckpointManager.instance.getNumCheckpoints();
 		char[] reached = new char[numCheckpoints];
 		for(int j = 0; j < numCheckpoints; j++)
 			reached[j] = '0';

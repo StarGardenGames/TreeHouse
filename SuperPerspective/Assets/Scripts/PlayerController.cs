@@ -55,7 +55,7 @@ public class PlayerController : MonoBehaviour
 
 	private Crate crate = null;
 	private Vector3 grabAxis = Vector3.zero;
-	
+
 	//direction of player
 	private float orientation = 0;
 
@@ -278,14 +278,20 @@ public class PlayerController : MonoBehaviour
             bool running = (Mathf.Abs(velocity.z) >= maxSpeed / 2 || Mathf.Abs(velocity.x) >= maxSpeed / 2);
             anim.SetBool("Walking", walking && !running && crate == null);
             anim.SetBool("Running", running && crate == null);
-            anim.SetBool("Pushing", false);
-            anim.SetBool("Pulling", walking && crate != null);
+			if (crate == null) {
+	            anim.SetBool("Pushing", false);
+	            anim.SetBool("Pulling", false);
+			} else {
+				anim.SetBool("Pushing", Vector3.Dot(velocity, grabAxis) > 0);
+				anim.SetBool("Pulling", Vector3.Dot(velocity, grabAxis) < 0);
+			}
             if (walking)
             {
                 if (crate == null)
                     model.transform.rotation = Quaternion.AngleAxis(Mathf.Rad2Deg * Mathf.Atan2(-velocity.z, velocity.x) + 90, Vector3.up);
 
             }
+
             // ------------------------------------------------------------------------------------------------------
             // COLLISION CHECKING
             // ------------------------------------------------------------------------------------------------------
@@ -312,8 +318,14 @@ public class PlayerController : MonoBehaviour
 			}
 			
 			trajectory = velocity.y * Vector3.up;
-			transform.Translate(Vector3.up * Mathf.Sign(velocity.y) * (hitInfo.distance - colliderHeight / 2));
-			velocity = new Vector3(velocity.x, 0f, velocity.z);
+			if (hitInfo.collider.gameObject.tag != "Intangible") {
+				transform.Translate(Vector3.up * Mathf.Sign(velocity.y) * (hitInfo.distance - colliderHeight / 2));
+				velocity = new Vector3(velocity.x, 0f, velocity.z);
+			} else {
+				hitInfo.collider.gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
+				CheckCollisions();
+				hitInfo.collider.gameObject.layer = LayerMask.NameToLayer("normalCollisions");
+			}
 			CollideWithObject(hitInfo, trajectory);
 		}
 		
@@ -330,8 +342,14 @@ public class PlayerController : MonoBehaviour
 		if (hitInfo.collider != null)
 		{
 			trajectory = velocity.x * Vector3.right;
-			transform.Translate(Vector3.right * Mathf.Sign(velocity.x) * (hitInfo.distance - colliderWidth / 2));
-			velocity = new Vector3(0f, velocity.y, velocity.z);
+			if (hitInfo.collider.gameObject.tag != "Intangible") {
+				transform.Translate(Vector3.right * Mathf.Sign(velocity.x) * (hitInfo.distance - colliderWidth / 2));
+				velocity = new Vector3(0f, velocity.y, velocity.z);
+			} else {
+				hitInfo.collider.gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
+				CheckCollisions();
+				hitInfo.collider.gameObject.layer = LayerMask.NameToLayer("normalCollisions");
+			}
 			CollideWithObject(hitInfo, trajectory);
 		}
 		
@@ -345,8 +363,14 @@ public class PlayerController : MonoBehaviour
 		if (hitInfo.collider != null)
 		{
 			trajectory = velocity.z * Vector3.forward;
-			transform.Translate(Vector3.forward * Mathf.Sign(velocity.z) * (hitInfo.distance - colliderDepth / 2));
-			velocity = new Vector3(velocity.x, velocity.y, 0f);
+			if (hitInfo.collider.gameObject.tag != "Intangible") {
+				transform.Translate(Vector3.forward * Mathf.Sign(velocity.z) * (hitInfo.distance - colliderDepth / 2));
+				velocity = new Vector3(velocity.x, velocity.y, 0f);
+			} else {
+				hitInfo.collider.gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
+				CheckCollisions();
+				hitInfo.collider.gameObject.layer = LayerMask.NameToLayer("normalCollisions");
+			}
 			CollideWithObject(hitInfo, trajectory);
 		}
 		
@@ -393,7 +417,7 @@ public class PlayerController : MonoBehaviour
 		float centerX 	= GetComponent<Collider>().bounds.center.x;
 		float maxX 		= GetComponent<Collider>().bounds.max.x - Margin;
 		float minY 		= GetComponent<Collider>().bounds.min.y + Margin;
-		float centerY 	= GetComponent<Collider>().bounds.center.x;
+		float centerY 	= GetComponent<Collider>().bounds.center.y;
 		float maxY 		= GetComponent<Collider>().bounds.max.y - Margin;
 		float centerZ	= GetComponent<Collider>().bounds.center.z - gz/2;
 
@@ -431,16 +455,17 @@ public class PlayerController : MonoBehaviour
 		}
 		// Crate
 		if (trajectory.normalized != Vector3.down && other.GetComponent<Crate>()) {
-			other.transform.Translate(trajectory * 0.5f * Time.deltaTime);
-			//other.GetComponent<Crate>().SetVelocity(trajectory * 0.75f);
+			other.GetComponent<Crate>().SetVelocity((trajectory * 0.75f).x, (trajectory * 0.75f).z);
 			velocity += trajectory * 0.5f;
-			anim.SetBool("Pushing", true);
-		} else {
+			if (crate == null)
+				anim.SetBool("Pushing", true);
+		} else if (crate == null) {
 			anim.SetBool("Pushing", false);
 		}
   		//Collision w/ PlayerInteractable
-		foreach(Interactable c in other.GetComponents<Interactable>())
-			c.EnterCollisionWithPlayer();
+		foreach (Interactable c in other.GetComponents<Interactable>()) {
+			c.EnterCollisionWithPlayer ();
+		}
 	}
 
 	public void Flip() {
@@ -455,9 +480,9 @@ public class PlayerController : MonoBehaviour
 		if (crate == null)
 			return;
 		if (GameStateManager.instance.currentPerspective == PerspectiveType.p2D || Mathf.Abs (crate.transform.position.x - transform.position.x) > Mathf.Abs (crate.transform.position.z - transform.position.z)) {
-			grabAxis = Vector3.right;
+			grabAxis = Vector3.right * Mathf.Sign(crate.transform.position.x - transform.position.x);
 		} else {
-			grabAxis = Vector3.forward;
+			grabAxis = Vector3.forward * Mathf.Sign(crate.transform.position.z - transform.position.z);
 		}
 	}
 
