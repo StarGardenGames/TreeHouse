@@ -287,9 +287,10 @@ public class PlayerController : MonoBehaviour
 			}
             if (walking)
             {
-                if (crate == null)
-                    model.transform.rotation = Quaternion.AngleAxis(Mathf.Rad2Deg * Mathf.Atan2(-velocity.z, velocity.x) + 90, Vector3.up);
-
+                if (crate == null){
+                    orientation = Mathf.Rad2Deg * Mathf.Atan2(-velocity.z, velocity.x) + 90;
+						  model.transform.rotation = Quaternion.AngleAxis(orientation, Vector3.up);
+					 }
             }
 
             // ------------------------------------------------------------------------------------------------------
@@ -513,6 +514,11 @@ public class PlayerController : MonoBehaviour
 	
 	public float getOrientation(){
 		return orientation;
+	}
+	
+	public void Teleport(Vector3 newPos){
+		transform.position = newPos;
+		gameObject.GetComponent<BoundObject>().updateBounds();
 	}
 
 	#region Event Handlers

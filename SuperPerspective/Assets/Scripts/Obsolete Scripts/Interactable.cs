@@ -15,11 +15,6 @@ public class Interactable : MonoBehaviour {
 		player = PlayerController.instance.gameObject;
 	}
 	
-	
-	public virtual void FixedUpdate(){
-		//do collision checking and make calls to methods
-	}
-	
 	//called by player when object collides with it
 	public virtual void EnterCollisionWithPlayer(){
 		EnterCollisionWithGeneral(player);

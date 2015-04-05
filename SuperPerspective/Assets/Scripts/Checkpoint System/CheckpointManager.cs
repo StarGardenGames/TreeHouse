@@ -140,7 +140,8 @@ public class CheckpointManager : MonoBehaviour {
 		bool checkpointFound = false;
 		for(int i = 0; i < cps.Length; i++){
 			if(cps[i].GetComponent<Checkpoint>().id == destination){
-				player.transform.position = cps[i].transform.position;
+				//player.transform.position = cps[i].transform.position;
+				player.GetComponent<PlayerController>().Teleport(cps[i].transform.position);
 				checkpointFound = true;
 			}
 		}

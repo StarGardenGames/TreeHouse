@@ -19,9 +19,13 @@ public class SaveManager : MonoBehaviour {
 
 	void Start(){
 		string pr = PlayerPrefs.GetString(currentSave + "_pointsReached");
-		if(pr == "" || pr.Length!=CheckpointManager.instance.getNumCheckpoints())
-			for(int i = 0; i < 3; i++)
-				resetSave(i);
+		if(CheckpointManager.instance != null){
+			if(pr == "" || pr.Length!=CheckpointManager.instance.getNumCheckpoints())
+				for(int i = 0; i < 3; i++)
+					resetSave(i);
+		}else{
+			Debug.Log("The SaveManager can't find any checkpoints");
+		}
 	}
 
 	//called from menu when Play is clicked

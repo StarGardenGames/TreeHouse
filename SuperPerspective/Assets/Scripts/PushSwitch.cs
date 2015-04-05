@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class PushSwitch : Interactable {
+public class PushSwitch : PassiveInteractable {
 
 	public Activatable[] triggers;//Activatable objects which this switch triggers
 
