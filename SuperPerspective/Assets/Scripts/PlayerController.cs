@@ -506,6 +506,10 @@ public class PlayerController : MonoBehaviour
 			grabbedEdge.resetStatus();
 		grabbedEdge = null;
 	}
+	
+	public bool IsOnEdge(){
+		return grabbedEdge != null;
+	}
 
 	public bool is3D(){
 		return GameStateManager.instance.currentPerspective== PerspectiveType.p3D;

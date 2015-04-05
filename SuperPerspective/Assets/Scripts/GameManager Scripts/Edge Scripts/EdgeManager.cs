@@ -23,29 +23,29 @@ public class EdgeManager : MonoBehaviour {
 
 		//generate edges
 		if(terrain != null)
-		GenerateEdges();
+			GenerateEdges();
 	}
 
 	public void GenerateEdges(){
 		float xx = edgePrefab.transform.lossyScale.x;
 		float yy = edgePrefab.transform.lossyScale.y;
 		float zz = edgePrefab.transform.lossyScale.z;
-
+		
 		Vector3 posBack = new Vector3 (0, 0, .5f);
 		Vector3 posLeft = new Vector3 (-.5f, 0, 0);
 		Vector3 posRight = new Vector3 (.5f,0,0);
 		Vector3 posFront = new Vector3 (0, 0, -.5f);
 
 		Vector3 posTop = new Vector3(0,.5f,0);
-		
+
 		for(int i = 0; i < terrain.Length; i++){
 			//width, height, and depth of terrain, modified for edge
 			float w = terrain[i].transform.lossyScale.x + xx;
 			float d = terrain[i].transform.lossyScale.z + zz;
 			float h = terrain[i].transform.lossyScale.y - yy;
-
+			
 			Vector3 top = terrain[i].transform.position + h * posTop;
-
+	
 			GameObject rightEdge = Instantiate(edgePrefab, top + w * posRight, Quaternion.identity) as GameObject;
 			GameObject backEdge = Instantiate(edgePrefab, top + d * posBack, Quaternion.identity) as GameObject;
 			GameObject leftEdge = Instantiate(edgePrefab, top + w * posLeft, Quaternion.identity) as GameObject;

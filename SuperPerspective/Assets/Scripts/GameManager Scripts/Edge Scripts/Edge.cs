@@ -47,7 +47,7 @@ public class Edge : MonoBehaviour {
 				player.ReleaseEdge();
 			}
 		//if player is overlapping
-		}else if(isOverlaping(cuboid, player.getCuboid()) && (player.is3D() || validIn2D) && GrabButtonDown()){
+		}else if(isOverlaping(cuboid, player.getCuboid()) && !player.IsOnEdge() && (player.is3D() || validIn2D) && GrabButtonDown()){
 			Vector3 playerPos = player.gameObject.transform.position;
 			if((or%2==0 && playerPos.x == transform.position.x) || (or%2==1 && playerPos.z == transform.position.z)){
 				if(player.getCuboid()[1].y > cuboid[1].y){
@@ -103,7 +103,7 @@ public class Edge : MonoBehaviour {
 	//args1: width of terrain
 	//args2: depth of terrain
 	//args3: bool[] showing overlapping terrains
-	//args4: how many of the terrains have been checked
+	//args4: how many of the terrains have been checked (so we don't recheck them)
 	public void Init(int or, float width, float depth, int overlapIndex){
 		//set parent
 		transform.parent = EdgeManager.instance.transform;
