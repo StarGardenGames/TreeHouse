@@ -3,22 +3,28 @@ using System.Collections;
 
 public class dynamicTexture : MonoBehaviour {
 	float planeOffset = 0;
+	public Texture topTexture;
+	public Texture bottomTexture;
+	public Texture leftTexture;
+	public Texture rightTexture;
+	public Texture backTexture;
+	public Texture frontTexture;
 
 	void Awake(){
 		//create the 6 sided cube
-		createSidePlane("top", "LoadTextures/RuinTest");
-		createSidePlane("bottom", "LoadTextures/RuinTest");
-		createSidePlane("left", "LoadTextures/RuinTest");
-		createSidePlane("right", "LoadTextures/RuinTest");
-		createSidePlane("back", "LoadTextures/RuinTest");
-		createSidePlane("front", "LoadTextures/RuinTest");
+		createSidePlane("top", topTexture);
+		createSidePlane("bottom", bottomTexture);
+		createSidePlane("left", leftTexture);
+		createSidePlane("right", rightTexture);
+		createSidePlane("back", backTexture);
+		createSidePlane("front", frontTexture);
 
 		//remove the builder prototype cube
 		Destroy(this.GetComponent<MeshRenderer>());
 	}
 
 	//creates a plane on the side of a cube.
-	GameObject createSidePlane(string side, string resourcePath){
+	GameObject createSidePlane(string side, Texture texture){
 		GameObject plane = GameObject.CreatePrimitive(PrimitiveType.Plane);
 		plane.name = "dynamic-plane-"+side;
 
@@ -59,7 +65,8 @@ public class dynamicTexture : MonoBehaviour {
 		plane.transform.Rotate(rotation);
 
 		pTransform.localScale = Vector3.one*.1f;
-		plane.GetComponent<Renderer>().material.mainTexture = Resources.Load(resourcePath, typeof(Texture)) as Texture;
+		plane.GetComponent<Renderer>().material.mainTexture = texture;
+		//plane.GetComponent<Renderer>().material.mainTexture = Resources.Load(resourcePath, typeof(Texture)) as Texture;
 		TileTextureScaler tts = plane.gameObject.AddComponent<TileTextureScaler>();
 		tts.CreateComponent(side);
 
