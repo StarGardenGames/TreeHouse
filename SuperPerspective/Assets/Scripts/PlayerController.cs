@@ -153,9 +153,12 @@ public class PlayerController : MonoBehaviour
         if (!_paused)
         {
             //update cuboid for edges
-            Vector3 halfScale = gameObject.transform.localScale * .5f;
+            /*Vector3 halfScale = gameObject.transform.localScale * .5f;
             cuboid[0] = gameObject.transform.position - halfScale;
-            cuboid[1] = gameObject.transform.position + halfScale;
+            cuboid[1] = gameObject.transform.position + halfScale;*/
+				Vector3 halfScale = gameObject.transform.GetChild(3).transform.lossyScale * .5f;
+				cuboid[0] = gameObject.transform.GetChild(3).transform.position - halfScale;
+				cuboid[1] = gameObject.transform.GetChild(3).transform.position + halfScale;
 
             if (zlockFlag)
             {
@@ -506,6 +509,10 @@ public class PlayerController : MonoBehaviour
 		if(grabbedEdge!=null)
 			grabbedEdge.resetStatus();
 		grabbedEdge = null;
+	}
+	
+	public bool IsOnEdge(){
+		return grabbedEdge != null;
 	}
 
 	public bool is3D(){
