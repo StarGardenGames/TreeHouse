@@ -3,6 +3,8 @@ using System.Collections;
 
 public class BoundObject : MonoBehaviour {
 
+	#pragma warning disable 414
+
 	public Rect myBounds;
 	Rect[] bounds;
 	//float altLeftBound = -1;//-1 means no alternate left bound

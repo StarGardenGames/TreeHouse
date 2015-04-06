@@ -19,6 +19,8 @@ public class Edge : MonoBehaviour {
 	
 	bool init = false;//indicates whether Edge has been initiated
 	
+	bool playerAboveEdge = false;
+	
 	public string edgeIndex = "n/a";
 
 	public void FixedUpdate(){
@@ -49,10 +51,16 @@ public class Edge : MonoBehaviour {
 		//if player is overlapping
 		}else if(isOverlaping(cuboid, player.getCuboid()) && (player.is3D() || validIn2D) && GrabButtonDown()){
 			Vector3 playerPos = player.gameObject.transform.position;
-			if((or%2==0 && playerPos.x == transform.position.x) || (or%2==1 && playerPos.z == transform.position.z)){
-				if(player.getCuboid()[1].y > cuboid[1].y){
+			float diff = 0;
+			if(or%2 == 0)
+				diff = Mathf.Abs(playerPos.x - transform.position.x);
+			else
+				diff = Mathf.Abs(playerPos.z - transform.position.z);
+			if(diff < .0001){
+				if(status == 0){
+					playerAboveEdge = player.getCuboid()[1].y > cuboid[1].y;
 					status = 1;
-				}else if(status == 1){
+				}else if (status == 1 && playerAboveEdge != (player.getCuboid()[1].y > cuboid[1].y)){
 					status = 2;
 					player.LockToEdge(this);
 				}
@@ -127,7 +135,7 @@ public class Edge : MonoBehaviour {
 		checkOverlaps();
 
 		//init cubiod
-		Vector3 halfScale = gameObject.transform.localScale;
+		Vector3 halfScale = gameObject.transform.localScale * .5f;
 		cuboid = new Vector3[2];
 		cuboid[0] = gameObject.transform.position - halfScale;
 		cuboid[1] = gameObject.transform.position + halfScale;
