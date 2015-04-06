@@ -27,7 +27,7 @@ public class PushSwitch : Interactable {
 		}
 	}
 
-	void FixedUpdate() {
+	public override void FixedUpdate() {
 		rune = GetComponentInChildren<Renderer>();
 		if (!pushed)
 			rune.transform.RotateAround (transform.position, Vector3.up, 1);

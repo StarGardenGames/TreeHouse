@@ -153,9 +153,12 @@ public class PlayerController : MonoBehaviour
         if (!_paused)
         {
             //update cuboid for edges
-            Vector3 halfScale = gameObject.transform.localScale;
+            /*Vector3 halfScale = gameObject.transform.localScale;
             cuboid[0] = gameObject.transform.position - halfScale;
-            cuboid[1] = gameObject.transform.position + halfScale;
+            cuboid[1] = gameObject.transform.position + halfScale;*/
+				Vector3 halfScale = gameObject.transform.GetChild(3).transform.lossyScale * .5f;
+				cuboid[0] = gameObject.transform.GetChild(3).transform.position - halfScale;
+				cuboid[1] = gameObject.transform.GetChild(3).transform.position + halfScale;
 
             if (zlockFlag)
             {

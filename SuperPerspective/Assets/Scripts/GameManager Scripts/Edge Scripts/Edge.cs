@@ -19,6 +19,8 @@ public class Edge : MonoBehaviour {
 	
 	bool init = false;//indicates whether Edge has been initiated
 	
+	bool playerAboveEdge = false;
+	
 	public string edgeIndex = "n/a";
 
 	public void FixedUpdate(){
@@ -47,12 +49,18 @@ public class Edge : MonoBehaviour {
 				player.ReleaseEdge();
 			}
 		//if player is overlapping
-		}else if(isOverlaping(cuboid, player.getCuboid()) && !player.IsOnEdge() && (player.is3D() || validIn2D) && GrabButtonDown()){
+		}else if(isOverlaping(cuboid, player.getCuboid()) && (player.is3D() || validIn2D) && GrabButtonDown()){
 			Vector3 playerPos = player.gameObject.transform.position;
-			if((or%2==0 && playerPos.x == transform.position.x) || (or%2==1 && playerPos.z == transform.position.z)){
-				if(player.getCuboid()[1].y > cuboid[1].y){
+			float diff = 0;
+			if(or%2 == 0)
+				diff = Mathf.Abs(playerPos.x - transform.position.x);
+			else
+				diff = Mathf.Abs(playerPos.z - transform.position.z);
+			if(diff < .0001f){
+				if(status == 0){
+					playerAboveEdge = player.getCuboid()[1].y > cuboid[1].y;
 					status = 1;
-				}else if(status == 1){
+				}else if (status == 1 && playerAboveEdge != (player.getCuboid()[1].y > cuboid[1].y)){
 					status = 2;
 					player.LockToEdge(this);
 				}
@@ -103,8 +111,10 @@ public class Edge : MonoBehaviour {
 	//args1: width of terrain
 	//args2: depth of terrain
 	//args3: bool[] showing overlapping terrains
-	//args4: how many of the terrains have been checked (so we don't recheck them)
-	public void Init(int or, float width, float depth, int overlapIndex){
+	//args4: how many of the terrains have been checked
+	public void Init(int or, float width, float depth, int overlapIndex, string edgeIndex){
+		//set index
+		this.edgeIndex = edgeIndex;
 		//set parent
 		transform.parent = EdgeManager.instance.transform;
 		//init player reference
@@ -115,6 +125,7 @@ public class Edge : MonoBehaviour {
 			scale.z = depth;
 		else//if front or back
 			scale.x = width;
+		
 		gameObject.transform.localScale = scale;
 
 		//orientation
@@ -127,7 +138,7 @@ public class Edge : MonoBehaviour {
 		checkOverlaps();
 
 		//init cubiod
-		Vector3 halfScale = gameObject.transform.localScale;
+		Vector3 halfScale = gameObject.transform.localScale * .5f;
 		cuboid = new Vector3[2];
 		cuboid[0] = gameObject.transform.position - halfScale;
 		cuboid[1] = gameObject.transform.position + halfScale;
@@ -136,8 +147,8 @@ public class Edge : MonoBehaviour {
 		init = true;
 	}
 
-	public void Init(int or, float width, float depth){
-		Init(or, width, depth, 0);
+	public void Init(int or, float width, float depth, string edgeIndex){
+		Init(or, width, depth, 0, edgeIndex);
 	}
 
 	public void checkOverlaps(){
@@ -184,8 +195,8 @@ public class Edge : MonoBehaviour {
 					min = overBot[0][2];
 					max = overBot[1][2];
 				}else{
-					min = overBot[0][1];
-					max = overBot[1][1];
+					min = overBot[0][0];
+					max = overBot[1][0];
 				}
 			}
 			if(overTop != null){
@@ -206,12 +217,12 @@ public class Edge : MonoBehaviour {
 				float newZ = (max + posZ + halfScaleZ) * .5f;
 				Vector3 newPos = new Vector3(gameObject.transform.position.x,gameObject.transform.position.y,newZ);
 				GameObject newEdge = Instantiate(EdgeManager.instance.edgePrefab, newPos, Quaternion.identity) as GameObject;
-				newEdge.GetComponent<Edge>().edgeIndex = "split_"+EdgeManager.instance.getGlobalIndex();
 				float newDepth = posZ + halfScaleZ - max;
 				if(newDepth <=0)
 					Destroy(newEdge);
 				else
-					newEdge.GetComponent<Edge>().Init(or, 0, newDepth, overlapIndex);
+					newEdge.GetComponent<Edge>().Init(or, 0, newDepth, overlapIndex, 
+						"split_"+EdgeManager.instance.getGlobalIndex());
 				//shorten current edge
 				float myZ = (min + posZ - halfScaleZ) * .5f;
 				Vector3 myPos = gameObject.transform.position;
@@ -234,12 +245,12 @@ public class Edge : MonoBehaviour {
 				float newX = (max + posX + halfScaleX) * .5f;
 				Vector3 newPos = new Vector3(newX,gameObject.transform.position.y,gameObject.transform.position.z);
 				GameObject newEdge = Instantiate(EdgeManager.instance.edgePrefab, newPos, Quaternion.identity) as GameObject;
-				newEdge.GetComponent<Edge>().edgeIndex = "split_"+EdgeManager.instance.getGlobalIndex();
 				float newWidth = posX + halfScaleX - max;
 				if(newWidth <= 0)
 					Destroy(newEdge);
 				else
-					newEdge.GetComponent<Edge>().Init(or, newWidth, 0, overlapIndex);
+					newEdge.GetComponent<Edge>().Init(or, newWidth, 0, overlapIndex,
+						"split_"+EdgeManager.instance.getGlobalIndex());
 				//shorten current edge
 				float myX = (min + posX - halfScaleX) * .5f;
 				Vector3 myPos = gameObject.transform.position;
