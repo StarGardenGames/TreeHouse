@@ -11,7 +11,7 @@ public class Edge : MonoBehaviour {
 
 	Vector3[] cuboid;
 
-	int status = 0; //0: no overlap, 1: lined up, 2: latched, 3: rested latch
+	byte status = 0; //0: no overlap, 1: lined up, 2: latched, 3: rested latch
 
 	bool validIn2D = true;
 
@@ -32,8 +32,10 @@ public class Edge : MonoBehaviour {
 			if(status == 2 && !GrabButtonDown())
 				status = 3;
 			//if player is trying to let go
-			if(ReleaseButtonDown())
-				player.ReleaseEdge();
+			if(ReleaseButtonDown()){
+				status = 0;
+				player.UpdateEdgeState(this, status, 4);
+			}
 			//if player is trying to get up
 			if(status == 3 && GrabButtonDown()){
 				Vector3 playerPos = player.gameObject.transform.position;
@@ -46,10 +48,11 @@ public class Edge : MonoBehaviour {
 				case 3: playerPos.z += playerScale.z; break;
 				}
 				player.gameObject.transform.position = playerPos;
-				player.ReleaseEdge();
+				status = 0;
+				player.UpdateEdgeState(this, status, 5);
 			}
 		//if player is overlapping
-		}else if(isOverlaping(cuboid, player.getCuboid()) && (player.is3D() || validIn2D) && GrabButtonDown()){
+		}else if(isOverlaping(cuboid, player.getCuboid()) && (player.is3D() || validIn2D)/* && GrabButtonDown()*/){
 			Vector3 playerPos = player.gameObject.transform.position;
 			float diff = 0;
 			if(or%2 == 0)
@@ -60,19 +63,22 @@ public class Edge : MonoBehaviour {
 				if(status == 0){
 					playerAboveEdge = player.getCuboid()[1].y > cuboid[1].y;
 					status = 1;
+					player.UpdateEdgeState(this, status);
 				}else if (status == 1 && playerAboveEdge != (player.getCuboid()[1].y > cuboid[1].y)){
 					status = 2;
-					player.LockToEdge(this);
+					player.UpdateEdgeState(this,status);
 				}
 			}
 		//if nothing is overlapping
-		}else
+		}else{
 			status = 0;
+			player.UpdateEdgeState(this, status);
+		}
 
 		//check for making the player let go
 		if(status != 0 && !player.is3D() && !validIn2D){
-			player.ReleaseEdge();
-			Debug.Log("Player Release");
+			status = 0;
+			player.UpdateEdgeState(this, status);
 		}	
 	}
 
