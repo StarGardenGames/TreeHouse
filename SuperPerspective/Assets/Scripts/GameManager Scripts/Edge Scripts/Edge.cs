@@ -41,11 +41,12 @@ public class Edge : MonoBehaviour {
 				Vector3 playerPos = player.gameObject.transform.position;
 				Vector3 playerScale = player.gameObject.transform.localScale;
 				playerPos.y += playerScale.y;
+				float offsetScale = .5f;
 				switch(or){
-				case 0: playerPos.x -= playerScale.x; break;
-				case 1: playerPos.z -= playerScale.z; break;
-				case 2: playerPos.x += playerScale.x; break;
-				case 3: playerPos.z += playerScale.z; break;
+				case 0: playerPos.x -= playerScale.x * offsetScale; break;
+				case 1: playerPos.z -= playerScale.z * offsetScale; break;
+				case 2: playerPos.x += playerScale.x * offsetScale; break;
+				case 3: playerPos.z += playerScale.z * offsetScale; break;
 				}
 				player.gameObject.transform.position = playerPos;
 				status = 0;

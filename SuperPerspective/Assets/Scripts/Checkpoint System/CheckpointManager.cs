@@ -82,8 +82,6 @@ public class CheckpointManager : MonoBehaviour {
 		menuAlpha += ((menuVisible)? (1/fadeTime) : -(1/fadeTime))*Time.deltaTime;
 		menuAlpha = Mathf.Clamp(menuAlpha,0f,1f);
 		menu.GetComponent<CanvasGroup>().alpha = menuAlpha;
-		//Debug.Log(menuAlpha);
-
 	}
 
 	public void showMenu(int id){

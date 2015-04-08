@@ -170,7 +170,7 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
     // Determine if the pause event should be aised. Do nothing if in a menu 
     private void HandlePausePressed()
     {
-        Debug.Log("MENU");
+        //Debug.Log("MENU");
         if (currentState == STATE_GAMEPLAY_2D || currentState == STATE_GAMEPLAY_3D)
         {
             // If the current state is a gameplay state pause the game

@@ -313,15 +313,20 @@ public class PlayerController : MonoBehaviour
 					anim.SetBool("Pushing", Vector3.Dot(velocity, grabAxis) > 0);
 					anim.SetBool("Pulling", Vector3.Dot(velocity, grabAxis) < 0);
 				}
-				if (walking)
+				// ------------------------------------------------------------------------------------------------------
+            // MANAGE EDGE STATE
+            // ------------------------------------------------------------------------------------------------------
+				if (walking && crate == null && edgeState < 2 && !climbing)
 				{
-					 if (crate == null){
-						  orientation = Mathf.Rad2Deg * Mathf.Atan2(-velocity.z, velocity.x) + 90;
-						  model.transform.rotation = Quaternion.AngleAxis(orientation, Vector3.up);
-					 }
-				}	
+					orientation = Mathf.Rad2Deg * Mathf.Atan2(-velocity.z, velocity.x) + 90;
+				}else if(edgeState >= 2){
+					orientation = (-1 - grabbedEdge.getOrientation()) * 90;
+				}				
+				model.transform.rotation = Quaternion.AngleAxis(orientation, Vector3.up);
 			
-				//manage edge state
+				// ------------------------------------------------------------------------------------------------------
+            // MANAGE EDGE STATE
+            // ------------------------------------------------------------------------------------------------------
 				int animEdgeState = anim.GetInteger("EdgeState");
 				if(animEdgeState < 3)
 					anim.SetInteger("EdgeState", edgeState);
