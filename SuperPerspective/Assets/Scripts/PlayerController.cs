@@ -478,7 +478,8 @@ public class PlayerController : MonoBehaviour
 		//check all startpoints
 		for(int i = 0; i < startPoints.Length; i++)
 			connected = connected || Physics.Raycast(startPoints[i], Vector3.forward);
-		
+
+        Debug.Log("Intersect: " + connected);
 		return connected;
 	}
 

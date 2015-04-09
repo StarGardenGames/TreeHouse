@@ -105,12 +105,16 @@ public class CameraController2 : PersistentSingleton<CameraController2>
 
     public void SetMount(Transform newMount, Matrix4x4 newViewSettings)
     {
-        mount = newMount;
-        targetMatrix = newViewSettings;
-        shiftComplete = false;
-        if (blender != null)
-            blender.BlendToMatrix(targetMatrix, cameraBlendSpeed);
-		RaiseShiftStartEvent();
+        if (newMount != mount)
+        {
+            mount = newMount;
+            targetMatrix = newViewSettings;
+            shiftComplete = false;
+            if (blender != null)
+                blender.BlendToMatrix(targetMatrix, cameraBlendSpeed);
+
+            RaiseShiftStartEvent();
+        }
     }
 
     #endregion Public Interface
