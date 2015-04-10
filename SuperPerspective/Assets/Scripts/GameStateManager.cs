@@ -70,7 +70,7 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
 
         // TODO: Change the game's starting state to dynamic behavior at some point
         // Start the game in 2D state
-        currentState = STATE_MENU;
+        currentState = STATE_GAMEPLAY_2D;
 		currentPerspective = PerspectiveType.p3D;
         CameraController2.instance.SetMount(MOUNT_MENU, VIEW_SETTINGS_MENU);
 
@@ -200,6 +200,8 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
 
             if (playerController.Check2DIntersect())
                 StartCoroutine(FailTimer());
+			else
+				playerController.Flip();
         }
     }
 

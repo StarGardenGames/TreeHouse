@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Crate : MonoBehaviour {
+public class Crate : ActiveInteractable {
 
 	#pragma warning disable 219
 
@@ -17,8 +17,6 @@ public class Crate : MonoBehaviour {
 
 	private Vector3 startPos;
 
-	private PlayerController player;
-
 	private CollisionChecker colCheck;
 
 	private bool grabbed, respawnFlag = false;
@@ -26,25 +24,30 @@ public class Crate : MonoBehaviour {
 	private PerspectiveType persp = PerspectiveType.p3D;
 
 	void Start() {
+		base.StartSetup ();
 		grounded = false;
 		velocity = Vector3.zero;
 		colliderHeight = GetComponent<Collider>().bounds.size.y;
 		colliderWidth = GetComponent<Collider>().bounds.size.x;
 		colliderDepth = GetComponent<Collider>().bounds.size.z;
 
-		player = GameObject.Find("Player").GetComponent<PlayerController>();
+		//player = GameObject.Find("Player").GetComponent<PlayerController>();
 
 		// Register CheckGrab to grab input event
-		InputManager.instance.InteractPressed += CheckGrab;
+		//InputManager.instance.InteractPressed += CheckGrab;
 		GameStateManager.instance.PerspectiveShiftEvent += Shift;
 		CameraController2.instance.ShiftStartEvent += checkBreak;
 		colCheck = new CollisionChecker (GetComponent<Collider> ());
 		startPos = transform.position;
+		range = 1.75f;
 	}
 
 	void FixedUpdate() {
+		base.FixedUpdateLogic ();
 		if (!grounded)
 			velocity = new Vector3(velocity.x, Mathf.Max(velocity.y - gravity, -terminalVelocity), velocity.z);
+
+		CheckCollisions ();
 
 		float newVelocityX = velocity.x, newVelocityZ = velocity.z;
 		if (velocity.x != 0)
@@ -67,12 +70,19 @@ public class Crate : MonoBehaviour {
 			colliderDepth = GetComponent<Collider>().bounds.size.z;
 		}
 
-		CheckCollisions ();
+		//CheckCollisions ();
 	}
 
 	void LateUpdate () {
-		if (grabbed && !PlayerInRange()) {
-			player.Grab(null);
+		base.LateUpdateLogic ();
+		float dist = 0;
+		if (GameStateManager.instance.currentPerspective == PerspectiveType.p2D)
+			Vector3.Distance(transform.position, player.transform.position);
+		else
+			dist = Vector2.Distance(new Vector2(transform.position.x,transform.position.y),
+			                        new Vector2(player.transform.position.x, player.transform.position.y));
+		if (grabbed && dist > range) {
+			player.GetComponent<PlayerController>().Grab(null);
 			grabbed = false;
 		}
 		transform.Translate(velocity * Time.deltaTime);
@@ -118,7 +128,7 @@ public class Crate : MonoBehaviour {
 		// If any rays connected move the player and set grounded to true since we're now on the ground
 		
 		hits = colCheck.CheckXCollision (velocity, Margin);
-		
+
 		close = -1;
 		for (int i = 0; i < hits.Length; i++) {
 			RaycastHit hitInfo = hits[i];
@@ -193,7 +203,11 @@ public class Crate : MonoBehaviour {
 	}
 
 	void checkBreak() {
-		if (GameStateManager.instance.currentPerspective == PerspectiveType.p2D && Check2DIntersect()) {
+		if (GameStateManager.instance.currentPerspective == PerspectiveType.p2D && Check2DIntersect ()) {
+			if (grabbed){
+				player.GetComponent<PlayerController> ().Grab (null);
+				grabbed = false;
+			}
 			respawnFlag = true;
 		}
 	}
@@ -218,12 +232,12 @@ public class Crate : MonoBehaviour {
 		}
 	}
 
-	public void CheckGrab() {
-		if (!grabbed && PlayerInRange()) {
-			player.Grab(this);
+	public override void Triggered() {
+		if (!grabbed) {
+			player.GetComponent<PlayerController> ().Grab (this);
 			grabbed = true;
-		} else if (grabbed) {
-			player.Grab(null);
+		} else {
+			player.GetComponent<PlayerController> ().Grab (null);
 			grabbed = false;
 		}
 	}

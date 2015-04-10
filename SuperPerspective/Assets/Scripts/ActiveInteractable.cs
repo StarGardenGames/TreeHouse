@@ -31,12 +31,31 @@ public class ActiveInteractable : MonoBehaviour {
 	bool fixedCalled = false;
 	
 	//distance for inRange
-	float range = 3.0f;
+	protected float range = 3.0f;
 	
 	//how much error there can be in the angle for it to be valid
 	float angleBuffer = 80;
 	
 	void Start(){
+		StartSetup ();
+	}
+		
+	void FixedUpdate(){
+		FixedUpdateLogic ();
+	}
+	
+	void LateUpdate(){
+		LateUpdateLogic ();
+	}
+	
+	void InteractPressed(){
+		if(selected == this)
+			Triggered();
+	}
+	
+	public virtual void Triggered(){}
+
+	protected void StartSetup() {
 		//find player
 		player = PlayerController.instance.gameObject;
 		//become main if no one else has become it yet
@@ -52,35 +71,35 @@ public class ActiveInteractable : MonoBehaviour {
 		//register interactpressed to the InputManager
 		InputManager.instance.InteractPressed += InteractPressed;
 	}
-		
-	void FixedUpdate(){
+
+	protected void FixedUpdateLogic() {
 		//check distance and determine if range methods need to be called
 		float dist = 0;
 		if(player.GetComponent<PlayerController>().is3D())
 			dist = Vector3.Distance(transform.position, player.transform.position);
 		else
 			dist = Vector2.Distance(new Vector2(transform.position.x,transform.position.y),
-				new Vector2(player.transform.position.x, player.transform.position.y));
+			                        new Vector2(player.transform.position.x, player.transform.position.y));
 		//update inRange
 		inRange = dist < range;
 		//update player facing
-			//get orientation from player
+		//get orientation from player
 		float playerOrientation = player.GetComponent<PlayerController>().getOrientation();
-			//calculate angle between interactable and player
+		//calculate angle between interactable and player
 		float playerAngle = Vector2.Angle(new Vector2(transform.position.x - player.transform.position.x,
-			transform.position.z - player.transform.position.z),Vector2.up);
+		                                              transform.position.z - player.transform.position.z),Vector2.up);
 		float playerAngle2 = Vector2.Angle(new Vector2(transform.position.x - player.transform.position.x,
-			transform.position.z - player.transform.position.z),Vector2.right);
-			//adjust angle to be between 0 and 360
+		                                               transform.position.z - player.transform.position.z),Vector2.right);
+		//adjust angle to be between 0 and 360
 		if(90 < playerAngle2 && playerAngle2 < 270)
 			playerAngle = 360 - playerAngle;
-			//calculate difference and modify so that it's in the correct range 
+		//calculate difference and modify so that it's in the correct range 
 		float angleDiff = Mathf.Abs(playerOrientation - playerAngle);
 		angleDiff += 360;
 		angleDiff %= 360;
 		if(angleDiff > 180)
 			angleDiff = 360 - angleDiff;
-			//determine whether player is facing interactable
+		//determine whether player is facing interactable
 		playerFacing = angleDiff < angleBuffer;
 		//update canTrigger
 		canTrigger = inRange && playerFacing;
@@ -94,8 +113,8 @@ public class ActiveInteractable : MonoBehaviour {
 		
 		fixedCalled = true;
 	}
-	
-	void LateUpdate(){
+
+	protected void LateUpdateLogic() {
 		//perform static actions
 		if(main == this && fixedCalled){
 			frameCount++;
@@ -110,11 +129,4 @@ public class ActiveInteractable : MonoBehaviour {
 			fixedCalled = false;
 		}
 	}
-	
-	void InteractPressed(){
-		if(selected == this)
-			Triggered();
-	}
-	
-	public virtual void Triggered(){}
 }
