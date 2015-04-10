@@ -73,6 +73,8 @@ public class CheckpointManager : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+		//enable/disable canvas component
+		menu.GetComponent<Canvas>().enabled = (menuAlpha != 0f);
 		//check if we entered new room
 		if(destination != -1 && menuVisible){
 			menuAlpha = 1;
@@ -82,8 +84,6 @@ public class CheckpointManager : MonoBehaviour {
 		menuAlpha += ((menuVisible)? (1/fadeTime) : -(1/fadeTime))*Time.deltaTime;
 		menuAlpha = Mathf.Clamp(menuAlpha,0f,1f);
 		menu.GetComponent<CanvasGroup>().alpha = menuAlpha;
-		//Debug.Log(menuAlpha);
-
 	}
 
 	public void showMenu(int id){
@@ -140,7 +140,8 @@ public class CheckpointManager : MonoBehaviour {
 		bool checkpointFound = false;
 		for(int i = 0; i < cps.Length; i++){
 			if(cps[i].GetComponent<Checkpoint>().id == destination){
-				player.transform.position = cps[i].transform.position;
+				//player.transform.position = cps[i].transform.position;
+				player.GetComponent<PlayerController>().Teleport(cps[i].transform.position);
 				checkpointFound = true;
 			}
 		}

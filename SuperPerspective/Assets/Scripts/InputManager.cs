@@ -27,6 +27,7 @@ public class InputManager : Singleton<InputManager>
     public event System.Action PausePressedEvent;
 
     // Game's pause state
+	 private bool continuePressed = false;//used as an alternate way to unpause
     private bool _paused = false;
     public bool paused
     {
@@ -48,8 +49,10 @@ public class InputManager : Singleton<InputManager>
 	void Update () {
 
         // Check pause button
-        if (Input.GetButtonDown("Pause"))
-            RaiseGamePauseEvent();
+        if (Input.GetButtonDown("Pause") || continuePressed){
+            continuePressed = false;
+				RaiseGamePauseEvent();
+		  }
 
         // Check jump button
         if (Input.GetButtonDown("Jump"))
@@ -179,8 +182,10 @@ public class InputManager : Singleton<InputManager>
         if (GrabPressed != null)
             GrabPressed();
     }
-
-
+	 
+	 public void ContinuePressed(){
+		 continuePressed = true;
+	 }
 
     #endregion Event Raising Functions
 }

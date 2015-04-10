@@ -14,10 +14,10 @@ public class ToggleSwitch : ActiveInteractable {
 
 	void Update(){
 		//update color for debugging
-		if(toggleEnabled)
+		/*if(toggleEnabled)
 			gameObject.GetComponent<Renderer>().material.color = Color.white;
 		else
-			gameObject.GetComponent<Renderer>().material.color = Color.red;
+			gameObject.GetComponent<Renderer>().material.color = Color.red;*/
 	}
 
 	public override void Triggered(){

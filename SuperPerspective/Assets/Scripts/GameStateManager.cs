@@ -23,11 +23,16 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
     public string previousState { get; private set; }
     public string targetState { get; private set; }
     public PerspectiveType currentPerspective { get; private set; }
+
     private const string STATE_GAMEPLAY_2D = "2D";
     private const string STATE_GAMEPLAY_3D = "3D";
     private const string STATE_MENU = "menu";
     private const string STATE_PAUSED = "pause";
     private const string STATE_TRANSITION = "transition";
+
+    // Flip failure timer variables
+    private float failureTime = .3f;    // How long the transition lasts before the flip fails and switches back
+    private float failureTimer = 0f;    // The current timer used in the FailTimer coroutine
 
     // TODO: Change camera mounts to be dynamic once menus and platforms are improved
     // Camera Mounts
@@ -40,7 +45,7 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
     private Matrix4x4 VIEW_SETTINGS_GAMEPLAY_3D =   CameraMatrixTypes.Standard3D;
     private Matrix4x4 VIEW_SETTINGS_GAMEPLAY_2D =   CameraMatrixTypes.Standard2D;
     private Matrix4x4 VIEW_SETTINGS_PAUSED =        CameraMatrixTypes.Standard3D;   // Consider adding specific settings for pause
-    private Matrix4x4 VIEW_SETTINGS_MENU =          CameraMatrixTypes.Standard3D;   // Consider adding specific settings for menus
+    private Matrix4x4 VIEW_SETTINGS_MENU =          CameraMatrixTypes.Menu;   // Consider adding specific settings for menus
 
     // Events to notify listeners of state changes
     public event System.Action<bool> GamePausedEvent;
@@ -57,7 +62,7 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
         MOUNT_GAMEPLAY_2D = GameObject.Find("2DCameraMount").transform;
         MOUNT_GAMEPLAY_3D = GameObject.Find("3DCameraMount").transform;
         //MOUNT_PAUSED = GameObject.Find("PauseMount").transform;             // Consider switching this to be more dynamic in future
-        //MOUNT_MENU = GameObject.Find("MenuMount").transform;                // Consider switching this to be more dynamic in future
+        MOUNT_MENU = GameObject.Find("MenuMount").transform;                // Consider switching this to be more dynamic in future
 
         // TODO: Change this line of code to use the final player object name and script name
         // Find Player and Main Camera
@@ -65,13 +70,16 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
 
         // TODO: Change the game's starting state to dynamic behavior at some point
         // Start the game in 2D state
-        currentState = STATE_GAMEPLAY_2D;
-		currentPerspective = PerspectiveType.p2D;
-        CameraController2.instance.SetMount(MOUNT_GAMEPLAY_2D, VIEW_SETTINGS_GAMEPLAY_2D);
+        currentState = STATE_MENU;
+		currentPerspective = PerspectiveType.p3D;
+        CameraController2.instance.SetMount(MOUNT_MENU, VIEW_SETTINGS_MENU);
 
         // Register event handlers to InputManagers
         InputManager.instance.ShiftPressedEvent += HandleShiftPressed;
         InputManager.instance.PausePressedEvent += HandlePausePressed;
+
+        // Register to switch state to proper gameplay when shift is complete
+        CameraController2.instance.ShiftCompleteEvent += HandleShiftComplete;
 	}
 
     #endregion Monobehavior Implementation
@@ -93,11 +101,6 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
         CameraController2.instance.SetMount(MOUNT_GAMEPLAY_3D, VIEW_SETTINGS_GAMEPLAY_3D);
     }
 
-	//called by Main Menu when play button is pressed
-	public void GameStart(){
-
-	}
-
     // Enter transition state between 2D and 3D or vice-versa
     private void EnterTransition(string targetState)
     {
@@ -114,8 +117,6 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
         else
             CameraController2.instance.SetMount(MOUNT_GAMEPLAY_3D, VIEW_SETTINGS_GAMEPLAY_3D);
 
-        // Register to switch state to proper gameplay when shift is complete
-        CameraController2.instance.ShiftCompleteEvent += HandleShiftComplete;
     }
 
     // Pause the game
@@ -169,8 +170,7 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
 
     // Determine if the pause event should be aised. Do nothing if in a menu 
     private void HandlePausePressed()
-    {
-        Debug.Log("MENU");
+    {   
         if (currentState == STATE_GAMEPLAY_2D || currentState == STATE_GAMEPLAY_3D)
         {
             // If the current state is a gameplay state pause the game
@@ -197,6 +197,9 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
 
             // Begin transition to that state (since this involves the shift animation we use the transition state)
             EnterTransition(newPerspective);
+
+            if (playerController.Check2DIntersect())
+                StartCoroutine(FailTimer());
         }
     }
 
@@ -216,20 +219,22 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
     // Handle the event raised when the camera completes its shift. 
     private void HandleShiftComplete()
     {
-        // Alert listeners to change in perspective
-        RaisePerspectiveShiftEvent();
-        
-        // Transition to target state
-        if (targetState == STATE_GAMEPLAY_2D)
-            EnterGameplay2D();
-        else
-            EnterGameplay3D();
+        if (currentState != STATE_MENU && currentState != STATE_PAUSED)
+        {
+            // Alert listeners to change in perspective
+            RaisePerspectiveShiftEvent();
 
-        // Unpause Game
-        RaisePauseEvent(false);
+            // Transition to target state
+            if (targetState == STATE_GAMEPLAY_2D)
+                EnterGameplay2D();
+            else
+                EnterGameplay3D();
 
-        // Unregister this function
-        CameraController2.instance.ShiftCompleteEvent -= HandleShiftComplete;
+            // Unpause Game
+            RaisePauseEvent(false);
+        }
+        // Unregister this function (we can probably remove this)
+        // CameraController2.instance.ShiftCompleteEvent -= HandleShiftComplete;
     }
 
     #endregion Event Handlers
@@ -256,11 +261,39 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
 
     #region Public Interface
 
+    // Called by main menu to begin gameplay
     public void StartGame()
     {
-
+        EnterTransition(STATE_GAMEPLAY_3D);
+        currentPerspective = PerspectiveType.p3D;
     }
     #endregion Public Interface
+
+    #region Helper Functions
+
+    private IEnumerator FailTimer()
+    {
+        failureTimer = 0f;
+
+        while (failureTimer < failureTime)
+        {
+            failureTimer += Time.deltaTime;
+
+            yield return null;
+        }
+
+        // Find the corresponding perspective to store for external reference
+        currentPerspective = (targetState == STATE_GAMEPLAY_2D) ? PerspectiveType.p3D : PerspectiveType.p2D;
+
+        // Find the corresponding perspective to store for external reference
+        if (targetState == STATE_GAMEPLAY_2D)
+            EnterTransition(STATE_GAMEPLAY_3D);
+        else
+            EnterTransition(STATE_GAMEPLAY_2D);
+
+    }
+
+    #endregion
 
 }
 

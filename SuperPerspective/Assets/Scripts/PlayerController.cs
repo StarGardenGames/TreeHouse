@@ -16,6 +16,7 @@ public class PlayerController : MonoBehaviour
     public float acceleration;
     public float decelleration;
     public float maxSpeed;
+	 public float hangMaxSpeed;
     public float gravity;
     public float terminalVelocity;
     public float jump;
@@ -63,6 +64,8 @@ public class PlayerController : MonoBehaviour
 	//Vars for edge grabbing
 	private Vector3[] cuboid;
 	Edge grabbedEdge = null;
+	byte edgeState = 0;//0: not near an edge, 1: close to an edge, 2:hanging
+	bool climbing = false;
 
     #endregion
 
@@ -130,19 +133,22 @@ public class PlayerController : MonoBehaviour
 
             // This only runs while the player is grounded, it allows the player to jump as soon as they land 
             //      even if they pressed the jump button while in midair if they were close enough to the ground
-            if ((grounded || grabbedEdge != null) && Time.time - jumpPressedTime < jumpMargin && crate == null)
+            if ((grounded || edgeState == 2) && Time.time - jumpPressedTime < jumpMargin && crate == null)
             {
-                anim.SetTrigger("Jump");
-                grounded = false;
-                velocity = new Vector3(velocity.x, jump, velocity.z);
-                jumpPressedTime = 0;
-                ReleaseEdge();
+					anim.SetTrigger("Jump");
+					grounded = false;
+					velocity = new Vector3(velocity.x, jump, velocity.z);
+					jumpPressedTime = 0;
+					ReleaseEdge();
+					//update edgeState for animation
+					anim.SetInteger("EdgeState", 6);
             }
 
             lastInput = input;
 
             anim.SetBool("Falling", falling);
             anim.SetBool("Grounded", velocity.y == 0);
+				
         }
     }
 
@@ -151,10 +157,13 @@ public class PlayerController : MonoBehaviour
     {
         if (!_paused)
         {
+				//update climbing variable
+				climbing = anim.GetCurrentAnimatorStateInfo(0).IsName("HangUp");
+			  
             //update cuboid for edges
-            Vector3 halfScale = gameObject.transform.localScale;
-            cuboid[0] = gameObject.transform.position - halfScale;
-            cuboid[1] = gameObject.transform.position + halfScale;
+				Vector3 halfScale = gameObject.transform.GetChild(3).transform.lossyScale * .5f;
+				cuboid[0] = gameObject.transform.GetChild(3).transform.position - halfScale;
+				cuboid[1] = gameObject.transform.GetChild(3).transform.position + halfScale;
 
             if (zlockFlag)
             {
@@ -165,14 +174,14 @@ public class PlayerController : MonoBehaviour
             // ------------------------------------------------------------------------------------------------------
             // VERTICAL MOVEMENT VELOCITY CALCULATIONS
             // ------------------------------------------------------------------------------------------------------
-            if (grabbedEdge == null)
+            if (edgeState != 2)
             {
                 // Apply Gravity
                 if (!grounded)
                     velocity = new Vector3(velocity.x, Mathf.Max(velocity.y - gravity, -terminalVelocity), velocity.z);
 
                 // Determine if the player is falling
-                if (velocity.y < 0f)
+                if (velocity.y < 0f && edgeState == 0)
                     falling = true;
             }
             else
@@ -186,8 +195,8 @@ public class PlayerController : MonoBehaviour
             // X-AXIS MOVEMENT VELOCITY CALCULATIONS
             // ------------------------------------------------------------------------------------------------------
             float newVelocityX = velocity.x;
-            //if we're either not on an edge, or on an edge which allows x movement
-            if (grabbedEdge == null || grabbedEdge.getOrientation() % 2 == 1)
+            //if we're either not on an edge
+            if (edgeState != 2 && !climbing)
             {
                 float xAxis = InputManager.instance.GetForwardMovement();
                 if (xAxis != 0)
@@ -200,25 +209,35 @@ public class PlayerController : MonoBehaviour
                     int modifier = velocity.x > 0 ? -1 : 1;
                     newVelocityX += Mathf.Min(decelleration, Mathf.Abs(velocity.x)) * modifier;
                 }
-
-                //clamp movement if we're on edge
-                if (grabbedEdge != null)
-                {
-                    float newX = gameObject.transform.position.x;
-                    float edgeX = grabbedEdge.gameObject.transform.position.x;
-                    float edgeScale = grabbedEdge.gameObject.transform.localScale.x;
-                    float minBound = edgeX - edgeScale * .5f;
-                    float maxBound = edgeX + edgeScale * .5f;
-                    if (!(minBound <= newX && newX <= maxBound))
-                    {
-                        newX = Mathf.Clamp(newX, minBound, maxBound);
-                        newVelocityX = 0;
-                        Vector3 pos = gameObject.transform.position;
-                        pos.x = newX;
-                        gameObject.transform.position = pos;
-                    }
-                }
             }
+				//shimmy
+				else if(!climbing && grabbedEdge.getOrientation() % 2 == 1){
+					//adjust velocity
+					float xAxis = InputManager.instance.GetForwardMovement();
+					if(xAxis == 0)
+						newVelocityX = 0;
+					else
+						newVelocityX = hangMaxSpeed * Mathf.Sign(xAxis);
+					
+					//clamp motion
+					float newX = gameObject.transform.position.x;
+					float edgeX = grabbedEdge.gameObject.transform.position.x;
+					float edgeScale = grabbedEdge.gameObject.transform.localScale.x;
+					float minBound = edgeX - edgeScale * .5f;
+					float maxBound = edgeX + edgeScale * .5f;
+					if (!(minBound <= newX && newX <= maxBound))
+					{
+						newX = Mathf.Clamp(newX, minBound, maxBound);
+						newVelocityX = 0;
+						Vector3 pos = gameObject.transform.position;
+						pos.x = newX;
+						gameObject.transform.position = pos;
+					}
+					//update edgeState for animation
+					if(newVelocityX!=0 && anim.GetInteger("EdgeState") < 3){
+						anim.SetInteger("EdgeState", 3);
+					}
+				}
             else
             {
                 //if we're latched to a wall which doesn't allow x axis movement don't move along x axis
@@ -232,7 +251,7 @@ public class PlayerController : MonoBehaviour
             // ------------------------------------------------------------------------------------------------------
             float newVelocityZ = velocity.z;
             //if we're either not on an edge or on an edge which allows z movement
-            if ((grabbedEdge == null || grabbedEdge.getOrientation() % 2 == 0))
+            if (edgeState != 2 && !climbing)
             {
                 float zAxis = -InputManager.instance.GetSideMovement();
 
@@ -246,25 +265,32 @@ public class PlayerController : MonoBehaviour
                     int modifier = velocity.z > 0 ? -1 : 1;
                     newVelocityZ += Mathf.Min(decelleration, Mathf.Abs(velocity.z)) * modifier;
                 }
-
-                //clamp movement if we're on edge
-                if (grabbedEdge != null)
-                {
-                    float newZ = gameObject.transform.position.z;
-                    float edgeZ = grabbedEdge.gameObject.transform.position.z;
-                    float edgeScale = grabbedEdge.gameObject.transform.localScale.z;
-                    float minBound = edgeZ - edgeScale * .5f;
-                    float maxBound = edgeZ + edgeScale * .5f;
-                    if (!(minBound <= newZ && newZ <= maxBound))
-                    {
-                        newZ = Mathf.Clamp(newZ, minBound, maxBound);
-                        newVelocityZ = 0;
-                        Vector3 pos = gameObject.transform.position;
-                        pos.z = newZ;
-                        gameObject.transform.position = pos;
-                    }
-                }
-            }
+            }else if(!climbing && grabbedEdge.getOrientation() % 2 == 0){
+					float zAxis = -InputManager.instance.GetSideMovement();
+					if(zAxis == 0)
+						newVelocityZ = 0f;
+					else
+						newVelocityZ = hangMaxSpeed * Mathf.Sign(zAxis);
+					//clamp position
+					float newZ = gameObject.transform.position.z + (newVelocityZ/50f);
+					float edgeZ = grabbedEdge.gameObject.transform.position.z;
+					float edgeScale = grabbedEdge.gameObject.transform.localScale.z;
+					float minBound = edgeZ - edgeScale * .5f;
+					float maxBound = edgeZ + edgeScale * .5f;
+					if (!(minBound <= newZ && newZ <= maxBound))
+					{
+						newZ = Mathf.Clamp(newZ, minBound, maxBound);
+						newVelocityZ = 0;
+						Vector3 pos = gameObject.transform.position;
+						pos.z = newZ;
+						gameObject.transform.position = pos;
+					}
+					
+					//update edgeState for animation
+					if(newVelocityZ!=0 && anim.GetInteger("EdgeState") < 3){
+						anim.SetInteger("EdgeState", 3);
+					}
+				}
             else
             {
                 //if we're latched to a wall which doesn't allow z movement
@@ -273,29 +299,48 @@ public class PlayerController : MonoBehaviour
 
             velocity.z = newVelocityZ;
 
-            bool walking = (Mathf.Abs(velocity.z) > 0.1 || Mathf.Abs(velocity.x) >= 0.1);
+            bool walking = edgeState != 2 && (Mathf.Abs(velocity.z) > 0.1 || Mathf.Abs(velocity.x) >= 0.1)/* && grounded*/;
+				bool shimmying = edgeState == 2 && ( Mathf.Abs(velocity.z) > 0.1 || Mathf.Abs(velocity.x) >= 0.1 );
             bool running = (Mathf.Abs(velocity.z) >= maxSpeed / 2 || Mathf.Abs(velocity.x) >= maxSpeed / 2);
             anim.SetBool("Walking", walking && !running && crate == null);
             anim.SetBool("Running", running && crate == null);
-			if (crate == null) {
-	            anim.SetBool("Pushing", false);
-	            anim.SetBool("Pulling", false);
-			} else {
-				anim.SetBool("Pushing", Vector3.Dot(velocity, grabAxis) > 0);
-				anim.SetBool("Pulling", Vector3.Dot(velocity, grabAxis) < 0);
-			}
-            if (walking)
-            {
-                if (crate == null)
-                    model.transform.rotation = Quaternion.AngleAxis(Mathf.Rad2Deg * Mathf.Atan2(-velocity.z, velocity.x) + 90, Vector3.up);
-
-            }
+					
+				if (crate == null) {
+						anim.SetBool("Pushing", false);
+						anim.SetBool("Pulling", false);
+				} else {
+					anim.SetBool("Pushing", Vector3.Dot(velocity, grabAxis) > 0);
+					anim.SetBool("Pulling", Vector3.Dot(velocity, grabAxis) < 0);
+				}
+				// ------------------------------------------------------------------------------------------------------
+            // MANAGE EDGE STATE
+            // ------------------------------------------------------------------------------------------------------
+				if (walking && crate == null && edgeState < 2 && !climbing)
+				{
+					orientation = Mathf.Rad2Deg * Mathf.Atan2(-velocity.z, velocity.x) + 90;
+				}else if(edgeState >= 2){
+					orientation = (-1 - grabbedEdge.getOrientation()) * 90;
+				}				
+				model.transform.rotation = Quaternion.AngleAxis(orientation, Vector3.up);
+			
+				// ------------------------------------------------------------------------------------------------------
+            // MANAGE EDGE STATE
+            // ------------------------------------------------------------------------------------------------------
+				int animEdgeState = anim.GetInteger("EdgeState");
+				if(animEdgeState < 3)
+					anim.SetInteger("EdgeState", edgeState);
+				else if(animEdgeState == 3){
+						if(Mathf.Abs(velocity.z) < 0.1 && Mathf.Abs(velocity.x) < 0.1)
+							anim.SetInteger("EdgeState", edgeState);
+				}else if(!anim.GetCurrentAnimatorStateInfo(0).IsName("HangBegin") && !anim.GetCurrentAnimatorStateInfo(0).IsName("HangShimmying"))
+					anim.SetInteger("EdgeState", edgeState);
+				}
+						
 
             // ------------------------------------------------------------------------------------------------------
             // COLLISION CHECKING
             // ------------------------------------------------------------------------------------------------------
             CheckCollisions();
-        }
     }
 
 	public void CheckCollisions(){
@@ -440,8 +485,9 @@ public class PlayerController : MonoBehaviour
 
 		//check all startpoints
 		for(int i = 0; i < startPoints.Length; i++)
-			connected = connected || Physics.Raycast(startPoints[i], Vector3.forward);
-		
+			connected = connected || Physics.Raycast(startPoints[i], Vector3.forward) || Physics.Raycast(startPoints[i], -1 * Vector3.forward);
+
+        Debug.Log("Intersect: " + connected);
 		return connected;
 	}
 
@@ -482,8 +528,6 @@ public class PlayerController : MonoBehaviour
 	public void Flip() {
 		if (GameStateManager.instance.currentPerspective == PerspectiveType.p3D)
 			DoZLock();
-		else if (Check2DIntersect())
-			InputManager.instance.SetFailFlag();
 	}
 
 	public void Grab(Crate crate) {
@@ -501,22 +545,49 @@ public class PlayerController : MonoBehaviour
 		return cuboid;
 	}
 
-	public void LockToEdge(Edge e){
-		//set grabbed edge
-		grabbedEdge = e;
-		//stop moving
-		velocity = Vector3.zero;
-		//lock y
-		Vector3 pos = gameObject.transform.position;
-		pos.y = e.gameObject.transform.position.y + (e.gameObject.transform.localScale.y * .5f) - (gameObject.transform.localScale.y * .5f);
-		gameObject.transform.position = pos;
-	}
-
-	public void ReleaseEdge(){
+	#region EdgeGrabbing
+		
+	//This can only be called from self
+	void ReleaseEdge(){
 		if(grabbedEdge!=null)
 			grabbedEdge.resetStatus();
 		grabbedEdge = null;
+		edgeState = 0;
 	}
+
+	//note: this is only called from the Edge.cs
+	public void UpdateEdgeState(Edge e, byte edgeState){
+		UpdateEdgeState(e,edgeState,-1);
+	}
+	public void UpdateEdgeState(Edge e, byte edgeState, int animState){
+		switch(edgeState){
+			case 0:
+				if(grabbedEdge == e){
+					this.edgeState = 0;
+					grabbedEdge =null;
+				}
+				//adjust animation state
+				if(animState!= -1)
+					anim.SetInteger("EdgeState", animState);
+				break;
+			case 1:
+				this.edgeState = 1;
+				grabbedEdge = e;
+				break;
+			case 2:
+				this.edgeState	 = 2;
+				//stop moving
+				velocity = Vector3.zero;
+				//lock y
+				Vector3 pos = gameObject.transform.position;
+				pos.y = e.gameObject.transform.position.y + (e.gameObject.transform.localScale.y * .5f) - (gameObject.transform.localScale.y * .5f);
+				gameObject.transform.position = pos;
+				
+				break;
+		}
+	}
+	
+	#endregion EdgeGrabbing
 
 	public bool is3D(){
 		return GameStateManager.instance.currentPerspective== PerspectiveType.p3D;
@@ -524,6 +595,11 @@ public class PlayerController : MonoBehaviour
 	
 	public float getOrientation(){
 		return orientation;
+	}
+	
+	public void Teleport(Vector3 newPos){
+		transform.position = newPos;
+		gameObject.GetComponent<BoundObject>().updateBounds();
 	}
 
 	private void OnPauseGame(bool p)
