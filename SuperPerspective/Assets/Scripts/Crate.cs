@@ -47,6 +47,8 @@ public class Crate : ActiveInteractable {
 		if (!grounded)
 			velocity = new Vector3(velocity.x, Mathf.Max(velocity.y - gravity, -terminalVelocity), velocity.z);
 
+		CheckCollisions ();
+
 		float newVelocityX = velocity.x, newVelocityZ = velocity.z;
 		if (velocity.x != 0)
 		{
@@ -68,7 +70,7 @@ public class Crate : ActiveInteractable {
 			colliderDepth = GetComponent<Collider>().bounds.size.z;
 		}
 
-		CheckCollisions ();
+		//CheckCollisions ();
 	}
 
 	void LateUpdate () {
@@ -126,7 +128,7 @@ public class Crate : ActiveInteractable {
 		// If any rays connected move the player and set grounded to true since we're now on the ground
 		
 		hits = colCheck.CheckXCollision (velocity, Margin);
-		
+
 		close = -1;
 		for (int i = 0; i < hits.Length; i++) {
 			RaycastHit hitInfo = hits[i];
@@ -201,7 +203,11 @@ public class Crate : ActiveInteractable {
 	}
 
 	void checkBreak() {
-		if (GameStateManager.instance.currentPerspective == PerspectiveType.p2D && Check2DIntersect()) {
+		if (GameStateManager.instance.currentPerspective == PerspectiveType.p2D && Check2DIntersect ()) {
+			if (grabbed){
+				player.GetComponent<PlayerController> ().Grab (null);
+				grabbed = false;
+			}
 			respawnFlag = true;
 		}
 	}
