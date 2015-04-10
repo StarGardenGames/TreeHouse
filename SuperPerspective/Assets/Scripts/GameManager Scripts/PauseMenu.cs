@@ -18,6 +18,8 @@ public class PauseMenu : MonoBehaviour {
 	
 	//called every frame
 	void Update () {
+		//enable/disable canvas component
+		menu.GetComponent<Canvas>().enabled = (menuAlpha != 0f);
 		//update alpha
 		menuAlpha += ((menuVisible)? (1/fadeTime) : -(1/fadeTime))*Time.deltaTime;
 		menuAlpha = Mathf.Clamp(menuAlpha,0f,1f);

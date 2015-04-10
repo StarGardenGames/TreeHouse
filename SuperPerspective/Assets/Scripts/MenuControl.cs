@@ -76,6 +76,8 @@ public class MenuControl : MonoBehaviour {
 	
 	// Update is called once per frame
 	void FixedUpdate () {
+		//enable/disable canvas component
+		menu.GetComponent<Canvas>().enabled = (menuAlpha != 0f);
 		//ensure that saves remain censistant
 		for(int i = 0; i < SaveManager.instance.getNumSaveSlots(); i++)
 			if(resets[i].IsActive() && !slotHasData[i])
