@@ -73,6 +73,8 @@ public class CheckpointManager : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+		//enable/disable canvas component
+		menu.GetComponent<Canvas>().enabled = (menuAlpha != 0f);
 		//check if we entered new room
 		if(destination != -1 && menuVisible){
 			menuAlpha = 1;
