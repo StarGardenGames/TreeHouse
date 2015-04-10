@@ -10,14 +10,15 @@ public class CollisionChecker {
 
 	public CollisionChecker(Collider col) {
 		this.col = col;
-		colliderWidth = col.bounds.max.x - col.bounds.min.x;
-		colliderHeight = col.bounds.max.y - col.bounds.min.y;
-		colliderDepth = col.bounds.max.z - col.bounds.min.z;
+		colliderWidth = col.bounds.size.x;
+		colliderHeight = col.bounds.size.y;
+		colliderDepth = col.bounds.size.z;
 	}
 	
-	public RaycastHit CheckXCollision(Vector3 velocity, float Margin) {
+	public RaycastHit[] CheckXCollision(Vector3 velocity, float Margin) {
 		colliderWidth = col.bounds.max.x - col.bounds.min.x;
 		Vector3[] startPoints = new Vector3[5];
+		RaycastHit[] hits = new RaycastHit[5];
 		RaycastHit hitInfo = new RaycastHit();
 
 		float minX 		= col.bounds.min.x + Margin;
@@ -45,14 +46,21 @@ public class CollisionChecker {
 		
 		//test all startpoints
 		Vector3 dir = Vector3.right * Mathf.Sign(velocity.x);
-		for(int i = 0; i < startPoints.Length && !connected; i++)
+		connected = Physics.Raycast(startPoints[0], dir, out hitInfo, distance);
+		hits[0] = hitInfo;
+		int i = 1;
+		while (i < startPoints.Length) {
 			connected = Physics.Raycast(startPoints[i], dir, out hitInfo, distance);
+			hits[i] = hitInfo;
+			i++;
+		}
 		
-		return hitInfo;
+		return hits;
 	}
 
-	public RaycastHit CheckYCollision(Vector3 velocity, float Margin) {
+	public RaycastHit[] CheckYCollision(Vector3 velocity, float Margin) {
 		colliderHeight = col.bounds.max.y - col.bounds.min.y;
+		RaycastHit[] hits = new RaycastHit[5];
 		RaycastHit hitInfo = new RaycastHit();
 		
 		float minX 		= col.bounds.min.x + Margin;
@@ -83,16 +91,22 @@ public class CollisionChecker {
 		//test all startpoints
 		Vector3 dir = Vector3.up * Mathf.Sign(velocity.y);
 		// must run outside loop once to ensure hitInfo is initialized
-		connected = Physics.Raycast(startPoints[0],dir, out hitInfo, distance);
-		for(int i = 1; i < startPoints.Length && !connected; i++)
-			connected = Physics.Raycast(startPoints[i],dir, out hitInfo, distance);
+		connected = Physics.Raycast(startPoints[0], dir, out hitInfo, distance);
+		hits[0] = hitInfo;
+		int i = 1;
+		while (i < startPoints.Length) {
+			connected = Physics.Raycast(startPoints[i], dir, out hitInfo, distance);
+			hits[i] = hitInfo;
+			i++;
+		}
 		
-		return hitInfo;
+		return hits;
 	}
 
-	public RaycastHit CheckZCollision(Vector3 velocity, float Margin) {
+	public RaycastHit[] CheckZCollision(Vector3 velocity, float Margin) {
 		colliderDepth = col.bounds.max.z - col.bounds.min.z;
 		Vector3[] startPoints = new Vector3[5];
+		RaycastHit[] hits = new RaycastHit[5];
 		RaycastHit hitInfo = new RaycastHit();
 		
 		float minX 		= col.bounds.min.x + Margin;
@@ -119,9 +133,15 @@ public class CollisionChecker {
 		
 		//loop through and check all startpoints
 		Vector3 dir = Vector3.forward * Mathf.Sign(velocity.z);
-		for(int i = 0; i < startPoints.Length && !connected; i++)
+		connected = Physics.Raycast(startPoints[0], dir, out hitInfo, distance);
+		hits[0] = hitInfo;
+		int i = 1;
+		while (i < startPoints.Length) {
 			connected = Physics.Raycast(startPoints[i], dir, out hitInfo, distance);
+			hits[i] = hitInfo;
+			i++;
+		}
 
-		return hitInfo;
+		return hits;
 	}
 }
