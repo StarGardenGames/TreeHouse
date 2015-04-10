@@ -28,9 +28,9 @@ public class Crate : MonoBehaviour {
 	void Start() {
 		grounded = false;
 		velocity = Vector3.zero;
-		colliderHeight = GetComponent<Collider>().bounds.max.y - GetComponent<Collider>().bounds.min.y;
-		colliderWidth = GetComponent<Collider>().bounds.max.x - GetComponent<Collider>().bounds.min.x;
-		colliderDepth = GetComponent<Collider>().bounds.max.z - GetComponent<Collider>().bounds.min.z;
+		colliderHeight = GetComponent<Collider>().bounds.size.y;
+		colliderWidth = GetComponent<Collider>().bounds.size.x;
+		colliderDepth = GetComponent<Collider>().bounds.size.z;
 
 		player = GameObject.Find("Player").GetComponent<PlayerController>();
 
@@ -45,8 +45,6 @@ public class Crate : MonoBehaviour {
 	void FixedUpdate() {
 		if (!grounded)
 			velocity = new Vector3(velocity.x, Mathf.Max(velocity.y - gravity, -terminalVelocity), velocity.z);
-
-		CheckCollisions ();
 
 		float newVelocityX = velocity.x, newVelocityZ = velocity.z;
 		if (velocity.x != 0)
@@ -64,10 +62,12 @@ public class Crate : MonoBehaviour {
 		velocity.z = newVelocityZ;
 
 		if (GetComponent<Collider> ().enabled) {
-			colliderHeight = GetComponent<Collider> ().bounds.max.y - GetComponent<Collider> ().bounds.min.y;
-			colliderWidth = GetComponent<Collider> ().bounds.max.x - GetComponent<Collider> ().bounds.min.x;
-			colliderDepth = GetComponent<Collider> ().bounds.max.z - GetComponent<Collider> ().bounds.min.z;
+			colliderHeight = GetComponent<Collider>().bounds.size.y;
+			colliderWidth = GetComponent<Collider>().bounds.size.x;
+			colliderDepth = GetComponent<Collider>().bounds.size.z;
 		}
+
+		CheckCollisions ();
 	}
 
 	void LateUpdate () {
@@ -87,79 +87,79 @@ public class Crate : MonoBehaviour {
 	}
 
 	public void CheckCollisions() {
-		#region Checking Below
-
-		// If any rays connected move the player and set grounded to true since we're now on the ground
-		RaycastHit hitInfo = colCheck.CheckYCollision (velocity, Margin);
-
-		if (hitInfo.collider != null)
-		{
-			if (velocity.y < 0) {
-				grounded = true;
-			}
-			
-			trajectory = velocity.y * Vector3.up;
-			if (hitInfo.collider.gameObject.tag != "Intangible") {
-				transform.Translate(Vector3.up * Mathf.Sign(velocity.y) * (hitInfo.distance - colliderHeight / 2));
-				velocity = new Vector3(velocity.x, 0f, velocity.z);
-			} else {
-				hitInfo.collider.gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
-				CheckCollisions();
-				hitInfo.collider.gameObject.layer = LayerMask.NameToLayer("normalCollisions");
-			}
-			CollideWithObject(hitInfo, trajectory);
-		}
+		Vector3 trajectory;
 		
-		// Otherwise we're not grounded (temporary?)
-		else
+		RaycastHit[] hits = colCheck.CheckYCollision (velocity, Margin);
+		
+		float close = -1;
+		for (int i = 0; i < hits.Length; i++) {
+			RaycastHit hitInfo = hits[i];
+			if (hitInfo.collider != null)
+			{
+				if (close == -1 || close > hitInfo.distance) {
+					close = hitInfo.distance;
+					if (velocity.y < 0) {
+						grounded = true;
+					}
+					trajectory = velocity.y * Vector3.up;
+					CollideWithObject(hitInfo, trajectory);
+				}
+			}
+		}
+		if (close == -1) {
 			grounded = false;
-		//}
-		
-		#endregion Checking Below
-
-		// Third check the player's velocity along the X axis and check for collisions in that direction is non-zero
-		#region Checking X Axis
-
-		// If any rays connected move the player and set grounded to true since we're now on the ground
-		hitInfo = colCheck.CheckXCollision (velocity, Margin);
-		
-		if (hitInfo.collider != null)
-		{
-			trajectory = velocity.x * Vector3.right;
-			if (hitInfo.collider.gameObject.tag != "Intangible") {
-				transform.Translate(Vector3.right * Mathf.Sign(velocity.x) * (hitInfo.distance - colliderWidth / 2));
-				velocity = new Vector3(0f, velocity.y, velocity.z);
-			} else {
-				hitInfo.collider.gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
-				CheckCollisions();
-				hitInfo.collider.gameObject.layer = LayerMask.NameToLayer("normalCollisions");
-			}
-			CollideWithObject(hitInfo, trajectory);
+		} else {
+			transform.Translate(Vector3.up * Mathf.Sign(velocity.y) * (close - colliderHeight / 2));
+			velocity = new Vector3(velocity.x, 0f, velocity.z);
 		}
 		
-		#endregion Checking X Axis
+		// Third check the player's velocity along the X axis and check for collisions in that direction is non-zero
+		
+		// If any rays connected move the player and set grounded to true since we're now on the ground
+		
+		hits = colCheck.CheckXCollision (velocity, Margin);
+		
+		close = -1;
+		for (int i = 0; i < hits.Length; i++) {
+			RaycastHit hitInfo = hits[i];
+			if (hitInfo.collider != null)
+			{
+				if (close == -1 || close > hitInfo.distance) {
+					close = hitInfo.distance;
+					transform.Translate(Vector3.right * Mathf.Sign(velocity.x) * (hitInfo.distance - colliderWidth / 2));
+					trajectory = velocity.x * Vector3.right;
+					CollideWithObject(hitInfo, trajectory);
+				}
+			}
+		}
+		if (close != -1) {
+			//transform.Translate(Vector3.right * Mathf.Sign(velocity.x) * (close - colliderWidth / 2));
+			velocity = new Vector3(0f, velocity.y, velocity.z);
+		}
+		
 		
 		// Fourth do the same along the Z axis  
-		#region Checking Z Axis
-
+		
 		// If any rays connected move the player and set grounded to true since we're now on the ground
-		hitInfo = colCheck.CheckZCollision (velocity, Margin);
+		hits = colCheck.CheckZCollision (velocity, Margin);
 		
-		if (hitInfo.collider != null)
-		{
-			trajectory = velocity.z * Vector3.forward;
-			if (hitInfo.collider.gameObject.tag != "Intangible") {
-				transform.Translate(Vector3.forward * Mathf.Sign(velocity.z) * (hitInfo.distance - colliderDepth / 2));
-				velocity = new Vector3(velocity.x, velocity.y, 0f);
-			} else {
-				hitInfo.collider.gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
-				CheckCollisions();
-				hitInfo.collider.gameObject.layer = LayerMask.NameToLayer("normalCollisions");
+		close = -1;
+		for (int i = 0; i < hits.Length; i++) {
+			RaycastHit hitInfo = hits[i];
+			if (hitInfo.collider != null)
+			{
+				if (close == -1 || close > hitInfo.distance) {
+					close = hitInfo.distance;
+					transform.Translate(Vector3.forward * Mathf.Sign(velocity.z) * (hitInfo.distance - colliderDepth / 2));
+					trajectory = velocity.z * Vector3.forward;
+					CollideWithObject(hitInfo, trajectory);
+				}
 			}
-			CollideWithObject(hitInfo, trajectory);
 		}
-		
-		#endregion Checking Z Axis
+		if (close != -1) {
+			//transform.Translate(Vector3.forward * Mathf.Sign(velocity.z) * (close - colliderDepth / 2));
+			velocity = new Vector3(velocity.x, velocity.y, 0f);
+		}
 	}
 
 	public bool Check2DIntersect() {
@@ -209,6 +209,9 @@ public class Crate : MonoBehaviour {
 			colliderDim = colliderWidth;
 		if (trajectory.normalized == Vector3.forward || trajectory.normalized == Vector3.back)
 			colliderDim = colliderDepth;
+		if (other.GetComponent<PushSwitchOld>() && colliderDim == colliderWidth) {
+			transform.Translate(0, 0.1f, 0);
+		}
 		//Collision w/ PlayerInteractable
 		foreach(Interactable c in other.GetComponents<Interactable>()){
 			c.EnterCollisionWithGeneral(gameObject);

@@ -8,13 +8,20 @@ public class PushSwitchOld : Interactable {
 	bool pushed = false; //whether switch is currently pushed
 	
 	Collider pusher = null;
+
+	Color baseColor = Color.white;
 	
 	void Update(){
 		//update color for debugging
 		if (pushed) {
-			gameObject.GetComponent<Renderer> ().material.color = Color.white;
+			if (baseColor == Color.white)
+				baseColor = gameObject.GetComponent<Renderer>().material.color;
+			gameObject.GetComponent<Renderer>().material.color = Color.white;
+			//gameObject.tag = "Intangible";
 		} else {
-			gameObject.GetComponent<Renderer> ().material.color = Color.red;
+			if (baseColor != Color.white)
+				gameObject.GetComponent<Renderer>().material.color = baseColor;
+			//gameObject.tag = "Untagged";
 		}
 		Bounds check;
 		if (pusher != null) {
