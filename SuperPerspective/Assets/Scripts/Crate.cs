@@ -39,7 +39,7 @@ public class Crate : ActiveInteractable {
 		CameraController2.instance.ShiftStartEvent += checkBreak;
 		colCheck = new CollisionChecker (GetComponent<Collider> ());
 		startPos = transform.position;
-		range = 1.75f;
+		range = colliderWidth * 0.85f;
 	}
 
 	void FixedUpdate() {
