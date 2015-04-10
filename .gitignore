@@ -27,3 +27,4 @@ SuperPerspective/[Bb]uilds/*
 Heapshots
 
 # Ignore, specifically for this project
+SuperPerspective/Assets/Scenes/Level1.unity
