@@ -264,8 +264,8 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
     // Called by main menu to begin gameplay
     public void StartGame()
     {
-        EnterTransition(STATE_GAMEPLAY_3D);
-        currentPerspective = PerspectiveType.p3D;
+        EnterTransition(STATE_GAMEPLAY_2D);
+        currentPerspective = PerspectiveType.p2D;
     }
     #endregion Public Interface
 
