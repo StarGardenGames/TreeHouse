@@ -146,9 +146,12 @@ public static class CameraMatrixTypes
 {
     // Camera setting variables
     private static float fov = 60f;                 // The camera's field of view while in 3D mode
-    private static float near = .01f;                // The near clipping plane of the camera
+    private static float near = .01f;              // The near clipping plane of the camera
     private static float far = 1000f;               // The far clipping plane of the camera
     private static float orthographicSize = 10f;    // The orthographic size variable of the camera in 2D mode
+
+    // Menu Camera settings
+    private static float menuFov = 38;
 
     // Used to quickly compute the aspect ratio
     private static float aspect 
@@ -166,5 +169,11 @@ public static class CameraMatrixTypes
     public static Matrix4x4 Standard3D
     {
         get { return Matrix4x4.Perspective(fov, aspect, near, far); }
+    }
+
+    // Returns the camera settings used when looking at the main menu
+    public static Matrix4x4 Menu
+    {
+        get { return Matrix4x4.Perspective(menuFov, aspect, near, far); }
     }
 }

@@ -8,10 +8,11 @@ public class TileTextureScaler : MonoBehaviour {
 
 	// Use this for initialization
 	public void CreateComponent(string side) {
+		float multiplier = .5f;//default 1
 		//scale texture to the following size
-		float scaleX = (this.transform.parent.localScale.x);//x scale
-		float scaleY = (this.transform.parent.localScale.y);//y scale
-		float scaleZ = (this.transform.parent.localScale.z);//y scale
+		float scaleX = (this.transform.parent.localScale.x)*multiplier;//x scale
+		float scaleY = (this.transform.parent.localScale.y)*multiplier;//y scale
+		float scaleZ = (this.transform.parent.localScale.z)*multiplier;//y scale
 		//apply to face
 
 		switch(side){

@@ -12,12 +12,13 @@ public class dynamicTexture : MonoBehaviour {
 
 	void Awake(){
 		//create the 6 sided cube
-		createSidePlane("top", topTexture);
-		createSidePlane("bottom", bottomTexture);
-		createSidePlane("left", leftTexture);
-		createSidePlane("right", rightTexture);
-		createSidePlane("back", backTexture);
-		createSidePlane("front", frontTexture);
+
+		if(topTexture) createSidePlane("top", topTexture);
+		if(bottomTexture) createSidePlane("bottom", bottomTexture);
+		if(leftTexture) createSidePlane("left", leftTexture);
+		if(rightTexture) createSidePlane("right", rightTexture);
+		if(backTexture) createSidePlane("back", backTexture);
+		if(frontTexture) createSidePlane("front", frontTexture);
 
 		//remove the builder prototype cube
 		Destroy(this.GetComponent<MeshRenderer>());
