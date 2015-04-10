@@ -23,13 +23,17 @@ public class Edge : MonoBehaviour {
 	
 	public string edgeIndex = "n/a";
 
+	float hangThresh = 35;//time to wait till player can climb
+	float hangCounter = 0.0f;
+
 	public void FixedUpdate(){
 		if(!init)
 			return;
 		//if locked on
 		if(status >= 2){
 			//check if rested latch can be entered
-			if(status == 2 && !GrabButtonDown())
+			hangCounter++;
+			if(status == 2 && hangCounter > hangThresh/*&& !GrabButtonDown()*/)
 				status = 3;
 			//if player is trying to let go
 			if(ReleaseButtonDown()){
@@ -67,6 +71,7 @@ public class Edge : MonoBehaviour {
 					player.UpdateEdgeState(this, status);
 				}else if (status == 1 && playerAboveEdge != (player.getCuboid()[1].y > cuboid[1].y)){
 					status = 2;
+					hangCounter = 0;
 					player.UpdateEdgeState(this,status);
 				}
 			}
