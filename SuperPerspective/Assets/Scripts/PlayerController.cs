@@ -99,7 +99,7 @@ public class PlayerController : MonoBehaviour
         colliderDepth = GetComponent<Collider>().bounds.max.z - GetComponent<Collider>().bounds.min.z;
 
 		//Register Flip method to the shift event
-		CameraController2.instance.ShiftStartEvent += Flip;
+		//CameraController2.instance.ShiftCompleteEvent += Flip;
 
 		anim = GetComponentInChildren<Animator>();
 		model = anim.gameObject;
@@ -439,7 +439,7 @@ public class PlayerController : MonoBehaviour
             if (crate != null)
             {
                 crate.transform.Translate(Vector3.Dot(velocity, grabAxis) * grabAxis * 0.75f * Time.deltaTime);
-                transform.Translate(velocity * 0.75f * Time.deltaTime);
+                transform.Translate(Vector3.Dot(velocity, grabAxis) * grabAxis * 0.75f * Time.deltaTime);
             }
             else
             {
@@ -511,7 +511,7 @@ public class PlayerController : MonoBehaviour
 		if (trajectory.normalized != Vector3.down && other.GetComponent<Crate>()) {
 			other.GetComponent<Crate>().SetVelocity((trajectory*0.75f).x, (trajectory*0.75f).z);
 			pushFlag = true;
-			if (crate == null)
+			if (crate == null && velocity != Vector3.zero)
 				anim.SetBool("Pushing", true);
 		} else if (crate == null) {
 			anim.SetBool("Pushing", false);
@@ -526,8 +526,7 @@ public class PlayerController : MonoBehaviour
 	}
 
 	public void Flip() {
-		if (GameStateManager.instance.currentPerspective == PerspectiveType.p3D)
-			DoZLock();
+		DoZLock();
 	}
 
 	public void Grab(Crate crate) {
