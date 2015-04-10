@@ -477,7 +477,7 @@ public class PlayerController : MonoBehaviour
 
 		//check all startpoints
 		for(int i = 0; i < startPoints.Length; i++)
-			connected = connected || Physics.Raycast(startPoints[i], Vector3.forward);
+			connected = connected || Physics.Raycast(startPoints[i], Vector3.forward) || Physics.Raycast(startPoints[i], -1 * Vector3.forward);
 
         Debug.Log("Intersect: " + connected);
 		return connected;
@@ -517,8 +517,6 @@ public class PlayerController : MonoBehaviour
 	public void Flip() {
 		if (GameStateManager.instance.currentPerspective == PerspectiveType.p3D)
 			DoZLock();
-		else if (Check2DIntersect())
-			InputManager.instance.SetFailFlag();
 	}
 
 	public void Grab(Crate crate) {

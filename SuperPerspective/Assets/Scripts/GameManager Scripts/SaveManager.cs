@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using SuperPerspective.Singleton;
 
 public class SaveManager : MonoBehaviour {
 
@@ -10,7 +11,8 @@ public class SaveManager : MonoBehaviour {
 	
 	int numSaveSlots = 3;
 
-	void Awake(){
+	void Awake()
+    {
 		if(instance == null)
 			instance = this;
 		else if(instance != this)
@@ -44,8 +46,6 @@ public class SaveManager : MonoBehaviour {
 		int recentPoint = PlayerPrefs.GetInt(currentSave + "_recentPoint",-1);
 		if(recentPoint != -1)
 			CheckpointManager.instance.goToCheckPoint(recentPoint);
-		else
-			CameraControl.instance.MountToPlayer();
 	}
 	
 	public void setSave(int i){
