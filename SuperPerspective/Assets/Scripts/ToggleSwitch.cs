@@ -11,15 +11,7 @@ public class ToggleSwitch : ActiveInteractable {
 	bool toggleEnabled = false; //whether switch is currently toggleEnabled
 
 	float distThresh = 1.5f; //distance threshhold where it will become unpressed
-
-	void Update(){
-		//update color for debugging
-		/*if(toggleEnabled)
-			gameObject.GetComponent<Renderer>().material.color = Color.white;
-		else
-			gameObject.GetComponent<Renderer>().material.color = Color.red;*/
-	}
-
+	
 	public override void Triggered(){
 		Toggle();//toggle switch
 	}
