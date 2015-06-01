@@ -3,6 +3,11 @@ using System.Collections;
 
 public class StepManager : MonoBehaviour {
 
+	//suppress warnings
+	#pragma warning disable 414
+
+	//init vars
+
 	AudioClip[] grassSteps;
 	AudioSource source;
 
