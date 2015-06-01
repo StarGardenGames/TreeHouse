@@ -31,7 +31,8 @@ public class PlayerController : MonoBehaviour
     public bool falling;
     private bool canJump;
     private bool lastInput;
-    private float jumpPressedTime;  
+	private bool bounced;
+    private float jumpPressedTime;
 
     // Raycasting Variables
     public int verticalRays = 8;
@@ -353,7 +354,10 @@ public class PlayerController : MonoBehaviour
 			RaycastHit hitInfo = hits[i];
 			if (hitInfo.collider != null)
 			{
-				if (close == -1 || close > hitInfo.distance) {
+				if (hitInfo.collider.gameObject.tag == "Intangible") {
+					trajectory = velocity.y * Vector3.up;
+					CollideWithObject(hitInfo, trajectory);
+				} else if (close == -1 || close > hitInfo.distance) {
 					close = hitInfo.distance;
 					if (velocity.y < 0) {
 						grounded = true;
@@ -373,8 +377,12 @@ public class PlayerController : MonoBehaviour
 		if (close == -1) {
 			grounded = false;
 		} else {
-			transform.Translate(Vector3.up * Mathf.Sign(velocity.y) * (close - colliderHeight / 2));
-			velocity = new Vector3(velocity.x, 0f, velocity.z);
+			if (!bounced) {
+				transform.Translate(Vector3.up * Mathf.Sign(velocity.y) * (close - colliderHeight / 2));
+				velocity = new Vector3(velocity.x, 0f, velocity.z);
+			} else {
+				bounced = false;
+			}
 		}
 
 		// Third check the player's velocity along the X axis and check for collisions in that direction is non-zero
@@ -389,7 +397,10 @@ public class PlayerController : MonoBehaviour
 			RaycastHit hitInfo = hits[i];
 			if (hitInfo.collider != null)
 			{
-				if (close == -1 || close > hitInfo.distance) {
+				if (hitInfo.collider.gameObject.tag == "Intangible") {
+					trajectory = velocity.x * Vector3.right;
+					CollideWithObject(hitInfo, trajectory);
+				} else if (close == -1 || close > hitInfo.distance) {
 					close = hitInfo.distance;
 					transform.Translate(Vector3.right * Mathf.Sign(velocity.x) * (hitInfo.distance - colliderWidth / 2));
 					trajectory = velocity.x * Vector3.right;
@@ -415,7 +426,10 @@ public class PlayerController : MonoBehaviour
 			RaycastHit hitInfo = hits[i];
 			if (hitInfo.collider != null)
 			{
-				if (close == -1 || close > hitInfo.distance) {
+				if (hitInfo.collider.gameObject.tag == "Intangible") {
+					trajectory = velocity.z * Vector3.forward;
+					CollideWithObject(hitInfo, trajectory);
+				} else if (close == -1 || close > hitInfo.distance) {
 					close = hitInfo.distance;
 					transform.Translate(Vector3.forward * Mathf.Sign(velocity.z) * (hitInfo.distance - colliderDepth / 2));
 					trajectory = velocity.z * Vector3.forward;
@@ -438,8 +452,10 @@ public class PlayerController : MonoBehaviour
         {
             if (crate != null)
             {
-                crate.transform.Translate(Vector3.Dot(velocity, grabAxis) * grabAxis * 0.75f * Time.deltaTime);
-                transform.Translate(Vector3.Dot(velocity, grabAxis) * grabAxis * 0.75f * Time.deltaTime);
+                //crate.transform.Translate(Vector3.Dot(velocity, grabAxis) * grabAxis * 0.75f * Time.deltaTime);
+				Vector3 drag = Vector3.Dot(velocity, grabAxis) * grabAxis * 0.75f;
+				crate.SetVelocity(drag.x, drag.z);
+                transform.Translate(drag * Time.deltaTime);
             }
             else
             {
@@ -483,11 +499,20 @@ public class PlayerController : MonoBehaviour
 			new Vector3(centerX, centerY, centerZ)
 		};
 
+		//ignore intagible objects
+		GameObject[] intangibles = GameObject.FindGameObjectsWithTag("Intangible");
+		foreach (GameObject obj in intangibles) {
+			obj.layer = 2;
+		}
+
 		//check all startpoints
 		for(int i = 0; i < startPoints.Length; i++)
 			connected = connected || Physics.Raycast(startPoints[i], Vector3.forward) || Physics.Raycast(startPoints[i], -1 * Vector3.forward);
 
-        Debug.Log("Intersect: " + connected);
+		foreach (GameObject obj in intangibles) {
+			obj.layer = 0;
+		}
+
 		return connected;
 	}
 
@@ -502,13 +527,19 @@ public class PlayerController : MonoBehaviour
 			colliderDim = colliderWidth;
 		if (trajectory.normalized == Vector3.forward || trajectory.normalized == Vector3.back)
 			colliderDim = colliderDepth;
+		// Rune Switch
+		if (other.GetComponent<PushSwitch>()) {
+			other.GetComponent<PushSwitch>().EnterCollisionWithPlayer();
+		}
 		// Bounce Pad
 		if (trajectory.normalized == Vector3.down && other.GetComponent<BouncePad>()) {
-			velocity.y += other.GetComponent<BouncePad>().GetBouncePower();
+			velocity.y = other.GetComponent<BouncePad>().GetBouncePower();
+			other.GetComponent<BouncePad>().Animate();
 			anim.SetTrigger("Jump");
+			bounced = true;
 		}
 		// Crate
-		if (trajectory.normalized != Vector3.down && other.GetComponent<Crate>()) {
+		if (trajectory.normalized != Vector3.down && trajectory.normalized != Vector3.zero && other.GetComponent<Crate>() && !other.GetComponent<Crate>().IsAxisBlocked(trajectory)) {
 			other.GetComponent<Crate>().SetVelocity((trajectory*0.75f).x, (trajectory*0.75f).z);
 			pushFlag = true;
 			if (crate == null && velocity != Vector3.zero)
@@ -599,6 +630,10 @@ public class PlayerController : MonoBehaviour
 	public void Teleport(Vector3 newPos){
 		transform.position = newPos;
 		gameObject.GetComponent<BoundObject>().updateBounds();
+	}
+
+	public Vector3 GetVelocity() {
+		return velocity;
 	}
 
 	private void OnPauseGame(bool p)

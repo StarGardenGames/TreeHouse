@@ -25,19 +25,16 @@ public class Footsteps : StateMachineBehaviour {
 		if (playbackTime < 0.3f && !play1){
 			play1 = true;
 			step.GrassStep();
-			Debug.Log ("1");
 		}
 
 		else if (playbackTime > 0.5f && playbackTime < 0.8f && !play2){
 			play2 = true;
 			step.GrassStep();
-			Debug.Log ("2");
 		}
 
 		else if (playbackTime > 0.81f){
 			play1 = false;
 			play2 = false;
-			Debug.Log ("3");
 		}
 	}
 

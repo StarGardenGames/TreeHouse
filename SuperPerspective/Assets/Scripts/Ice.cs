@@ -1,29 +1,28 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Crate : ActiveInteractable {
-
-	#pragma warning disable 219
+public class Ice : ActiveInteractable {
 
 	private const float gravity = 1.5f;
 	private const float terminalVelocity = 60;
 	private const float decelleration = 15;
-
+	
 	private Vector3 velocity, trajectory, newVelocity;
 	private bool grounded, svFlag;
 	private float colliderHeight, colliderWidth, colliderDepth;
 	private float Margin = 0.05f;
-
+	private float slideSpeed = 20;
+	
 	private Vector3 startPos;
-
+	
 	private CollisionChecker colCheck;
-
+	
 	private bool grabbed, respawnFlag = false;
-
+	
 	private PerspectiveType persp = PerspectiveType.p3D;
-
+	
 	private bool[] axisBlocked = new bool[4];
-
+	
 	void Start() {
 		base.StartSetup ();
 		grounded = false;
@@ -31,9 +30,9 @@ public class Crate : ActiveInteractable {
 		colliderHeight = GetComponent<Collider>().bounds.size.y;
 		colliderWidth = GetComponent<Collider>().bounds.size.x;
 		colliderDepth = GetComponent<Collider>().bounds.size.z;
-
+		
 		//player = GameObject.Find("Player").GetComponent<PlayerController>();
-
+		
 		// Register CheckGrab to grab input event
 		//InputManager.instance.InteractPressed += CheckGrab;
 		GameStateManager.instance.PerspectiveShiftEvent += Shift;
@@ -41,54 +40,58 @@ public class Crate : ActiveInteractable {
 		colCheck = new CollisionChecker (GetComponent<Collider> ());
 		startPos = transform.position;
 		range = colliderWidth * 0.85f;
-
+		
 		for (int i = 0; i < 4; i++)
 			axisBlocked[i] = false;
+	}
+
+	void Update() {
+		CheckCollisions();
 	}
 
 	void FixedUpdate() {
 		base.FixedUpdateLogic ();
 		if (!grounded)
 			velocity = new Vector3(velocity.x, Mathf.Max(velocity.y - gravity, -terminalVelocity), velocity.z);
-
+		
 		/*if (grabbed) {
 			float vy = velocity.y;
 			velocity = player.GetComponent<PlayerController>().GetVelocity();
 			velocity.y = vy;
 		}*/
-
+		
 		//CheckCollisions();
-
-		float newVelocityX = velocity.x, newVelocityZ = velocity.z;
+		
+		/*float newVelocityX = velocity.x, newVelocityZ = velocity.z;
 		if (velocity.x != 0)
 		{
 			int modifier = velocity.x > 0 ? -1 : 1;
 			newVelocityX += Mathf.Min(decelleration, Mathf.Abs(velocity.x)) * modifier;
 		}
 		velocity.x = newVelocityX;
-	
+		
 		if (velocity.z != 0)
 		{
 			int modifier = velocity.z > 0 ? -1 : 1;
 			newVelocityZ += Mathf.Min(decelleration, Mathf.Abs(velocity.z)) * modifier;
 		}
-		velocity.z = newVelocityZ;
-
+		velocity.z = newVelocityZ;*/
+		
 		if (GetComponent<Collider> ().enabled) {
 			colliderHeight = GetComponent<Collider>().bounds.size.y;
 			colliderWidth = GetComponent<Collider>().bounds.size.x;
 			colliderDepth = GetComponent<Collider>().bounds.size.z;
 		}
-
+		
 		if (svFlag) {
 			velocity.x = newVelocity.x;
 			velocity.z = newVelocity.z;
 			svFlag = false;
 		}
-
-		CheckCollisions();
+		
+		//CheckCollisions();
 	}
-
+	
 	void LateUpdate () {
 		base.LateUpdateLogic ();
 		float dist = 0;
@@ -112,15 +115,15 @@ public class Crate : ActiveInteractable {
 		}
 		//CheckCollisions();
 	}
-
+	
 	public void CheckCollisions() {
 		Vector3 trajectory;
-
+		
 		RaycastHit[] hits = colCheck.CheckYCollision (velocity, Margin);
-
+		
 		for (int i = 0; i < 4; i++)
 			axisBlocked[i] = false;
-
+		
 		float close = -1;
 		for (int i = 0; i < hits.Length; i++) {
 			RaycastHit hitInfo = hits[i];
@@ -151,7 +154,7 @@ public class Crate : ActiveInteractable {
 		// If any rays connected move the player and set grounded to true since we're now on the ground
 		
 		hits = colCheck.CheckXCollision (velocity, Margin);
-
+		
 		close = -1;
 		for (int i = 0; i < hits.Length; i++) {
 			RaycastHit hitInfo = hits[i];
@@ -164,8 +167,6 @@ public class Crate : ActiveInteractable {
 					close = hitInfo.distance;
 					transform.Translate(Vector3.right * Mathf.Sign(velocity.x) * (hitInfo.distance - colliderWidth / 2));
 					trajectory = velocity.x * Vector3.right;
-					if (trajectory != Vector3.zero)
-						axisBlocked[HashAxis(trajectory)] = true;
 					CollideWithObject(hitInfo, trajectory);
 				}
 			}
@@ -193,8 +194,6 @@ public class Crate : ActiveInteractable {
 					close = hitInfo.distance;
 					transform.Translate(Vector3.forward * Mathf.Sign(velocity.z) * (hitInfo.distance - colliderDepth / 2));
 					trajectory = velocity.z * Vector3.forward;
-					if (trajectory != Vector3.zero)
-						axisBlocked[HashAxis(trajectory)] = true;
 					CollideWithObject(hitInfo, trajectory);
 				}
 			}
@@ -204,7 +203,7 @@ public class Crate : ActiveInteractable {
 			velocity = new Vector3(velocity.x, velocity.y, 0f);
 		}
 	}
-
+	
 	public bool Check2DIntersect() {
 		// True if any ray hits a collider
 		bool connected = false;
@@ -231,10 +230,10 @@ public class Crate : ActiveInteractable {
 		for (int i = 0; i < startPoints.Length; i++) {
 			connected = connected || Physics.Raycast (startPoints [i], Vector3.forward) || Physics.Raycast (startPoints [i], -Vector3.forward);
 		}
-
+		
 		return connected;
 	}
-
+	
 	void checkBreak() {
 		if (GameStateManager.instance.currentPerspective == PerspectiveType.p2D && Check2DIntersect ()) {
 			if (grabbed){
@@ -244,7 +243,7 @@ public class Crate : ActiveInteractable {
 			respawnFlag = true;
 		}
 	}
-
+	
 	// Used to check collisions with special objects
 	// Make this more object oriented? Collidable interface?
 	private void CollideWithObject(RaycastHit hitInfo, Vector3 trajectory) {
@@ -270,50 +269,22 @@ public class Crate : ActiveInteractable {
 	}
 
 	public override void Triggered() {
-		if (!grabbed) {
-			player.GetComponent<PlayerController> ().Grab (this);
-			grabbed = true;
-		} else {
-			player.GetComponent<PlayerController> ().Grab (null);
-			grabbed = false;
+		if (velocity.Equals(Vector3.zero)) {
+			if ((Mathf.Abs(player.transform.position.x - transform.position.x) > Mathf.Abs(player.transform.position.z - transform.position.z)) || persp == PerspectiveType.p2D) {
+				if (player.transform.position.x - transform.position.x > 0)
+					velocity = Vector3.left * slideSpeed;
+				else
+					velocity = Vector3.right * slideSpeed;
+			} else {
+				if (player.transform.position.z - transform.position.z > 0)
+					velocity = Vector3.back * slideSpeed;
+				else
+					velocity = Vector3.forward * slideSpeed;
+			}
 		}
-	}
-
-	public void SetVelocity(float x, float z) {
-		newVelocity.x = x;
-		newVelocity.z = z;
-		svFlag = true;
-	}
-
-	public bool IsAxisBlocked(Vector3 axis) {
-		return axisBlocked[HashAxis(axis)];
-	}
-
-	public int HashAxis(Vector3 axis) {
-		if (axis.normalized == Vector3.right) {
-			return 0;
-		} else if (axis.normalized == Vector3.left) {
-			return 1;
-		} else if (axis.normalized == Vector3.forward) {
-			return 2;
-		} else if (axis.normalized == Vector3.back) {
-			return 3;
-		}
-		return -1;
 	}
 
 	private void Shift(PerspectiveType p) {
 		persp = p;
-		if (respawnFlag) {
-			GetComponent<Collider>().enabled = false;
-			GetComponentInChildren<Renderer>().enabled = false;
-		}
-	}
-
-	private bool PlayerInRange() {
-		if (persp == PerspectiveType.p3D)
-			return Mathf.Abs(player.transform.position.y - transform.position.y) <= colliderHeight / 2 && Mathf.Abs (player.transform.position.x - transform.position.x) <= colliderWidth / 2 + player.GetComponent<Collider>().bounds.size.x / 2 + Margin * 4 && Mathf.Abs (player.transform.position.z - transform.position.z) <= GetComponent<Collider>().bounds.size.z / 2 + player.GetComponent<Collider>().bounds.size.z / 2 + Margin * 4;
-		else
-			return Mathf.Abs(player.transform.position.y - transform.position.y) <= colliderHeight / 2 && Mathf.Abs (player.transform.position.x - transform.position.x) <= colliderWidth / 2 + player.GetComponent<Collider>().bounds.size.x / 2 + Margin * 4;
 	}
 }
