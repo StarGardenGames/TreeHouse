@@ -3,6 +3,8 @@ using System.Collections;
 
 public class PushSwitch : PassiveInteractable {
 
+	#pragma warning disable 114
+
 	public Activatable[] triggers;//Activatable objects which this switch triggers
 
 	bool pushed = false; //whether switch is currently pushed

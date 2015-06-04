@@ -20,6 +20,11 @@ public class BoundObject : MonoBehaviour {
 	public void updateBounds(){
 		Vector3 pos = transform.position;
 		int boundIndex = IslandControl.instance.getBound (pos.x, pos.y, pos.z, !PlayerController.instance.is3D());
+		if(boundIndex == -1){
+			Debug.Log("There is no valid bound for player");
+			Destroy(this);
+			return;
+		}
 		//update myBounds
 		float halfWidth = transform.lossyScale.x / 2f;
 		float halfDepth = transform.lossyScale.z / 2f;

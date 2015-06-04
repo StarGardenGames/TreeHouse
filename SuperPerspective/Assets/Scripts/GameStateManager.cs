@@ -62,17 +62,23 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
         MOUNT_GAMEPLAY_2D = GameObject.Find("2DCameraMount").transform;
         MOUNT_GAMEPLAY_3D = GameObject.Find("3DCameraMount").transform;
         //MOUNT_PAUSED = GameObject.Find("PauseMount").transform;             // Consider switching this to be more dynamic in future
-        MOUNT_MENU = GameObject.Find("MenuMount").transform;                // Consider switching this to be more dynamic in future
-
+		  GameObject menuObj = GameObject.Find("MenuMount");
+		  
         // TODO: Change this line of code to use the final player object name and script name
         // Find Player and Main Camera
         playerController = GameObject.Find("Player").GetComponent<PlayerController>();
 
         // TODO: Change the game's starting state to dynamic behavior at some point
         // Start the game in 2D state
-        currentState = STATE_GAMEPLAY_2D;
-		currentPerspective = PerspectiveType.p3D;
-        CameraController2.instance.SetMount(MOUNT_MENU, VIEW_SETTINGS_MENU);
+		  
+		  if(menuObj == null){
+			  StartGame();
+		  }else{
+			  MOUNT_MENU = menuObj.transform;
+			currentState = STATE_GAMEPLAY_2D;  
+			currentPerspective = PerspectiveType.p3D;
+			  CameraController2.instance.SetMount(MOUNT_MENU, VIEW_SETTINGS_MENU);
+		  }
 
         // Register event handlers to InputManagers
         InputManager.instance.ShiftPressedEvent += HandleShiftPressed;
