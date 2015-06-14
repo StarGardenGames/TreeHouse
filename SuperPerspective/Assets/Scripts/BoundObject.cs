@@ -52,7 +52,20 @@ public class BoundObject : MonoBehaviour {
 		bind ();
 	}
 
-	void bind(){
+	public void bind(){
+		bool pMode = PlayerController.instance.is3D();
+		Vector3 pos = transform.position;
+		//left
+		pos.x = Mathf.Max (myBounds.xMin, pos.x);
+		//right
+		pos.x = Mathf.Min (myBounds.xMax, pos.x);
+		//bind z 
+		if(pMode)
+			pos.z = Mathf.Max (myBounds.yMin, Mathf.Min (myBounds.yMax, transform.position.z));
+		transform.position = pos;
+	}
+	
+	void bindAlternate(){
 		bool pMode = PlayerController.instance.is3D();
 		Vector3 pos = transform.position;
 		//left

@@ -113,6 +113,11 @@ public class Ice : ActiveInteractable {
 			GetComponentInChildren<Renderer>().enabled = true;
 			respawnFlag = false;
 		}
+		//check for binding
+		BoundObject binder = gameObject.getComponent<BoundObject>();
+		if(binder  != null)
+			binder.bind();
+		
 		//CheckCollisions();
 	}
 	
