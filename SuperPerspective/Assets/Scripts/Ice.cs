@@ -114,7 +114,7 @@ public class Ice : ActiveInteractable {
 			respawnFlag = false;
 		}
 		//check for binding
-		BoundObject binder = gameObject.getComponent<BoundObject>();
+		BoundObject binder = gameObject.GetComponent<BoundObject>();
 		if(binder  != null)
 			binder.bind();
 		
