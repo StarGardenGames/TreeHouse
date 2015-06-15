@@ -1,9 +1,13 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class RealmManager : Activatable {
+public class RealmManager : MonoBehaviour {
 	
-	static int dimension=RED;
+	#pragma warning disable 414
+	
+	public static RealmManager instance;
+	
+	static int dimension=BLUE;
 	
 	int leftDimension=0;
 	
@@ -18,24 +22,63 @@ public class RealmManager : Activatable {
 
 	bool hor=false;
 
-	public GameObject[] reds,blues;
+	GameObject[] reds,blues;
 
 	GameObject on, off;
 	
 	// Use this for initialization
 	void Awake () {
+		//singleton
+		if (instance == null)
+			instance = this;
+		else
+			Destroy (this);
+		//
 		hor=transform.localScale.z>transform.localScale.y;
 
 		player=GameObject.Find("Player");
+		
+		getBlocks();
 		
 		//update stuff
 		updateBlocks();
 	}
 	
 	
-	public override void setActivated(bool a){
+	public void toggle(bool a){
 		dimension = a?RED:BLUE;
 		updateBlocks();
+	}
+	
+	void getBlocks(){
+		GameObject[] trackers = GameObject.FindGameObjectsWithTag("RealmTracker");
+		
+		//determine lengths
+		int blue_length = 0;
+		int red_length = 0;
+		foreach(GameObject tracker in trackers){
+			RealmTracker comp = tracker.GetComponent<RealmTracker>();
+			red_length += comp.reds.Length;
+			blue_length += comp.blues.Length;
+		}
+		
+		//init arrays
+		reds = new GameObject[red_length];
+		blues = new GameObject[blue_length];
+		int red_index = 0;
+		int blue_index = 0;
+		//populate arrays
+		foreach(GameObject tracker in trackers){
+			RealmTracker comp = tracker.GetComponent<RealmTracker>();
+			foreach(GameObject blue in comp.blues){
+				blues[blue_index] = blue;
+				blue_index++;
+			}
+			foreach(GameObject red in comp.reds){
+				reds[red_index] = red;
+				red_index++;
+			}
+		}
 	}
 	
 	void updateBlocks(){

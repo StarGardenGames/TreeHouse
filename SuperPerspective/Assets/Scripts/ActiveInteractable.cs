@@ -75,7 +75,8 @@ public class ActiveInteractable : MonoBehaviour {
 	protected void FixedUpdateLogic() {
 		//check distance and determine if range methods need to be called
 		float dist = 0;
-		if(player.GetComponent<PlayerController>().is3D())
+		bool is3D = player.GetComponent<PlayerController>().is3D();
+		if(is3D)
 			dist = Vector3.Distance(transform.position, player.transform.position);
 		else
 			dist = Vector2.Distance(new Vector2(transform.position.x,transform.position.y),
@@ -102,7 +103,7 @@ public class ActiveInteractable : MonoBehaviour {
 		//determine whether player is facing interactable
 		playerFacing = angleDiff < angleBuffer;
 		//update canTrigger
-		canTrigger = inRange && playerFacing;
+		canTrigger = inRange && (playerFacing || !is3D);
 		//update notiShown
 		if(canTrigger && (!notiShown || dist < notiDist)){
 			selected = this;

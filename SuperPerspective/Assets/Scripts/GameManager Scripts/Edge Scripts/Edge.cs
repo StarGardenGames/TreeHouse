@@ -5,6 +5,7 @@ public class Edge : MonoBehaviour {
 	//suppress warnings
 	#pragma warning disable 162
 
+	
 	int or = 0; //orientation of game object (0-3: right,back,left,front)
 	
 	int overlapIndex; //how many of the overlaps that we've checked
@@ -25,6 +26,8 @@ public class Edge : MonoBehaviour {
 
 	float hangThresh = 35;//time to wait till player can climb
 	float hangCounter = 0.0f;
+	
+	float edgeFactor = .5f;//factor by which top check is smaller
 
 	public void FixedUpdate(){
 		if(!init)
@@ -41,7 +44,7 @@ public class Edge : MonoBehaviour {
 				player.UpdateEdgeState(this, status, 4);
 			}
 			//if player is trying to get up
-			if(status == 3 && GrabButtonDown()){
+			if(status == 3 && GrabButtonDown() && SpaceAboveFree()){
 				Vector3 playerPos = player.gameObject.transform.position;
 				Vector3 playerScale = player.gameObject.transform.localScale;
 				playerPos.y += playerScale.y;
@@ -163,6 +166,53 @@ public class Edge : MonoBehaviour {
 		Init(or, width, depth, 0, edgeIndex);
 	}
 
+	bool SpaceAboveFree(){
+		//reference to terrain in edgemanager
+		GameObject[] t = EdgeManager.instance.getTerrain();
+		//generate hitbox
+		Vector3[] checkBox = new Vector3[2];
+		Vector3 playerPos = PlayerController.instance.gameObject.transform.position;
+		Vector3 playerScale = PlayerController.instance.gameObject.transform.localScale;
+		checkBox[0] = playerPos + new Vector3(0,playerScale.y *  .5f,0);
+		checkBox[1] = playerPos + new Vector3(0,playerScale.y * 1.5f,0);
+		float width = playerScale.x;
+		switch(or){
+		case 0://right
+			checkBox[0] += new Vector3(-width,0,0);
+			checkBox[1] += new Vector3(0,0,0);
+			break;
+		case 1://back
+			checkBox[0] += new Vector3(0,0,-width);
+			checkBox[1] += new Vector3(0,0,0);
+			break;
+		case 2://left
+			checkBox[0] += new Vector3(0,0,0);
+			checkBox[1] += new Vector3(width,0,0);
+			break;
+		case 3://up
+			checkBox[0] += new Vector3(0,0,0);
+			checkBox[1] += new Vector3(0,0,width);
+			break;
+		}
+		
+		//find overlaps
+		for(int i = overlapIndex; i < t.Length; i++){
+			if(PlayerController.instance.is3D()){
+				Vector3[] boxOverlap = EdgeManager.instance.GetOverlap(i,checkBox);
+				if(boxOverlap != null)
+					return false;
+			}else{
+				if(EdgeManager.instance.CheckOverlap2D(i,checkBox))
+					return false;
+			}
+		}
+		
+		//if no overlaps are found
+		return true;
+	}
+	
+	
+	
 	public void checkOverlaps(){
 		//reference to terrain in edgemanager
 		GameObject[] t = EdgeManager.instance.getTerrain();
@@ -173,22 +223,23 @@ public class Edge : MonoBehaviour {
 		cubBot[1] = gameObject.transform.position + halfScale;
 		Vector3[] cubTop = new Vector3[2];
 		float edgeSize = gameObject.transform.localScale.y;
+		float smallEdge = edgeSize * edgeFactor;
 		switch(or){
 		case 0:
-			cubTop[0] = cubBot[0] + new Vector3(-edgeSize,edgeSize,0);
-			cubTop[1] = cubBot[1] + new Vector3(0,edgeSize,0);
+			cubTop[0] = cubBot[0] + new Vector3(-smallEdge,edgeSize,0);
+			cubTop[1] = cubBot[1] + new Vector3(0,smallEdge,0);
 			break;
 		case 1:
-			cubTop[0] = cubBot[0] + new Vector3(0,edgeSize,-edgeSize);
-			cubTop[1] = cubBot[1] + new Vector3(0,edgeSize,0);
+			cubTop[0] = cubBot[0] + new Vector3(0,edgeSize,-smallEdge);
+			cubTop[1] = cubBot[1] + new Vector3(0,smallEdge,0);
 			break;
 		case 2:
 			cubTop[0] = cubBot[0] + new Vector3(0,edgeSize,0);
-			cubTop[1] = cubBot[1] + new Vector3(edgeSize,edgeSize,0);
+			cubTop[1] = cubBot[1] + new Vector3(smallEdge,smallEdge,0);
 			break;
 		case 3:
 			cubTop[0] = cubBot[0] + new Vector3(0,edgeSize,0);
-			cubTop[1] = cubBot[1] + new Vector3(0,edgeSize,edgeSize);
+			cubTop[1] = cubBot[1] + new Vector3(0,smallEdge,smallEdge);
 			break;
 		}
 

@@ -121,11 +121,19 @@ public class Ice : ActiveInteractable {
 			velocity = Vector3.zero;
 			respawnFlag = false;
 		}
+<<<<<<< HEAD
 		if (startPush) {
 			if (velocity.Equals(Vector3.zero))
 				respawnFlag = true;
 			startPush = false;
 		}
+=======
+		//check for binding
+		BoundObject binder = gameObject.GetComponent<BoundObject>();
+		if(binder  != null)
+			binder.bind();
+		
+>>>>>>> origin/master
 		//CheckCollisions();
 	}
 	
