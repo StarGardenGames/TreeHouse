@@ -285,6 +285,14 @@ public class Crate : ActiveInteractable {
 		svFlag = true;
 	}
 
+	public Vector3 GetVelocity() {
+		return velocity;
+	}
+
+	public bool IsGrounded() {
+		return grounded;
+	}
+
 	public bool IsAxisBlocked(Vector3 axis) {
 		return axisBlocked[HashAxis(axis)];
 	}
