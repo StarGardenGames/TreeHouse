@@ -19,6 +19,8 @@ public class Footsteps : StateMachineBehaviour {
 
 	// OnStateUpdate is called on each Update frame between OnStateEnter and OnStateExit callbacks
 	override public void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
+		if(step == null)
+			return;
 		currentState = animator.GetCurrentAnimatorStateInfo(0);
 		playbackTime = currentState.normalizedTime % 1;
 

@@ -33,7 +33,6 @@ public class IslandControl : MonoBehaviour {
 
 	void generateBounds(){
 		grounds = GameObject.FindGameObjectsWithTag("Ground");
-		Debug.Log(grounds.Length);
 		islandBounds = new Rect[grounds.Length];
 		float gX, gZ, gW, gD;
 		for (int i = 0; i < grounds.Length; i++) {
