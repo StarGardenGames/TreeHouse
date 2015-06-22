@@ -212,7 +212,7 @@ public class PlayerController : MonoBehaviour
                 }
             }
 				//shimmy
-				else if(!climbing && grabbedEdge.getOrientation() % 2 == 1){
+				else if(grabbedEdge!=null && !climbing && grabbedEdge.getOrientation() % 2 == 1){
 					//adjust velocity
 					float xAxis = InputManager.instance.GetForwardMovement();
 					if(xAxis == 0)
