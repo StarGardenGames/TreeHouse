@@ -9,6 +9,7 @@ TagManager:
   - Ground
   - Intangible
   - Checkpoint
+  - BackgroundObject
   layers:
   - Default
   - TransparentFX
