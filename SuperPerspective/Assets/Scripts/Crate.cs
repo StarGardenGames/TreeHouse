@@ -37,7 +37,7 @@ public class Crate : ActiveInteractable {
 		// Register CheckGrab to grab input event
 		//InputManager.instance.InteractPressed += CheckGrab;
 		GameStateManager.instance.PerspectiveShiftEvent += Shift;
-		CameraController2.instance.ShiftStartEvent += checkBreak;
+		CameraController.instance.ShiftStartEvent += checkBreak;
 		colCheck = new CollisionChecker (GetComponent<Collider> ());
 		startPos = transform.position;
 		range = colliderWidth * 0.85f;
@@ -283,6 +283,14 @@ public class Crate : ActiveInteractable {
 		newVelocity.x = x;
 		newVelocity.z = z;
 		svFlag = true;
+	}
+
+	public Vector3 GetVelocity() {
+		return velocity;
+	}
+
+	public bool IsGrounded() {
+		return grounded;
 	}
 
 	public bool IsAxisBlocked(Vector3 axis) {

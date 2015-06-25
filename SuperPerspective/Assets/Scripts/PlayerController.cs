@@ -212,7 +212,7 @@ public class PlayerController : MonoBehaviour
                 }
             }
 				//shimmy
-				/*else if(!climbing && grabbedEdge.getOrientation() % 2 == 1){
+				else if(grabbedEdge!=null && !climbing && grabbedEdge.getOrientation() % 2 == 1){
 					//adjust velocity
 					float xAxis = InputManager.instance.GetForwardMovement();
 					if(xAxis == 0)
@@ -238,7 +238,7 @@ public class PlayerController : MonoBehaviour
 					if(newVelocityX!=0 && anim.GetInteger("EdgeState") < 3){
 						anim.SetInteger("EdgeState", 3);
 					}
-				}*/
+				}
             else
             {
                 //if we're latched to a wall which doesn't allow x axis movement don't move along x axis
@@ -266,7 +266,7 @@ public class PlayerController : MonoBehaviour
                     int modifier = velocity.z > 0 ? -1 : 1;
                     newVelocityZ += Mathf.Min(decelleration, Mathf.Abs(velocity.z)) * modifier;
                 }
-            }/*else if(!climbing && grabbedEdge.getOrientation() % 2 == 0){
+            }else if(!climbing && grabbedEdge.getOrientation() % 2 == 0){
 					float zAxis = -InputManager.instance.GetSideMovement();
 					if(zAxis == 0)
 						newVelocityZ = 0f;
@@ -291,7 +291,7 @@ public class PlayerController : MonoBehaviour
 					if(newVelocityZ!=0 && anim.GetInteger("EdgeState") < 3){
 						anim.SetInteger("EdgeState", 3);
 					}
-				}*/
+				}
             else
             {
                 //if we're latched to a wall which doesn't allow z movement

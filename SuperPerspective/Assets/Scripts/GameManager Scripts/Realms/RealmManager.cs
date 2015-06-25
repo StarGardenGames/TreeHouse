@@ -3,6 +3,8 @@ using System.Collections;
 
 public class RealmManager : MonoBehaviour {
 	
+	#pragma warning disable 414
+	
 	public static RealmManager instance;
 	
 	static int dimension=BLUE;
@@ -23,8 +25,6 @@ public class RealmManager : MonoBehaviour {
 	GameObject[] reds,blues;
 
 	GameObject on, off;
-	
-	
 	
 	// Use this for initialization
 	void Awake () {

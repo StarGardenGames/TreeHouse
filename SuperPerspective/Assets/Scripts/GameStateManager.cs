@@ -62,22 +62,22 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
         MOUNT_GAMEPLAY_2D = GameObject.Find("2DCameraMount").transform;
         MOUNT_GAMEPLAY_3D = GameObject.Find("3DCameraMount").transform;
         //MOUNT_PAUSED = GameObject.Find("PauseMount").transform;             // Consider switching this to be more dynamic in future
-		  GameObject menuObj = GameObject.Find("MenuMount");
+		  GameObject menuMountObj = GameObject.Find("MenuMount");
 		  
         // TODO: Change this line of code to use the final player object name and script name
         // Find Player and Main Camera
-        playerController = GameObject.Find("Player").GetComponent<PlayerController>();
-
+        //playerController = GameObject.Find("Player").GetComponent<PlayerController>();
+		  playerController = PlayerController.instance;
         // TODO: Change the game's starting state to dynamic behavior at some point
         // Start the game in 2D state
 		  
-		  if(menuObj == null){
+		  if(menuMountObj == null){
 			  StartGame();
 		  }else{
-			  MOUNT_MENU = menuObj.transform;
-			currentState = STATE_GAMEPLAY_2D;  
-			currentPerspective = PerspectiveType.p3D;
-			  CameraController2.instance.SetMount(MOUNT_MENU, VIEW_SETTINGS_MENU);
+			  MOUNT_MENU = menuMountObj.transform;
+			  currentState = STATE_GAMEPLAY_2D;  
+			  currentPerspective = PerspectiveType.p2D;
+			  CameraController.instance.SetMount(MOUNT_MENU, VIEW_SETTINGS_MENU);
 		  }
 
         // Register event handlers to InputManagers
@@ -85,7 +85,7 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
         InputManager.instance.PausePressedEvent += HandlePausePressed;
 
         // Register to switch state to proper gameplay when shift is complete
-        CameraController2.instance.ShiftCompleteEvent += HandleShiftComplete;
+        CameraController.instance.ShiftCompleteEvent += HandleShiftComplete;
 	}
 
     #endregion Monobehavior Implementation
@@ -97,14 +97,14 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
     private void EnterGameplay2D()
     {
         currentState = STATE_GAMEPLAY_2D;
-        CameraController2.instance.SetMount(MOUNT_GAMEPLAY_2D, VIEW_SETTINGS_GAMEPLAY_2D);
+        CameraController.instance.SetMount(MOUNT_GAMEPLAY_2D, VIEW_SETTINGS_GAMEPLAY_2D);
     }
 
     // Change the satte and set the new mount and view settings
     private void EnterGameplay3D()
     {
         currentState = STATE_GAMEPLAY_3D;
-        CameraController2.instance.SetMount(MOUNT_GAMEPLAY_3D, VIEW_SETTINGS_GAMEPLAY_3D);
+        CameraController.instance.SetMount(MOUNT_GAMEPLAY_3D, VIEW_SETTINGS_GAMEPLAY_3D);
     }
 
     // Enter transition state between 2D and 3D or vice-versa
@@ -119,9 +119,9 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
 
         // Set the camer'as mount to the target settings
         if (targetState == STATE_GAMEPLAY_2D)
-            CameraController2.instance.SetMount(MOUNT_GAMEPLAY_2D, VIEW_SETTINGS_GAMEPLAY_2D);
+            CameraController.instance.SetMount(MOUNT_GAMEPLAY_2D, VIEW_SETTINGS_GAMEPLAY_2D);
         else
-            CameraController2.instance.SetMount(MOUNT_GAMEPLAY_3D, VIEW_SETTINGS_GAMEPLAY_3D);
+            CameraController.instance.SetMount(MOUNT_GAMEPLAY_3D, VIEW_SETTINGS_GAMEPLAY_3D);
 
     }
 
@@ -130,7 +130,7 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
     {
         previousState = currentState;
         currentState = STATE_PAUSED;
-        CameraController2.instance.SetMount(MOUNT_PAUSED, VIEW_SETTINGS_PAUSED);
+        CameraController.instance.SetMount(MOUNT_PAUSED, VIEW_SETTINGS_PAUSED);
         RaisePauseEvent(true);
     }
 
@@ -152,7 +152,7 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
     {
         previousState = currentState;
         currentState = STATE_MENU;
-        CameraController2.instance.SetMount(MOUNT_MENU, VIEW_SETTINGS_MENU);
+        CameraController.instance.SetMount(MOUNT_MENU, VIEW_SETTINGS_MENU);
         RaisePauseEvent(true);
     }
 
@@ -242,7 +242,7 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
             RaisePauseEvent(false);
         }
         // Unregister this function (we can probably remove this)
-        // CameraController2.instance.ShiftCompleteEvent -= HandleShiftComplete;
+        // CameraController.instance.ShiftCompleteEvent -= HandleShiftComplete;
     }
 
     #endregion Event Handlers

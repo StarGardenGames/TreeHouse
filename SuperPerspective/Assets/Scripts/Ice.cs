@@ -14,10 +14,11 @@ public class Ice : ActiveInteractable {
 	private float slideSpeed = 20;
 	
 	private Vector3 startPos;
+	private Vector3 setVelocity;
 	
 	private CollisionChecker colCheck;
 	
-	private bool grabbed, respawnFlag = false;
+	private bool grabbed, respawnFlag, startPush;
 	
 	private PerspectiveType persp = PerspectiveType.p3D;
 	
@@ -27,6 +28,7 @@ public class Ice : ActiveInteractable {
 		base.StartSetup ();
 		grounded = false;
 		velocity = Vector3.zero;
+		setVelocity = Vector3.zero;
 		colliderHeight = GetComponent<Collider>().bounds.size.y;
 		colliderWidth = GetComponent<Collider>().bounds.size.x;
 		colliderDepth = GetComponent<Collider>().bounds.size.z;
@@ -36,16 +38,21 @@ public class Ice : ActiveInteractable {
 		// Register CheckGrab to grab input event
 		//InputManager.instance.InteractPressed += CheckGrab;
 		GameStateManager.instance.PerspectiveShiftEvent += Shift;
-		CameraController2.instance.ShiftStartEvent += checkBreak;
+		CameraController.instance.ShiftStartEvent += checkBreak;
 		colCheck = new CollisionChecker (GetComponent<Collider> ());
 		startPos = transform.position;
-		range = colliderWidth * 0.85f;
+		range = colliderWidth >= colliderDepth ? colliderWidth * 0.85f : colliderDepth * 0.85f;
 		
 		for (int i = 0; i < 4; i++)
 			axisBlocked[i] = false;
 	}
 
 	void Update() {
+		if (!setVelocity.Equals(Vector3.zero)) {
+			velocity = setVelocity;
+			setVelocity = Vector3.zero;
+			startPush = true;
+		}
 		CheckCollisions();
 	}
 
@@ -111,8 +118,19 @@ public class Ice : ActiveInteractable {
 			transform.position = pos;
 			GetComponent<Collider>().enabled = true;
 			GetComponentInChildren<Renderer>().enabled = true;
+			velocity = Vector3.zero;
 			respawnFlag = false;
 		}
+		if (startPush) {
+			if (velocity.Equals(Vector3.zero))
+				respawnFlag = true;
+			startPush = false;
+		}
+		//check for binding
+		BoundObject binder = gameObject.GetComponent<BoundObject>();
+		if(binder  != null)
+			binder.bind();
+		
 		//CheckCollisions();
 	}
 	
@@ -267,19 +285,19 @@ public class Ice : ActiveInteractable {
 			c.EnterCollisionWithGeneral(gameObject);
 		}
 	}
-
+	//Mathf.Abs(player.transform.position.x - transform.position.x) > colliderWidth / 2
 	public override void Triggered() {
 		if (velocity.Equals(Vector3.zero)) {
-			if ((Mathf.Abs(player.transform.position.x - transform.position.x) > Mathf.Abs(player.transform.position.z - transform.position.z)) || persp == PerspectiveType.p2D) {
+			if (Mathf.Abs(player.transform.position.x - transform.position.x) > colliderWidth / 2 || persp == PerspectiveType.p2D) {
 				if (player.transform.position.x - transform.position.x > 0)
-					velocity = Vector3.left * slideSpeed;
+					setVelocity = Vector3.left * slideSpeed;
 				else
-					velocity = Vector3.right * slideSpeed;
+					setVelocity = Vector3.right * slideSpeed;
 			} else {
 				if (player.transform.position.z - transform.position.z > 0)
-					velocity = Vector3.back * slideSpeed;
+					setVelocity = Vector3.back * slideSpeed;
 				else
-					velocity = Vector3.forward * slideSpeed;
+					setVelocity = Vector3.forward * slideSpeed;
 			}
 		}
 	}
