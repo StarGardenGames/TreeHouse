@@ -585,6 +585,9 @@ public class PlayerController : MonoBehaviour
 		edgeState = 0;
 	}
 
+	public bool isFalling(){
+		return falling;
+	}
 	//note: this is only called from the Edge.cs
 	public void UpdateEdgeState(Edge e, byte edgeState){
 		UpdateEdgeState(e,edgeState,-1);
@@ -592,8 +595,11 @@ public class PlayerController : MonoBehaviour
 	public void UpdateEdgeState(Edge e, byte edgeState, int animState){
 		switch(edgeState){
 			case 0:
+				if(grabbedEdge != null && e!= null)
+				Debug.Log(grabbedEdge.edgeIndex + " "+e.edgeIndex);
 				if(grabbedEdge == e){
 					this.edgeState = 0;
+					Debug.Log("state is 0");
 					grabbedEdge =null;
 				}
 				//adjust animation state
@@ -612,7 +618,6 @@ public class PlayerController : MonoBehaviour
 				Vector3 pos = gameObject.transform.position;
 				pos.y = e.gameObject.transform.position.y + (e.gameObject.transform.localScale.y * .5f) - (gameObject.transform.localScale.y * .5f);
 				gameObject.transform.position = pos;
-				
 				break;
 		}
 	}

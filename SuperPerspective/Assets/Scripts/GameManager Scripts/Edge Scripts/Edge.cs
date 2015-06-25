@@ -32,6 +32,7 @@ public class Edge : MonoBehaviour {
 	public void FixedUpdate(){
 		if(!init)
 			return;
+		bool playerCanGrab = player.isFalling() && (player.is3D() || validIn2D);
 		//if locked on
 		if(status >= 2){
 			//check if rested latch can be entered
@@ -57,10 +58,11 @@ public class Edge : MonoBehaviour {
 				}
 				player.gameObject.transform.position = playerPos;
 				status = 0;
+				Debug.Log(edgeIndex + "State0");
 				player.UpdateEdgeState(this, status, 5);
 			}
 		//if player is overlapping
-		}else if(isOverlaping(cuboid, player.getCuboid()) && (player.is3D() || validIn2D)/* && GrabButtonDown()*/){
+		}else if(playerCanGrab && isOverlaping(cuboid, player.getCuboid())/* && GrabButtonDown()*/){
 			Vector3 playerPos = player.gameObject.transform.position;
 			float diff = 0;
 			if(or%2 == 0)
