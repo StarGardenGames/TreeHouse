@@ -270,13 +270,14 @@ MonoBehaviour:
   - {fileID: 144680, guid: ec559883affb4024f82d4e640c5040ed, type: 2}
   - {fileID: 130454, guid: 515ab81ea9f088a4c92107f47f51ebf0, type: 2}
   - {fileID: 113424, guid: 17f76ad19b42b944d8f48e8208157185, type: 2}
-  numToGenerate: 3
+  numToGenerate: 1
   calculateAmountForMe: 1
   rotateX: 0
   rotateY: 1
   rotateZ: 0
   changeSize: 0
   evenDistribution: 0
+  cleanUpIn2D: 1
 --- !u!1 &1154928057
 GameObject:
   m_ObjectHideFlags: 0

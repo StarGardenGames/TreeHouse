@@ -5,7 +5,9 @@ public class ProceduralGround : MonoBehaviour {
 
 	public GameObject[] generatableObjects;
 	public int numToGenerate;
-	public bool calculateAmountForMe, rotateX, rotateY, rotateZ, changeSize, evenDistribution;
+	public bool calculateAmountForMe, rotateX, rotateY, rotateZ, changeSize, evenDistribution, cleanUpIn2D;
+
+	private GameObject[] renderedObjects;
 	// Use this for initialization
 	void Start () {
 		//me = this
@@ -13,10 +15,12 @@ public class ProceduralGround : MonoBehaviour {
 		MeshRenderer m = this.GetComponent<MeshRenderer>();
 		Vector3 meSize = new Vector3(m.bounds.size.x, m.bounds.size.y, m.bounds.size.z);
 
+
 		if(calculateAmountForMe){
 			float avgSize = 5.0f;
 			numToGenerate = (int)Mathf.Ceil((meSize.x * meSize.z)/avgSize);
 		}
+		renderedObjects = new GameObject[numToGenerate];
 
 		for(int i=0;i<numToGenerate;i++){
 			GameObject obj = getRandomObject();
@@ -41,11 +45,10 @@ public class ProceduralGround : MonoBehaviour {
 
 			//create
 			GameObject newObj = Object.Instantiate(obj, newPos, newRotation) as GameObject;
+			renderedObjects[i] = newObj;
 			newObj.transform.parent = this.gameObject.transform;
 		}
-
 		//hide
-		
 		m.enabled = false;
 	}
 
@@ -56,6 +59,18 @@ public class ProceduralGround : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-	
+		if(cleanUpIn2D){
+			if(!PlayerController.instance.is3D()){
+				for(int i=0;i<Mathf.Ceil(renderedObjects.Length/2);i++){
+					MeshRenderer r = renderedObjects[i].GetComponentInChildren<MeshRenderer>();
+					r.enabled = false;
+				}
+			}else{
+				for(int i=0;i<Mathf.Ceil(renderedObjects.Length);i++){
+					MeshRenderer r = renderedObjects[i].GetComponentInChildren<MeshRenderer>();
+					r.enabled = true;
+				}
+			}
+		}
 	}
 }
