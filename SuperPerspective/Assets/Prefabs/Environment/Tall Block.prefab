@@ -8,9 +8,11 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 464604}
+  - 65: {fileID: 6524208}
+  - 114: {fileID: 11440820}
   m_Layer: 0
   m_Name: Tall Block
-  m_TagString: Untagged
+  m_TagString: Terrain
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -26,7 +28,6 @@ GameObject:
   - 33: {fileID: 3384068}
   - 23: {fileID: 2306776}
   - 95: {fileID: 9541786}
-  - 65: {fileID: 6520118}
   m_Layer: 0
   m_Name: jaggy-rock-2
   m_TagString: Untagged
@@ -41,7 +42,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 162128}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -32.3337975, y: 3.43946028, z: -4.02771902}
+  m_LocalPosition: {x: -29.0400009, y: 2.22000003, z: 6.21000004}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 484274}
@@ -53,8 +54,8 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 182122}
-  m_LocalRotation: {x: 0, y: -.793352544, z: 0, w: .608762503}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: 0, y: -.732200503, z: 0, w: .681089163}
+  m_LocalPosition: {x: -.00198173523, y: 0, z: -.000984668732}
   m_LocalScale: {x: 174.288651, y: 348.577118, z: 174.288574}
   m_Children: []
   m_Father: {fileID: 464604}
@@ -90,18 +91,18 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 182122}
   m_Mesh: {fileID: 4300000, guid: 0074a29a000f08e43a0fa2ad99132cc5, type: 3}
---- !u!65 &6520118
+--- !u!65 &6524208
 BoxCollider:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 182122}
+  m_GameObject: {fileID: 162128}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: .00999999978, y: .00999999885, z: .00999999978}
-  m_Center: {x: 6.41569568e-05, y: 0, z: 1.94651111e-05}
+  m_Size: {x: 1.74011183, y: 3.22309971, z: 1.75783837}
+  m_Center: {x: -.0051574707, y: .128000736, z: -.0685124397}
 --- !u!95 &9541786
 Animator:
   serializedVersion: 3
@@ -119,6 +120,18 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
+--- !u!114 &11440820
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 162128}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe0eae766198e2c4a9b62a96556eacb6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  parentPlatform: {fileID: 0}
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
