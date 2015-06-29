@@ -1,44 +1,22 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Footsteps : StateMachineBehaviour {
+public class ClimbSound : StateMachineBehaviour {
 
-	public StepManager step;
-	public AnimationClip anim;
-	AnimatorStateInfo currentState;
-	float playbackTime;
-	bool play1, play2;
+	public VoiceManager voice; 
 
-	 // OnStateEnter is called when a transition starts and the state machine starts to evaluate this state
+	// OnStateEnter is called when a transition starts and the state machine starts to evaluate this state
 	override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
-		step = Object.FindObjectOfType<StepManager> ();
-		if(step == null)
-			return;
-		currentState = animator.GetCurrentAnimatorStateInfo(0);
-		play1 = false;
-		play2 = false;
+	voice = Object.FindObjectOfType<VoiceManager> ();
+	if(voice == null)
+		return;
+	voice.Climb ();
 	}
 
 	// OnStateUpdate is called on each Update frame between OnStateEnter and OnStateExit callbacks
-	override public void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
-		currentState = animator.GetCurrentAnimatorStateInfo(0);
-		playbackTime = currentState.normalizedTime % 1;
-
-		if (playbackTime < 0.3f && !play1){
-			play1 = true;
-			step.GrassStep();
-		}
-
-		else if (playbackTime > 0.5f && playbackTime < 0.8f && !play2){
-			play2 = true;
-			step.GrassStep();
-		}
-
-		else if (playbackTime > 0.81f){
-			play1 = false;
-			play2 = false;
-		}
-	}
+	//override public void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
+	//
+	//}
 
 	// OnStateExit is called when a transition ends and the state machine finishes evaluating this state
 	//override public void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
