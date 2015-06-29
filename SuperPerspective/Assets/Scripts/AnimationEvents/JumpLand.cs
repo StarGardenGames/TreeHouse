@@ -3,6 +3,8 @@ using System.Collections;
 
 public class JumpLand : StateMachineBehaviour {
 
+	#pragma warning disable 414
+
 	public StepManager step;
 	AnimatorStateInfo currentState;
 	float playbackTime;
