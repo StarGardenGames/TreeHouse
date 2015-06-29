@@ -2,7 +2,7 @@
 using System.Collections;
 
 //can be activated by player
-public class ActiveInteractable : MonoBehaviour {
+public class ActiveInteractable : PhysicalObject {
 	
 	//suppress warnings
 	#pragma warning disable 414
@@ -56,6 +56,7 @@ public class ActiveInteractable : MonoBehaviour {
 	public virtual void Triggered(){}
 
 	protected void StartSetup() {
+		base.Init();
 		//find player
 		player = PlayerController.instance.gameObject;
 		//become main if no one else has become it yet
