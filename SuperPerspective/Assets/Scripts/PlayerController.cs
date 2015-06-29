@@ -2,7 +2,7 @@
 using System.Collections;
 
 [RequireComponent(typeof(LineRenderer))]
-public class PlayerController : MonoBehaviour
+public class PlayerController : PhysicalObject
 {
 	//suppress warnings
 	#pragma warning disable 1691,168,219,414
@@ -46,7 +46,7 @@ public class PlayerController : MonoBehaviour
 	private CollisionChecker colCheck;
 
     // Vector used to store new veolicty
-    private Vector3 velocity;
+    //private Vector3 velocity; functionality has been moved to PhysicalObject
 
 	// Vars for Z-locking
 	private float zlock = int.MinValue;
@@ -80,7 +80,7 @@ public class PlayerController : MonoBehaviour
 	
     // Initialization
 	void Start () {
-
+		  base.Init();
         // Set player as falling 
         // TODO: Since the player often falls through the ground we should cast a ray down and immediately place then on the ground.
         grounded = false;
@@ -90,9 +90,6 @@ public class PlayerController : MonoBehaviour
 
         // Initialize the layer mask
         layerMask = LayerMask.NameToLayer("normalCollisions");
-        
-        // Set the starting velocity to the zero vector
-        velocity = Vector3.zero;
 
         // Get the collider dimensions to use for raycasting
         colliderHeight = GetComponent<Collider>().bounds.max.y - GetComponent<Collider>().bounds.min.y;

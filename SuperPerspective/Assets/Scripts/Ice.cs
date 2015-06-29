@@ -7,14 +7,14 @@ public class Ice : ActiveInteractable {
 	private const float terminalVelocity = 60;
 	private const float decelleration = 15;
 	
-	private Vector3 velocity, trajectory, newVelocity;
+	private Vector3 trajectory, newVelocity;
 	private bool grounded, svFlag;
 	private float colliderHeight, colliderWidth, colliderDepth;
 	private float Margin = 0.05f;
 	private float slideSpeed = 20;
 	
 	private Vector3 startPos;
-	private Vector3 setVelocity;
+	private Vector3 nextVelocity;//previously called setVelocity
 	
 	private CollisionChecker colCheck;
 	
@@ -28,7 +28,7 @@ public class Ice : ActiveInteractable {
 		base.StartSetup ();
 		grounded = false;
 		velocity = Vector3.zero;
-		setVelocity = Vector3.zero;
+		nextVelocity = Vector3.zero;
 		colliderHeight = GetComponent<Collider>().bounds.size.y;
 		colliderWidth = GetComponent<Collider>().bounds.size.x;
 		colliderDepth = GetComponent<Collider>().bounds.size.z;
@@ -48,10 +48,13 @@ public class Ice : ActiveInteractable {
 	}
 
 	void Update() {
-		if (!setVelocity.Equals(Vector3.zero)) {
-			velocity = setVelocity;
-			setVelocity = Vector3.zero;
+		if (!nextVelocity.Equals(Vector3.zero)) {
+			velocity = nextVelocity;
+			nextVelocity = Vector3.zero;
 			startPush = true;
+			BoundObject binder = gameObject.GetComponent<BoundObject>();
+			if(binder!=null)
+				binder.bind();
 		}
 		CheckCollisions();
 	}
@@ -121,16 +124,18 @@ public class Ice : ActiveInteractable {
 			velocity = Vector3.zero;
 			respawnFlag = false;
 		}
-		if (startPush) {
-			if (velocity.Equals(Vector3.zero))
-				respawnFlag = true;
-			startPush = false;
-		}
-		//check for binding
+		
 		BoundObject binder = gameObject.GetComponent<BoundObject>();
-		if(binder  != null)
+		if(binder != null)
 			binder.bind();
 		
+		//call custom bind
+		if (startPush) {
+			if (velocity.Equals(Vector3.zero)){
+				respawnFlag = true;
+			}
+			startPush = false;
+		}
 		//CheckCollisions();
 	}
 	
@@ -290,14 +295,14 @@ public class Ice : ActiveInteractable {
 		if (velocity.Equals(Vector3.zero)) {
 			if (Mathf.Abs(player.transform.position.x - transform.position.x) > colliderWidth / 2 || persp == PerspectiveType.p2D) {
 				if (player.transform.position.x - transform.position.x > 0)
-					setVelocity = Vector3.left * slideSpeed;
+					nextVelocity = Vector3.left * slideSpeed;
 				else
-					setVelocity = Vector3.right * slideSpeed;
+					nextVelocity = Vector3.right * slideSpeed;
 			} else {
 				if (player.transform.position.z - transform.position.z > 0)
-					setVelocity = Vector3.back * slideSpeed;
+					nextVelocity = Vector3.back * slideSpeed;
 				else
-					setVelocity = Vector3.forward * slideSpeed;
+					nextVelocity = Vector3.forward * slideSpeed;
 			}
 		}
 	}
