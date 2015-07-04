@@ -592,12 +592,12 @@ public class PlayerController : PhysicalObject
 	public void UpdateEdgeState(Edge e, byte edgeState, int animState){
 		switch(edgeState){
 			case 0:
-				if(grabbedEdge != null && e!= null)
-				Debug.Log(grabbedEdge.edgeIndex + " "+e.edgeIndex);
-				if(grabbedEdge == e){
-					this.edgeState = 0;
-					Debug.Log("state is 0");
-					grabbedEdge =null;
+				if(grabbedEdge != null && e!= null){
+					if(grabbedEdge == e){
+						this.edgeState = 0;
+						Debug.Log("state is 0");
+						grabbedEdge =null;
+					}
 				}
 				//adjust animation state
 				if(animState!= -1)

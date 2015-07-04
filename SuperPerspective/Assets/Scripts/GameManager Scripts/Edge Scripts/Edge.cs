@@ -58,7 +58,6 @@ public class Edge : MonoBehaviour {
 				}
 				player.gameObject.transform.position = playerPos;
 				status = 0;
-				Debug.Log(edgeIndex + "State0");
 				player.UpdateEdgeState(this, status, 5);
 			}
 		//if player is overlapping

@@ -14,30 +14,35 @@ public class CameraController : PersistentSingleton<CameraController	>
 	//suppress warnings
 	#pragma warning disable 472
 	
-    #region Properties & Variables
+	#region Properties & Variables
 
-    // This is the camera component and matrix blender script (see above)
-    Camera cam;
-    MatrixBlender blender;
+	// This is the camera component and matrix blender script (see above)
+	Camera cam;
+	MatrixBlender blender;
 
-    // Movement variables
-    Transform mount;                // The current transform the camera is "mounted" to
-    Vector3 velocity;               // Used by SmoothDamp function
-    Quaternion startRotation;       // Used to Slerp rotation to new mount
-    Matrix4x4 targetMatrix;         // The matrix containing camera settings to blend to
+	// Movement variables
+	Transform mount;                // The current transform the camera is "mounted" to
+	Vector3 velocity;               // Used by SmoothDamp function
+	Quaternion startRotation;       // Used to Slerp rotation to new mount
+	Matrix4x4 targetMatrix;         // The matrix containing camera settings to blend to
 
-    // TODO: Consider taking these last three as extra parameters in SetMount to dictate blend speeds on the fly
-    float smoothTime = .2f;         // Used to control the damp speed   
-    float turnSpeed = 3f;           // USed to dictate how quickly the camera can match its target rotation
-    float cameraBlendSpeed = .07f;  // USed to determine how quickly the camera changes from one setting to another and vice versa
-    float shiftThreshold = .5f;     // Use to determine if the camera is close enough to the mount's position and rotation to consider the shift complete
-
-    // Event to alert Gameplay State Manager of completed shift
+	// TODO: Consider taking these last three as extra parameters in SetMount to dictate blend speeds on the fly
+	float smoothTime = .2f;         // Used to control the damp speed   
+	float turnSpeed = 3f;           // USed to dictate how quickly the camera can match its target rotation
+	float cameraBlendSpeed = .07f;  // USed to determine how quickly the camera changes from one setting to another and vice versa
+	float shiftThreshold = .5f;     // Use to determine if the camera is close enough to the mount's position and rotation to consider the shift complete
+	
+	public float maxLeanAngle = 30f;
+	public float leanSpeed = 30f;//degrees per second
+	float leanAngle = 0;
+	
+	
+	// Event to alert Gameplay State Manager of completed shift
 	public event System.Action ShiftStartEvent;
-    public event System.Action ShiftCompleteEvent;
-    private bool shiftComplete = false;
+	public event System.Action ShiftCompleteEvent;
+	private bool shiftComplete = false;
 
-    #endregion Properties & Variables
+	#endregion Properties & Variables
 
 
     #region Monobehavior Implementation
@@ -48,36 +53,56 @@ public class CameraController : PersistentSingleton<CameraController	>
         blender = gameObject.GetComponent<MatrixBlender>();
     }
 
-    // Use this for initialization
-    void Start()
-    {
-        
-    }
+	// Since the behavior in each state is the same we execute behavior in Update and just check conditions to change state
+	void Update(){
+		checkStateChange();
+		checkCamereaLean();
+	}
+	 
+	void checkStateChange(){		
+		if (mount != null && targetMatrix != null){
+			// Smoothdamp the camera towards the mount and blend the camera matrix to the target settings
+			transform.position = Vector3.SmoothDamp(transform.position, mount.position, ref velocity, smoothTime);
 
-    // Since the behavior in each state is the same we execute behavior in Update and just check conditions to change state
-    void Update()
-    {
-        if (mount != null && targetMatrix != null)
-        {
-            // Smoothdamp the camera towards the mount and blend the camera matrix to the target settings
-            transform.position = Vector3.SmoothDamp(transform.position, mount.position, ref velocity, smoothTime);
+			// If we haven't matched the 2D mount's rotation yet rotate to match
+			if (!(transform.rotation == mount.rotation))
+				 transform.rotation = Quaternion.RotateTowards(transform.rotation, mount.rotation, turnSpeed);
 
-            // If we haven't matched the 2D mount's rotation yet rotate to match
-            if (!(transform.rotation == mount.rotation))
-                transform.rotation = Quaternion.RotateTowards(transform.rotation, mount.rotation, turnSpeed);
-
-            // Check if the shift is complete
-            if (!shiftComplete)
-            {
-                // IF the shift is over alert listeners
-                if (CheckTransition())
-                {
-                    shiftComplete = true;
-                    RaiseShiftCompleteEvent();
-                }
-            }
-        }
-    }
+			// Check if the shift is complete
+			if (!shiftComplete){
+				// IF the shift is over alert listeners
+				if (CheckTransition()){
+					shiftComplete = true;
+					RaiseShiftCompleteEvent();
+				}
+			}
+		}
+	}
+	
+	void checkCamereaLean(){
+		//determine target
+		float targetAngle = 0;
+		if (Input.GetKey(KeyCode.Semicolon)){
+			targetAngle = maxLeanAngle;
+			Debug.Log(targetAngle);
+		}
+		if (Input.GetKey(KeyCode.Quote)){
+			targetAngle = -maxLeanAngle;
+			Debug.Log(targetAngle);
+		}
+		
+		
+		//Debug.Log("CameraLean is called, < "+targetAngle+" , "+leanAngle);
+		//adjust leanAngle
+		float leanDelta = leanSpeed * Time.deltaTime * ((targetAngle > leanAngle)? 1 : -1);
+		bool passedTarget = (leanAngle - targetAngle > 0) != (leanAngle + leanDelta - targetAngle > 0);
+		if(passedTarget)
+			leanDelta = (targetAngle - leanAngle);
+		leanAngle += leanDelta;
+		
+		transform.RotateAround(PlayerController.instance.gameObject.transform.position,
+			Vector3.up, leanDelta);
+	}
 
     #endregion Monobehavior Implementation
 

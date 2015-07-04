@@ -77,7 +77,6 @@ public class EdgeManager : MonoBehaviour {
 			region[0][k] = Mathf.Max(p0[k],c[0][k]);
 			region[1][k] = Mathf.Min(p1[k],c[1][k]);
 		}
-		//Debug.Log("< "+p0 + " -- "+ p1 + ">  ^   < " + c[0] + " -- "+ c[1] + " > = < "+region[0]+" -- " + region[1] + " > ( "+overlap+" )");
 		if(!overlap)
 			return null;
 		else
