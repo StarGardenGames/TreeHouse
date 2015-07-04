@@ -56,7 +56,7 @@ public class CameraController : PersistentSingleton<CameraController	>
 	// Since the behavior in each state is the same we execute behavior in Update and just check conditions to change state
 	void Update(){
 		checkStateChange();
-		checkCamereaLean();
+		//checkCamereaLean();
 	}
 	 
 	void checkStateChange(){		

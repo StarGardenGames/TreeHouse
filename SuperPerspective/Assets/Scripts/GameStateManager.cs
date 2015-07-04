@@ -51,7 +51,7 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
 	private Matrix4x4 VIEW_SETTINGS_GAMEPLAY_3D =   CameraMatrixTypes.Standard3D;
 	private Matrix4x4 VIEW_SETTINGS_GAMEPLAY_2D =   CameraMatrixTypes.Standard2D;
 	private Matrix4x4 VIEW_SETTINGS_PAUSED =        CameraMatrixTypes.Standard3D;  
-	private Matrix4x4 VIEW_SETTINGS_MENU =          CameraMatrixTypes.Standard2D; 
+	private Matrix4x4 VIEW_SETTINGS_MENU =          CameraMatrixTypes.Menu; 
 	private Matrix4x4 VIEW_SETTINGS_LEAN_LEFT =		CameraMatrixTypes.Standard3D; 
 	private Matrix4x4 VIEW_SETTINGS_LEAN_RIGHT =		CameraMatrixTypes.Standard3D; 
 	private Matrix4x4 VIEW_SETTINGS_BACKWARD =		CameraMatrixTypes.Standard3D; 
@@ -79,25 +79,15 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
 		if(mountMenuObj != null)	MOUNT_MENU = mountMenuObj.transform;
 		
 		//initial settings
-		//currentPerspective = PerspectiveType.p2D;
+		currentPerspective = PerspectiveType.p2D;
 		
 		//determine wheather or not to start on menu
-		/*if(MOUNT_MENU == null){
-			Debug.Log("not menu");
+		if(MOUNT_MENU == null){
 			StartGame();
 		}else{
 			currentState = STATE_GAMEPLAY_2D;
 			CameraController.instance.SetMount(MOUNT_MENU, VIEW_SETTINGS_MENU);
-		}*/
-		
-		if(mountMenuObj == null){
-			  StartGame();
-		  }else{
-			  MOUNT_MENU = mountMenuObj.transform;
-			  currentState = STATE_GAMEPLAY_2D;  
-			  currentPerspective = PerspectiveType.p2D;
-			  CameraController.instance.SetMount(MOUNT_MENU, VIEW_SETTINGS_MENU);
-		  }
+		}
 
 		// Register event handlers to InputManagers
 		InputManager.instance.ShiftPressedEvent += HandleShiftPressed;
