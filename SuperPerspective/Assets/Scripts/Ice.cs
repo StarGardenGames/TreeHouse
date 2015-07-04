@@ -23,7 +23,7 @@ public class Ice : ActiveInteractable {
 	private PerspectiveType persp = PerspectiveType.p3D;
 	
 	private bool[] axisBlocked = new bool[4];
-	
+
 	void Start() {
 		base.StartSetup ();
 		grounded = false;
@@ -41,7 +41,8 @@ public class Ice : ActiveInteractable {
 		CameraController2.instance.ShiftStartEvent += checkBreak;
 		colCheck = new CollisionChecker (GetComponent<Collider> ());
 		startPos = transform.position;
-		range = colliderWidth >= colliderDepth ? colliderWidth * 0.85f : colliderDepth * 0.85f;
+		//range = colliderWidth >= colliderDepth ? colliderWidth * 0.85f : colliderDepth * 0.85f;
+		range = 2;
 		
 		for (int i = 0; i < 4; i++)
 			axisBlocked[i] = false;
@@ -121,19 +122,18 @@ public class Ice : ActiveInteractable {
 			velocity = Vector3.zero;
 			respawnFlag = false;
 		}
-<<<<<<< HEAD
+
 		if (startPush) {
 			if (velocity.Equals(Vector3.zero))
 				respawnFlag = true;
 			startPush = false;
 		}
-=======
+
 		//check for binding
-		BoundObject binder = gameObject.GetComponent<BoundObject>();
+		/*BoundObject binder = gameObject.GetComponent<BoundObject>();
 		if(binder  != null)
-			binder.bind();
-		
->>>>>>> origin/master
+			binder.bind();*/
+
 		//CheckCollisions();
 	}
 	

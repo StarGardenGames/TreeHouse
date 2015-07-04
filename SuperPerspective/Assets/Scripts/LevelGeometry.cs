@@ -14,9 +14,9 @@ public class LevelGeometry : MonoBehaviour
 
     private BoxCollider boxCollider;    // Reference to this object's BoxCollider
     private Vector3 colliderSize;       // Stores the collider's beginning size, usually (1, 1, 1)
-    private float zScaleRatioParent;    // Ratio of this object's z scale to the parent platform's
-    private float zScaleRatioWorld;     // Ratio of this object's z scale to the world
 	private Vector3 startCenter;
+	private Quaternion startRotation;
+	private float zDiff;
 
     #endregion Properties & Variables
 
@@ -25,28 +25,21 @@ public class LevelGeometry : MonoBehaviour
 
     void Awake()
     {
-        // Get the BoxCollider component
-        boxCollider = GetComponent<BoxCollider>();
-
 		if (parentPlatform == null) {
 			parentPlatform = GameObject.Find("Ground");
 		}
 
-        // Store the ratio of our scale to the parent's
-		zScaleRatioParent = parentPlatform.transform.lossyScale.z / transform.lossyScale.z;
-		zScaleRatioWorld = (1 / transform.lossyScale.z);
-
-		// Get the collider's actual center and size
-		startCenter = boxCollider.center;
-		colliderSize = boxCollider.size;
     }
 	
 	void Start () 
     {
         // Register to perspective shift event
-        GameStateManager.instance.PerspectiveShiftEvent += AdjustCollider;
+        GameStateManager.instance.PerspectiveShiftEvent += AdjustPosition;
+		boxCollider = GetComponent<BoxCollider>();
+		startCenter = boxCollider.center;
+		colliderSize = boxCollider.size;
 
-		AdjustCollider(PerspectiveType.p2D);
+		AdjustPosition(PerspectiveType.p2D);
 	}
 
     #endregion Monobehavior Implementation
@@ -56,19 +49,24 @@ public class LevelGeometry : MonoBehaviour
 
     
     // Adjusts the collider to the appropriate shape when the perspective shift event occurs.
-    private void AdjustCollider(PerspectiveType p)
+    private void AdjustPosition(PerspectiveType p)
     {
-        if (p == PerspectiveType.p2D)
-        {
-            // Stretch the collider's Z depth and center z value to match parent platform
-			boxCollider.center = startCenter + new Vector3(0f, 0f, (parentPlatform.transform.position.z - transform.position.z - startCenter.z) * zScaleRatioWorld);
-	        boxCollider.size = new Vector3(colliderSize.x, colliderSize.y, zScaleRatioParent);
-        }
+		//Mathf.Pow(Mathf.Sin(rot * Mathf.Deg2Rad), 2)
+		float rot = Mathf.Floor(transform.rotation.eulerAngles.y);
+		float sign = 1;
+		if (rot >= 90 && rot <= 270)
+			sign = -1;
+		if (p == PerspectiveType.p2D)
+		{
+			boxCollider.size = new Vector3(colliderSize.x * Mathf.Cos(rot * Mathf.Deg2Rad) + (parentPlatform.transform.lossyScale.z / transform.lossyScale.x) * Mathf.Sin(rot * Mathf.Deg2Rad), colliderSize.y, 
+			                               colliderSize.z * Mathf.Sin(rot * Mathf.Deg2Rad) + (parentPlatform.transform.lossyScale.z / transform.lossyScale.z) * Mathf.Cos(rot * Mathf.Deg2Rad));
+			boxCollider.center = new Vector3(sign * (parentPlatform.transform.position.z - transform.position.z) * (1 / (transform.localScale.x)) * Mathf.Sin(rot * Mathf.Deg2Rad), startCenter.y, 
+			                                 sign * (parentPlatform.transform.position.z - transform.position.z) * (1 / (transform.localScale.z)) * Mathf.Cos(rot * Mathf.Deg2Rad));
+		}
         else if (p == PerspectiveType.p3D)
         {
-            // Return collider to initial state
-            boxCollider.size = colliderSize;
-            boxCollider.center = startCenter;
+			boxCollider.center = startCenter;
+			boxCollider.size = colliderSize;
         }
     }
 
