@@ -80,7 +80,7 @@ public class CameraController : PersistentSingleton<CameraController	>
 	}
 	
 	void checkCamereaLean(){
-		if(GameStateManager.instance.currentState.Equals("3D")){
+		if(GameStateManager.instance.currentState==ViewType.STANDARD_3D){
 			//determine target
 			float targetAngle = 0;
 			if (Input.GetKey(KeyCode.Semicolon)){
