@@ -8,7 +8,7 @@ public class Key : Interactable {
 
 	void FixedUpdate() {
 		if (active)
-			GetComponentInChildren<Renderer>().transform.Rotate(Vector3.up, Mathf.PI / 16);
+			GetComponentInChildren<Renderer>().transform.Rotate(Vector3.up, Mathf.PI / 4, Space.World);
 	}
 
 	public static bool UseKey() {

@@ -7,13 +7,10 @@ using System.Collections;
 public class ObjectFade : MonoBehaviour {
 
 	float setAlpha = 1, fadeSpeed = 0.15f;
-	float height, width;
 	Renderer[] rends;
 	GameObject player;
 	
 	void Start () {
-		height = GetComponent<Collider>().bounds.size.y;
-		width = GetComponent<Collider>().bounds.size.x;
 		player = PlayerController.instance.gameObject;
 		if (GetComponent<Renderer>())
 			rends = GetComponents<Renderer>();
@@ -26,12 +23,11 @@ public class ObjectFade : MonoBehaviour {
 	}
 
 	void Update() {
-		height = GetComponent<Collider>().bounds.size.y;
 		setAlpha = 1;
-		if (GameStateManager.instance.currentPerspective == PerspectiveType.p3D && player.transform.position.y < transform.position.y + height / 2f) {
-			if (transform.position.x < player.transform.position.x && transform.position.x + width / 2 > Camera.main.transform.position.x) {
+		float dist;
+		if (GetComponent<Collider>().bounds.IntersectRay(new Ray(Camera.main.transform.position, player.transform.position - Camera.main.transform.position), out dist)) { 
+			if (dist < Vector3.Distance(player.transform.position, Camera.main.transform.position))
 				setAlpha = 0.5f - Mathf.Lerp(0, 0.5f, (transform.position.x - player.transform.position.x) / (Camera.main.transform.position.x - player.transform.position.x));
-			}
 		}
 	}
 
