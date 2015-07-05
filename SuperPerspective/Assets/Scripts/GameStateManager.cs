@@ -23,6 +23,7 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
 	public string previousState { get; private set; }
 	public string targetState { get; private set; }
 	public PerspectiveType currentPerspective { get; private set; }
+	public bool paused {get; private set;}
 
 	private const string STATE_GAMEPLAY_2D = "2D";
 	private const string STATE_GAMEPLAY_3D = "3D";
@@ -69,25 +70,23 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
 		// Gather mount gameobjects
 		GameObject mount2dObj = GameObject.Find("2DCameraMount");
 		GameObject mount3dObj = GameObject.Find("3DCameraMount");
-		//GameObject mountPausedObj = GameObject.Find("PauseMount");
+		GameObject mountPausedObj = GameObject.Find("PauseMount");
 		GameObject mountMenuObj = GameObject.Find("MenuMount");
 		
 		//find transforms
 		if(mount2dObj != null) 		MOUNT_GAMEPLAY_2D = mount2dObj.transform;
 		if(mount3dObj != null) 		MOUNT_GAMEPLAY_3D = mount3dObj.transform;
-		//if(mountPausedObj != null) MOUNT_PAUSED = mountPausedObj.transform; 
+		if(mountPausedObj != null) MOUNT_PAUSED = mountPausedObj.transform; 
 		if(mountMenuObj != null)	MOUNT_MENU = mountMenuObj.transform;
 		
 		//initial settings
 		currentPerspective = PerspectiveType.p2D;
 		
 		//determine wheather or not to start on menu
-		if(MOUNT_MENU == null){
+		//if(MOUNT_MENU == null)
 			StartGame();
-		}else{
-			currentState = STATE_GAMEPLAY_2D;
-			CameraController.instance.SetMount(MOUNT_MENU, VIEW_SETTINGS_MENU);
-		}
+		/*else
+			EnterMenu();*/
 
 		// Register event handlers to InputManagers
 		InputManager.instance.ShiftPressedEvent += HandleShiftPressed;
@@ -115,23 +114,30 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
         CameraController.instance.SetMount(MOUNT_GAMEPLAY_3D, VIEW_SETTINGS_GAMEPLAY_3D);
     }
 
-    // Enter transition state between 2D and 3D or vice-versa
-    private void EnterTransition(string targetState)
-    {
-        // Pause the game during the transition
-        RaisePauseEvent(true);
+	// Enter transition state between 2D and 3D or vice-versa
+	private void EnterTransition(string targetState)
+	{
+		// Pause the game during the transition
+		RaisePauseEvent(true);
 
-        // Set transition state and target state
-        currentState = STATE_TRANSITION;
-        this.targetState = targetState;
+		/*if(targetState == STATE_GAMEPLAY_2D)
+			EnterGameplay2D();
+		
+		if(targetState == STATE_GAMEPLAY_3D)
+			EnterGameplay3D();*/
 
-        // Set the camer'as mount to the target settings
-        if (targetState == STATE_GAMEPLAY_2D)
-            CameraController.instance.SetMount(MOUNT_GAMEPLAY_2D, VIEW_SETTINGS_GAMEPLAY_2D);
-        else
-            CameraController.instance.SetMount(MOUNT_GAMEPLAY_3D, VIEW_SETTINGS_GAMEPLAY_3D);
 
-    }
+		// Set transition state and target state
+		currentState = STATE_TRANSITION;
+		this.targetState = targetState;
+
+		// Set the camer'as mount to the target settings
+		if (targetState == STATE_GAMEPLAY_2D)
+			CameraController.instance.SetMount(MOUNT_GAMEPLAY_2D, VIEW_SETTINGS_GAMEPLAY_2D);
+		else
+			CameraController.instance.SetMount(MOUNT_GAMEPLAY_3D, VIEW_SETTINGS_GAMEPLAY_3D);
+
+	}
 
     // Pause the game
     private void EnterPause()
@@ -251,12 +257,12 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
 
     #region Event Raising Functions
 
-    // Alert listeners that the game is being paused or unpaused
-    private void RaisePauseEvent(bool paused)
-    {
-        if (GamePausedEvent != null)
-            GamePausedEvent(paused);
-    }
+	// Alert listeners that the game is being paused or unpaused
+	private void RaisePauseEvent(bool paused){
+		this.paused = paused;
+		if (GamePausedEvent != null)
+			GamePausedEvent(paused);
+	}
 
     // Alert listeners that the perspective should shift
     private void RaisePerspectiveShiftEvent()
@@ -270,10 +276,10 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
     #region Public Interface
 
     // Called by main menu to begin gameplay
-    public void StartGame()
-    {
+    public void StartGame(){
         EnterTransition(STATE_GAMEPLAY_2D);
         currentPerspective = PerspectiveType.p2D;
+		  RaisePauseEvent(false);
     }
     #endregion Public Interface
 

@@ -56,16 +56,16 @@ public class CameraController : PersistentSingleton<CameraController	>
 	// Since the behavior in each state is the same we execute behavior in Update and just check conditions to change state
 	void Update(){
 		checkStateChange();
-		//checkCamereaLean();
+		checkCamereaLean();
 	}
-	 
+	
 	void checkStateChange(){		
 		if (mount != null && targetMatrix != null){
 			// Smoothdamp the camera towards the mount and blend the camera matrix to the target settings
 			transform.position = Vector3.SmoothDamp(transform.position, mount.position, ref velocity, smoothTime);
 
 			// If we haven't matched the 2D mount's rotation yet rotate to match
-			if (!(transform.rotation == mount.rotation))
+			if (!(transform.rotation == mount.rotation) && GameStateManager.instance.paused)
 				 transform.rotation = Quaternion.RotateTowards(transform.rotation, mount.rotation, turnSpeed);
 
 			// Check if the shift is complete
@@ -80,28 +80,30 @@ public class CameraController : PersistentSingleton<CameraController	>
 	}
 	
 	void checkCamereaLean(){
-		//determine target
-		float targetAngle = 0;
-		if (Input.GetKey(KeyCode.Semicolon)){
-			targetAngle = maxLeanAngle;
-			Debug.Log(targetAngle);
+		if(GameStateManager.instance.currentState.Equals("3D")){
+			//determine target
+			float targetAngle = 0;
+			if (Input.GetKey(KeyCode.Semicolon)){
+				targetAngle = maxLeanAngle;
+			}
+			if (Input.GetKey(KeyCode.Quote)){
+				targetAngle = -maxLeanAngle;
+			}
+			
+			//determine if rotation is necessary
+			if(leanAngle == targetAngle)
+				return;
+			
+			//adjust leanAngle
+			float leanDelta = leanSpeed * Time.deltaTime * ((targetAngle > leanAngle)? 1 : -1);
+			bool passedTarget = (leanAngle - targetAngle > 0) != (leanAngle + leanDelta - targetAngle > 0);
+			if(passedTarget)
+				leanDelta = targetAngle - leanAngle;
+			leanAngle += leanDelta;
+			
+			transform.RotateAround(PlayerController.instance.gameObject.transform.position,
+				Vector3.up, leanDelta);
 		}
-		if (Input.GetKey(KeyCode.Quote)){
-			targetAngle = -maxLeanAngle;
-			Debug.Log(targetAngle);
-		}
-		
-		
-		//Debug.Log("CameraLean is called, < "+targetAngle+" , "+leanAngle);
-		//adjust leanAngle
-		float leanDelta = leanSpeed * Time.deltaTime * ((targetAngle > leanAngle)? 1 : -1);
-		bool passedTarget = (leanAngle - targetAngle > 0) != (leanAngle + leanDelta - targetAngle > 0);
-		if(passedTarget)
-			leanDelta = (targetAngle - leanAngle);
-		leanAngle += leanDelta;
-		
-		transform.RotateAround(PlayerController.instance.gameObject.transform.position,
-			Vector3.up, leanDelta);
 	}
 
     #endregion Monobehavior Implementation
