@@ -33,7 +33,7 @@ public class CameraController : PersistentSingleton<CameraController	>
 	float shiftThreshold = .5f;     // Use to determine if the camera is close enough to the mount's position and rotation to consider the shift complete
 	
 	public float maxLeanAngle = 30f;
-	public float leanSpeed = 30f;//degrees per second
+	public float leanDegreesPerSecond = 60f;
 	float leanAngle = 0;
 	
 	
@@ -95,7 +95,7 @@ public class CameraController : PersistentSingleton<CameraController	>
 				return;
 			
 			//adjust leanAngle
-			float leanDelta = leanSpeed * Time.deltaTime * ((targetAngle > leanAngle)? 1 : -1);
+			float leanDelta = leanDegreesPerSecond * Time.deltaTime * ((targetAngle > leanAngle)? 1 : -1);
 			bool passedTarget = (leanAngle - targetAngle > 0) != (leanAngle + leanDelta - targetAngle > 0);
 			if(passedTarget)
 				leanDelta = targetAngle - leanAngle;
