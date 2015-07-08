@@ -16,6 +16,13 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
 	#region Properties & Variables
 
 	// State variables
+	
+	public ViewType testState;
+	
+	public void Update(){
+		testState = currentState;
+	}
+	
 	public ViewType currentState { get; private set; }
 	public ViewType previousState { get; private set; }
 	public ViewType targetState { get; private set; }
@@ -46,13 +53,16 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
 		InitViewMounts();
 		
 		//initial settings
-		currentPerspective = PerspectiveType.p2D;
+		
 		
 		//determine wheather or not to start on menu
-		//if(view_mounts[(int)ViewType.MENU == null)
+		if(view_mounts[(int)ViewType.MENU] == null){
+			currentPerspective = PerspectiveType.p2D;
 			StartGame();
-		/*else
-			EnterMenu();*/
+		}else{
+			currentPerspective = PerspectiveType.p3D;
+			EnterMenu();
+		}
 
 		// Register event handlers to InputManagers
 		InputManager.instance.ShiftPressedEvent += HandleShiftPressed;
@@ -66,7 +76,7 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
 		view_settings[(int)ViewType.STANDARD_3D] =   CameraMatrixTypes.Standard3D;
 		view_settings[(int)ViewType.STANDARD_2D] =   CameraMatrixTypes.Standard2D;
 		view_settings[(int)ViewType.PAUSED] =        CameraMatrixTypes.Standard3D;  
-		view_settings[(int)ViewType.MENU] =          CameraMatrixTypes.Menu; 
+		view_settings[(int)ViewType.MENU] =          CameraMatrixTypes.Standard2D; 
 		view_settings[(int)ViewType.LEAN_LEFT] =		CameraMatrixTypes.Standard3D; 
 		view_settings[(int)ViewType.LEAN_RIGHT] =		CameraMatrixTypes.Standard3D; 
 		view_settings[(int)ViewType.BACKWARD] =		CameraMatrixTypes.Standard3D;
