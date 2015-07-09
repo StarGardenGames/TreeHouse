@@ -12,6 +12,8 @@ public class Footsteps : StateMachineBehaviour {
 	 // OnStateEnter is called when a transition starts and the state machine starts to evaluate this state
 	override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
 		step = Object.FindObjectOfType<StepManager> ();
+		if(step == null)
+			return;
 		currentState = animator.GetCurrentAnimatorStateInfo(0);
 		play1 = false;
 		play2 = false;

@@ -9,7 +9,7 @@ public class Crate : ActiveInteractable {
 	private const float terminalVelocity = 60;
 	private const float decelleration = 15;
 
-	private Vector3 velocity, trajectory, newVelocity;
+	private Vector3 trajectory, newVelocity;
 	private bool grounded, svFlag;
 	private float colliderHeight, colliderWidth, colliderDepth;
 	private float Margin = 0.05f;
@@ -27,7 +27,6 @@ public class Crate : ActiveInteractable {
 	void Start() {
 		base.StartSetup ();
 		grounded = false;
-		velocity = Vector3.zero;
 		colliderHeight = GetComponent<Collider>().bounds.size.y;
 		colliderWidth = GetComponent<Collider>().bounds.size.x;
 		colliderDepth = GetComponent<Collider>().bounds.size.z;
@@ -37,7 +36,7 @@ public class Crate : ActiveInteractable {
 		// Register CheckGrab to grab input event
 		//InputManager.instance.InteractPressed += CheckGrab;
 		GameStateManager.instance.PerspectiveShiftEvent += Shift;
-		CameraController2.instance.ShiftStartEvent += checkBreak;
+		CameraController.instance.ShiftStartEvent += checkBreak;
 		colCheck = new CollisionChecker (GetComponent<Collider> ());
 		startPos = transform.position;
 		range = colliderWidth * 0.85f;

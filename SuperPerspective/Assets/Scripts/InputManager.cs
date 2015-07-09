@@ -72,20 +72,6 @@ public class InputManager : Singleton<InputManager>
 
     }
 
-	void FixedUpdate() {
-        /*
-		if (flipFailed) {
-			if (flipTimer < FAIL_TIME) {
-				flipTimer += 1/50f;
-			} else {
-                RaiseShiftPressedEvent();
-				flipTimer = 0;
-				flipFailed = false;
-			}
-		}
-        */
-	}
-
     #endregion MonobehaviorImplementation
 
 

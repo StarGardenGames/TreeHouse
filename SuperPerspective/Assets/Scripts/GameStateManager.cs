@@ -13,176 +13,169 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
 	//suppress warnings
 	#pragma warning disable 414, 649
 	
-    #region Properties & Variables
+	#region Properties & Variables
 
-    // Object references for the Player and the Main Camera
-    PlayerController playerController;
+	// State variables
+	
+	public ViewType testState;
+	
+	public void Update(){
+		testState = currentState;
+	}
+	
+	public ViewType currentState { get; private set; }
+	public ViewType previousState { get; private set; }
+	public ViewType targetState { get; private set; }
+	public PerspectiveType currentPerspective { get; private set; }
+	public bool paused {get; private set;}
 
-    // State variables
-    public string currentState { get; private set; }
-    public string previousState { get; private set; }
-    public string targetState { get; private set; }
-    public PerspectiveType currentPerspective { get; private set; }
+	// Flip failure timer variables
+	private float failureTime = .3f;    // How long the transition lasts before the flip fails and switches back
+	private float failureTimer = 0f;    // The current timer used in the FailTimer coroutine
 
-    private const string STATE_GAMEPLAY_2D = "2D";
-    private const string STATE_GAMEPLAY_3D = "3D";
-    private const string STATE_MENU = "menu";
-    private const string STATE_PAUSED = "pause";
-    private const string STATE_TRANSITION = "transition";
+	// view mounts & settings
+	private const int NUM_VIEW_TYPES = 8;
+	private Transform[] view_mounts = new Transform[NUM_VIEW_TYPES];
+	private Matrix4x4[] view_settings = new Matrix4x4[NUM_VIEW_TYPES];
+	
+	// Events to notify listeners of state changes
+	public event System.Action<bool> GamePausedEvent;
+	public event System.Action<PerspectiveType> PerspectiveShiftEvent;
 
-    // Flip failure timer variables
-    private float failureTime = .3f;    // How long the transition lasts before the flip fails and switches back
-    private float failureTimer = 0f;    // The current timer used in the FailTimer coroutine
+	
+	
+	#endregion Properties & Variables
+	
+	#region Monobehavior Implementation
 
-    // TODO: Change camera mounts to be dynamic once menus and platforms are improved
-    // Camera Mounts
-    private Transform MOUNT_GAMEPLAY_2D;
-    private Transform MOUNT_GAMEPLAY_3D;
-    private Transform MOUNT_PAUSED;         // This will be dynamic once separate platforms can change this to their specified pause mount
-    private Transform MOUNT_MENU;           // This will be dynamic once we know the final menu structure
-
-    // Camera Settings
-    private Matrix4x4 VIEW_SETTINGS_GAMEPLAY_3D =   CameraMatrixTypes.Standard3D;
-    private Matrix4x4 VIEW_SETTINGS_GAMEPLAY_2D =   CameraMatrixTypes.Standard2D;
-    private Matrix4x4 VIEW_SETTINGS_PAUSED =        CameraMatrixTypes.Standard3D;   // Consider adding specific settings for pause
-    private Matrix4x4 VIEW_SETTINGS_MENU =          CameraMatrixTypes.Menu;   // Consider adding specific settings for menus
-
-    // Events to notify listeners of state changes
-    public event System.Action<bool> GamePausedEvent;
-    public event System.Action<PerspectiveType> PerspectiveShiftEvent;
-
-    #endregion Properties & Variables
-
-
-    #region Monobehavior Implementation
-
-    void Start () {
-	    
-        // Find Mounts in scene
-        MOUNT_GAMEPLAY_2D = GameObject.Find("2DCameraMount").transform;
-        MOUNT_GAMEPLAY_3D = GameObject.Find("3DCameraMount").transform;
-        //MOUNT_PAUSED = GameObject.Find("PauseMount").transform;             // Consider switching this to be more dynamic in future
-		  GameObject menuObj = GameObject.Find("MenuMount");
-		  
-        // TODO: Change this line of code to use the final player object name and script name
-        // Find Player and Main Camera
-        playerController = GameObject.Find("Player").GetComponent<PlayerController>();
-
-        // TODO: Change the game's starting state to dynamic behavior at some point
-        // Start the game in 2D state
-		  
-		  if(menuObj == null){
-			  StartGame();
-		  }else{
-			  MOUNT_MENU = menuObj.transform;
-			currentState = STATE_GAMEPLAY_2D;  
+	void Start () {
+		InitViewSettings();
+		InitViewMounts();
+		
+		//initial settings
+		
+		
+		//determine wheather or not to start on menu
+		if(view_mounts[(int)ViewType.MENU] == null){
+			currentPerspective = PerspectiveType.p2D;
+			StartGame();
+		}else{
 			currentPerspective = PerspectiveType.p3D;
-			  CameraController2.instance.SetMount(MOUNT_MENU, VIEW_SETTINGS_MENU);
-		  }
+			EnterMenu();
+		}
 
-        // Register event handlers to InputManagers
-        InputManager.instance.ShiftPressedEvent += HandleShiftPressed;
-        InputManager.instance.PausePressedEvent += HandlePausePressed;
+		// Register event handlers to InputManagers
+		InputManager.instance.ShiftPressedEvent += HandleShiftPressed;
+		InputManager.instance.PausePressedEvent += HandlePausePressed;
 
-        // Register to switch state to proper gameplay when shift is complete
-        CameraController2.instance.ShiftCompleteEvent += HandleShiftComplete;
+		// Register to switch state to proper gameplay when shift is complete
+		CameraController.instance.ShiftCompleteEvent += HandleShiftComplete;
+	}
+	
+	void InitViewSettings(){
+		view_settings[(int)ViewType.STANDARD_3D] =   CameraMatrixTypes.Standard3D;
+		view_settings[(int)ViewType.STANDARD_2D] =   CameraMatrixTypes.Standard2D;
+		view_settings[(int)ViewType.PAUSED] =        CameraMatrixTypes.Standard3D;  
+		view_settings[(int)ViewType.MENU] =          CameraMatrixTypes.Standard2D; 
+		view_settings[(int)ViewType.LEAN_LEFT] =		CameraMatrixTypes.Standard3D; 
+		view_settings[(int)ViewType.LEAN_RIGHT] =		CameraMatrixTypes.Standard3D; 
+		view_settings[(int)ViewType.BACKWARD] =		CameraMatrixTypes.Standard3D;
+	}
+	
+	void InitViewMounts(){
+		// Gather mount gameobjects
+		GameObject mount2dObj = GameObject.Find("2DCameraMount");
+		GameObject mount3dObj = GameObject.Find("3DCameraMount");
+		GameObject mountPausedObj = GameObject.Find("PauseMount");
+		GameObject mountMenuObj = GameObject.Find("MenuMount");
+		
+		//find transforms
+		if(mount2dObj != null) 		view_mounts[(int)ViewType.STANDARD_2D] = mount2dObj.transform;
+		if(mount3dObj != null) 		view_mounts[(int)ViewType.STANDARD_3D] = mount3dObj.transform;
+		if(mountPausedObj != null) view_mounts[(int)ViewType.PAUSED] = mountPausedObj.transform; 
+		if(mountMenuObj != null)	view_mounts[(int)ViewType.MENU] = mountMenuObj.transform;
 	}
 
-    #endregion Monobehavior Implementation
+	#endregion Monobehavior Implementation
 
+	#region State Change Functions
+	
+	private void EnterState(ViewType targetState){
+		previousState = currentState;
+		currentState = targetState;
+		CameraController.instance.SetMount(view_mounts[(int)targetState],view_settings[(int)targetState]);
+	}
 
-    #region State Change Functions
+	// Enter transition state between 2D and 3D or vice-versa
+	private void EnterTransition(ViewType targetState){
+		// Pause the game during the transition
+		RaisePauseEvent(true);
+		
+		this.targetState = targetState;
+		
+		EnterState(targetState);
+		
+		// Set transition state and target state
+		/*currentState = ViewType.TRANSITION;
+		this.targetState = targetState;
 
-    // Change the satte and set the new mount and view settings
-    private void EnterGameplay2D()
-    {
-        currentState = STATE_GAMEPLAY_2D;
-        CameraController2.instance.SetMount(MOUNT_GAMEPLAY_2D, VIEW_SETTINGS_GAMEPLAY_2D);
-    }
+		// Set the camer'as mount to the target settings
+		if (targetState == ViewType.STANDARD_2D)
+			CameraController.instance.SetMount(view_mounts[(int)ViewType.STANDARD_2D], view_settings[(int)ViewType.STANDARD_2D]);
+		else
+			CameraController.instance.SetMount(view_mounts[(int)ViewType.STANDARD_3D], view_settings[(int)ViewType.STANDARD_3D]);
+		*/
+	}
 
-    // Change the satte and set the new mount and view settings
-    private void EnterGameplay3D()
-    {
-        currentState = STATE_GAMEPLAY_3D;
-        CameraController2.instance.SetMount(MOUNT_GAMEPLAY_3D, VIEW_SETTINGS_GAMEPLAY_3D);
-    }
-
-    // Enter transition state between 2D and 3D or vice-versa
-    private void EnterTransition(string targetState)
-    {
-        // Pause the game during the transition
-        RaisePauseEvent(true);
-
-        // Set transition state and target state
-        currentState = STATE_TRANSITION;
-        this.targetState = targetState;
-
-        // Set the camer'as mount to the target settings
-        if (targetState == STATE_GAMEPLAY_2D)
-            CameraController2.instance.SetMount(MOUNT_GAMEPLAY_2D, VIEW_SETTINGS_GAMEPLAY_2D);
-        else
-            CameraController2.instance.SetMount(MOUNT_GAMEPLAY_3D, VIEW_SETTINGS_GAMEPLAY_3D);
-
-    }
-
-    // Pause the game
-    private void EnterPause()
-    {
-        previousState = currentState;
-        currentState = STATE_PAUSED;
-        CameraController2.instance.SetMount(MOUNT_PAUSED, VIEW_SETTINGS_PAUSED);
-        RaisePauseEvent(true);
-    }
+	// Pause the game
+	private void EnterPause(){
+		EnterState(ViewType.PAUSED);
+		RaisePauseEvent(true);
+	}
 
     // Exits the pause state
     private void ExitPause()
     {
         // Return to previous state
-        currentState = previousState;
-        if (currentState == STATE_GAMEPLAY_2D)
+		  EnterState(previousState);
+        /*if (currentState == ViewType.STANDARD_2D)
             EnterGameplay2D();
         else
-            EnterGameplay3D();
+            EnterGameplay3D();*/
 
         // Alert gameobjects of unpause
         RaisePauseEvent(false);
     }
 
-    private void EnterMenu()
-    {
-        previousState = currentState;
-        currentState = STATE_MENU;
-        CameraController2.instance.SetMount(MOUNT_MENU, VIEW_SETTINGS_MENU);
+    private void EnterMenu(){
+		  EnterState(ViewType.MENU);
         RaisePauseEvent(true);
     }
 
     private void ExitMenu()
     {
-        currentState = previousState;
-        if (currentState == STATE_GAMEPLAY_2D)
-            EnterGameplay2D();
-        else
-            EnterGameplay3D();
+			EnterState(previousState);
 
         // Unpause the game
         RaisePauseEvent(false);
 
     }
+	 
+	
 
     #endregion State Change Functions
-
 
     #region Event Handlers
 
     // Determine if the pause event should be aised. Do nothing if in a menu 
     private void HandlePausePressed()
     {   
-        if (currentState == STATE_GAMEPLAY_2D || currentState == STATE_GAMEPLAY_3D)
+        if (currentState == ViewType.STANDARD_2D || currentState == ViewType.STANDARD_3D)
         {
             // If the current state is a gameplay state pause the game
             EnterMenu();
         }
-        else if (currentState == STATE_MENU)
+        else if (currentState == ViewType.MENU)
         {
             // If the current state is paused then unpause
             ExitMenu();
@@ -193,69 +186,60 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
     private void HandleShiftPressed()
     {
         // Shift perspective if current state is a gameplay state
-        if (currentState == STATE_GAMEPLAY_2D || currentState == STATE_GAMEPLAY_3D)
+        if (currentState == ViewType.STANDARD_2D || currentState == ViewType.STANDARD_3D)
         {
             // Find the target state to switch to
-            string newPerspective = (currentState == STATE_GAMEPLAY_2D) ? STATE_GAMEPLAY_3D : STATE_GAMEPLAY_2D;
+            ViewType newPerspective = (currentState == ViewType.STANDARD_2D) ? ViewType.STANDARD_3D : ViewType.STANDARD_2D;
 
             // Find the corresponding perspective to store for external reference
-            currentPerspective = (newPerspective == STATE_GAMEPLAY_2D) ? PerspectiveType.p2D : PerspectiveType.p3D;
+            currentPerspective = (newPerspective == ViewType.STANDARD_2D) ? PerspectiveType.p2D : PerspectiveType.p3D;
 
             // Begin transition to that state (since this involves the shift animation we use the transition state)
             EnterTransition(newPerspective);
 
-            if (playerController.Check2DIntersect())
+            if (PlayerController.instance.Check2DIntersect())
                 StartCoroutine(FailTimer());
 			else
-				playerController.Flip();
+				PlayerController.instance.Flip();
         }
     }
 
-    // Determine if the menu state event should be raised
-    private void HandleMenuEnterPressed()
-    {
-        if (currentState == STATE_GAMEPLAY_2D || currentState == STATE_GAMEPLAY_3D)
-        {
-            EnterMenu();
-        }
-        if (currentState == STATE_MENU)
-        {
-            ExitMenu();
-        }
-    }
+	// Determine if the menu state event should be raised
+	private void HandleMenuEnterPressed(){
+		if (currentState == ViewType.STANDARD_2D || currentState == ViewType.STANDARD_3D){
+			EnterMenu();
+		}
+		if (currentState == ViewType.MENU){
+			ExitMenu();
+		}
+	}
     
-    // Handle the event raised when the camera completes its shift. 
-    private void HandleShiftComplete()
-    {
-        if (currentState != STATE_MENU && currentState != STATE_PAUSED)
-        {
-            // Alert listeners to change in perspective
-            RaisePerspectiveShiftEvent();
+	// Handle the event raised when the camera completes its shift. 
+	private void HandleShiftComplete(){
+		if (!IsPauseState(currentState)){
+			// Alert listeners to change in perspective
+			RaisePerspectiveShiftEvent();
 
-            // Transition to target state
-            if (targetState == STATE_GAMEPLAY_2D)
-                EnterGameplay2D();
-            else
-                EnterGameplay3D();
+			// Transition to target state
+			EnterState(targetState);
 
-            // Unpause Game
-            RaisePauseEvent(false);
-        }
-        // Unregister this function (we can probably remove this)
-        // CameraController2.instance.ShiftCompleteEvent -= HandleShiftComplete;
-    }
+			// Unpause Game
+			RaisePauseEvent(false);
+		}
+		// Unregister this function (we can probably remove this)
+		// CameraController.instance.ShiftCompleteEvent -= HandleShiftComplete;
+	}
 
     #endregion Event Handlers
 
-
     #region Event Raising Functions
 
-    // Alert listeners that the game is being paused or unpaused
-    private void RaisePauseEvent(bool paused)
-    {
-        if (GamePausedEvent != null)
-            GamePausedEvent(paused);
-    }
+	// Alert listeners that the game is being paused or unpaused
+	private void RaisePauseEvent(bool paused){
+		this.paused = paused;
+		if (GamePausedEvent != null)
+			GamePausedEvent(paused);
+	}
 
     // Alert listeners that the perspective should shift
     private void RaisePerspectiveShiftEvent()
@@ -266,42 +250,41 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
 
     #endregion Event Raising Functions
 
-
     #region Public Interface
 
     // Called by main menu to begin gameplay
-    public void StartGame()
-    {
-        EnterTransition(STATE_GAMEPLAY_2D);
+    public void StartGame(){
+        EnterTransition(ViewType.STANDARD_2D);
         currentPerspective = PerspectiveType.p2D;
+		  RaisePauseEvent(false);
     }
     #endregion Public Interface
 
     #region Helper Functions
 
-    private IEnumerator FailTimer()
-    {
-        failureTimer = 0f;
+	private IEnumerator FailTimer(){
+		failureTimer = 0f;
 
-        while (failureTimer < failureTime)
-        {
-            failureTimer += Time.deltaTime;
+		while (failureTimer < failureTime){
+			failureTimer += Time.deltaTime;
+			yield return null;
+		}
 
-            yield return null;
-        }
+		// Find the corresponding perspective to store for external reference
+		currentPerspective = (targetState == ViewType.STANDARD_2D) ? PerspectiveType.p3D : PerspectiveType.p2D;
 
-        // Find the corresponding perspective to store for external reference
-        currentPerspective = (targetState == STATE_GAMEPLAY_2D) ? PerspectiveType.p3D : PerspectiveType.p2D;
+		// Find the corresponding perspective to store for external reference
+		if (targetState == ViewType.STANDARD_2D)
+			EnterTransition(ViewType.STANDARD_3D);
+		else
+			EnterTransition(ViewType.STANDARD_2D);
+	}
 
-        // Find the corresponding perspective to store for external reference
-        if (targetState == STATE_GAMEPLAY_2D)
-            EnterTransition(STATE_GAMEPLAY_3D);
-        else
-            EnterTransition(STATE_GAMEPLAY_2D);
-
-    }
-
-    #endregion
+	private bool IsPauseState(ViewType targetState){
+		return targetState == ViewType.PAUSED || targetState == ViewType.MENU;
+	}
+	 
+   #endregion
 
 }
 
@@ -312,4 +295,8 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
 public enum PerspectiveType
 {
     p3D, p2D
+}
+
+public enum ViewType{
+	STANDARD_3D, STANDARD_2D, MENU, PAUSED, TRANSITION, LEAN_LEFT, LEAN_RIGHT, BACKWARD
 }

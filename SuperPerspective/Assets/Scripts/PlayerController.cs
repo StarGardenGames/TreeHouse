@@ -2,7 +2,7 @@
 using System.Collections;
 
 [RequireComponent(typeof(LineRenderer))]
-public class PlayerController : MonoBehaviour
+public class PlayerController : PhysicalObject
 {
 	//suppress warnings
 	#pragma warning disable 1691,168,219,414
@@ -46,7 +46,7 @@ public class PlayerController : MonoBehaviour
 	private CollisionChecker colCheck;
 
     // Vector used to store new veolicty
-    private Vector3 velocity;
+    //private Vector3 velocity; functionality has been moved to PhysicalObject
 
 	// Vars for Z-locking
 	private float zlock = int.MinValue;
@@ -80,7 +80,7 @@ public class PlayerController : MonoBehaviour
 	
     // Initialization
 	void Start () {
-
+		  base.Init();
         // Set player as falling 
         // TODO: Since the player often falls through the ground we should cast a ray down and immediately place then on the ground.
         grounded = false;
@@ -90,9 +90,6 @@ public class PlayerController : MonoBehaviour
 
         // Initialize the layer mask
         layerMask = LayerMask.NameToLayer("normalCollisions");
-        
-        // Set the starting velocity to the zero vector
-        velocity = Vector3.zero;
 
         // Get the collider dimensions to use for raycasting
         colliderHeight = GetComponent<Collider>().bounds.max.y - GetComponent<Collider>().bounds.min.y;
@@ -212,7 +209,7 @@ public class PlayerController : MonoBehaviour
                 }
             }
 				//shimmy
-				else if(!climbing && grabbedEdge.getOrientation() % 2 == 1){
+				else if(grabbedEdge!=null && !climbing && grabbedEdge.getOrientation() % 2 == 1){
 					//adjust velocity
 					float xAxis = InputManager.instance.GetForwardMovement();
 					if(xAxis == 0)
@@ -585,6 +582,9 @@ public class PlayerController : MonoBehaviour
 		edgeState = 0;
 	}
 
+	public bool isFalling(){
+		return falling;
+	}
 	//note: this is only called from the Edge.cs
 	public void UpdateEdgeState(Edge e, byte edgeState){
 		UpdateEdgeState(e,edgeState,-1);
@@ -592,9 +592,12 @@ public class PlayerController : MonoBehaviour
 	public void UpdateEdgeState(Edge e, byte edgeState, int animState){
 		switch(edgeState){
 			case 0:
-				if(grabbedEdge == e){
-					this.edgeState = 0;
-					grabbedEdge =null;
+				if(grabbedEdge != null && e!= null){
+					if(grabbedEdge == e){
+						this.edgeState = 0;
+						Debug.Log("state is 0");
+						grabbedEdge =null;
+					}
 				}
 				//adjust animation state
 				if(animState!= -1)
@@ -612,7 +615,6 @@ public class PlayerController : MonoBehaviour
 				Vector3 pos = gameObject.transform.position;
 				pos.y = e.gameObject.transform.position.y + (e.gameObject.transform.localScale.y * .5f) - (gameObject.transform.localScale.y * .5f);
 				gameObject.transform.position = pos;
-				
 				break;
 		}
 	}

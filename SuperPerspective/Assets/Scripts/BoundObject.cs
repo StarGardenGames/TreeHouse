@@ -5,7 +5,7 @@ public class BoundObject : MonoBehaviour {
 
 	#pragma warning disable 414
 
-	public Rect myBounds;
+	Rect myBounds;
 	Rect[] bounds;
 	//float altLeftBound = -1;//-1 means no alternate left bound
 	//float altRightBound = -1;
@@ -54,14 +54,27 @@ public class BoundObject : MonoBehaviour {
 
 	public void bind(){
 		bool pMode = PlayerController.instance.is3D();
-		Vector3 pos = transform.position;
-		//left
-		pos.x = Mathf.Max (myBounds.xMin, pos.x);
-		//right
-		pos.x = Mathf.Min (myBounds.xMax, pos.x);
-		//bind z 
+		//find velocity
+		PhysicalObject po = gameObject.GetComponent<PhysicalObject>();
+		Vector3 vel = Vector3.zero;
+		if(po!=null)
+			vel = po.getVelocity();
+		//bind by position
+		Vector3 startPos = transform.position;
+		Vector3 pos = startPos;
+		//bind along x
+		pos.x = Mathf.Max (myBounds.xMin, Mathf.Min (myBounds.xMax, pos.x));
+		//bind along z
 		if(pMode)
-			pos.z = Mathf.Max (myBounds.yMin, Mathf.Min (myBounds.yMax, transform.position.z));
+			pos.z = Mathf.Max (myBounds.yMin, Mathf.Min (myBounds.yMax, pos.z));
+		//reset velocity if necessary
+		if(startPos.x != pos.x)
+			vel.x = 0;
+		if(startPos.z != pos.z)
+			vel.z = 0;
+		//update variables
+		if(po!=null)
+			po.setVelocity(vel);
 		transform.position = pos;
 	}
 	
