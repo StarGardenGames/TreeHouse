@@ -30,15 +30,15 @@ public class PushSwitch : PassiveInteractable {
 		}
 		Bounds check;
 		if (pushers.Count > 0) {
-			Collider pusher = (Collider)(pushers.ToArray()[pushers.Count - 1]);
-			check = pusher.bounds;
-			if (!check.Intersects (GetComponent<Collider> ().bounds)) {
-				pushers.RemoveAt(pushers.Count - 1);
-				ExitCollisionWithGeneral(pusher.gameObject);
+			foreach (Collider pusher in pushers) {
+				check = pusher.bounds;
+				if (!check.Intersects (GetComponent<Collider> ().bounds)) {
+					pushers.RemoveAt(pushers.Count - 1);
+					ExitCollisionWithGeneral(pusher.gameObject);
+				}
 			}
 		}
 	}
-
 
 	void FixedUpdate() {
 		if (!pushed)
