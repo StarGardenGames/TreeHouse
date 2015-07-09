@@ -25,6 +25,7 @@ public class VoiceManager : MonoBehaviour {
 		pushes [2] = Resources.Load ("Sound/SFX/Player/Voice/PushPull3")  as AudioClip;
 
 		source = gameObject.GetComponent<AudioSource> ();
+		source.volume = 0.3f;
 
 	}
 	

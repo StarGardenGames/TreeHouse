@@ -48,6 +48,7 @@ public class StepManager : MonoBehaviour {
 	public void GrassStep(){
 		source.clip = grassSteps [Random.Range (0, 4)];
 		source.pitch = Random.Range (0.95f, 1.05f);
+		source.volume = 0.15f;
 		source.Play ();
 	}
 }

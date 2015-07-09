@@ -1468,6 +1468,7 @@ GameObject:
   - 65: {fileID: 6560798}
   - 114: {fileID: 11407236}
   - 114: {fileID: 11457306}
+  - 81: {fileID: 8159318}
   m_Layer: 2
   m_Name: Player
   m_TagString: Untagged
@@ -3587,6 +3588,13 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1, y: 1.10000002, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!81 &8159318
+AudioListener:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 182022}
+  m_Enabled: 1
 --- !u!82 &8217496
 AudioSource:
   m_ObjectHideFlags: 1
