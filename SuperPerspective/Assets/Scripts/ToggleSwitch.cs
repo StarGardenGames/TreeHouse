@@ -17,6 +17,21 @@ public class ToggleSwitch : ActiveInteractable {
 	}
 
 	void Toggle(){
+
+		//Triggers sound -Nick
+
+		if (!toggleEnabled) {
+			gameObject.GetComponent<AudioSource>().clip = Resources.Load ("Sound/SFX/Objects/Switch/SwitchOn")  as AudioClip;
+		}
+
+		else {
+			gameObject.GetComponent<AudioSource>().clip = Resources.Load ("Sound/SFX/Objects/Switch/SwitchOff")  as AudioClip;
+		}
+
+		gameObject.GetComponent<AudioSource>().Play ();
+
+		//End Nick stuff
+
 		toggleEnabled = !toggleEnabled;//enable toggles
 		//toggleEnabled is also updated for all activatable objects
 		foreach(Activatable o in triggers)
