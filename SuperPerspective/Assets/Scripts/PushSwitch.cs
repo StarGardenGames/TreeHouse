@@ -1,9 +1,11 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class PushSwitch : PassiveInteractable {
+public class PushSwitch : MonoBehaviour {
 
 	#pragma warning disable 114
+
+	public GameObject parentPlatform;
 
 	public Activatable[] triggers;//Activatable objects which this switch triggers
 
@@ -15,29 +17,49 @@ public class PushSwitch : PassiveInteractable {
 
 	Vector3 baseScale;
 
+	void Awake()
+	{
+		if (parentPlatform == null) {
+			parentPlatform = GameObject.Find("Ground");
+		}
+		
+	}
+
 	void Start() {
-		base.Start();
 		rune = GetComponentInChildren<Renderer>();
 		baseScale = rune.transform.localScale;
 	}
 
 	void Update(){
-		//update color for debugging
 		if (pushed) {
 			rune.transform.localScale = baseScale * 0.8f;
 		} else {
 			rune.transform.localScale = baseScale;
 		}
-		Bounds check;
-		if (pushers.Count > 0) {
+		RaycastHit hit;
+		if (GameStateManager.instance.currentPerspective == PerspectiveType.p3D) {
+			if (Physics.Raycast(transform.position + Vector3.forward, -Vector3.forward, out hit, 2f, LayerMask.NameToLayer("RaycastIgnore"))) {
+				if (!pushed)
+					EnterCollisionWithGeneral(hit.collider.gameObject);
+			} else if (pushed) {
+				ExitCollisionWithGeneral(null);
+			}
+		} else {
+			if (Physics.Raycast(transform.position + Vector3.forward * parentPlatform.transform.lossyScale.z / 2f, -Vector3.forward, out hit, parentPlatform.transform.lossyScale.z, LayerMask.NameToLayer("RaycastIgnore"))) {
+				if (!pushed)
+					EnterCollisionWithGeneral(hit.collider.gameObject);
+			} else if (pushed) {
+				ExitCollisionWithGeneral(null);
+			}
+		}
+		/*if (pushers.Count > 0) {
 			foreach (Collider pusher in pushers) {
 				check = pusher.bounds;
 				if (!check.Intersects (GetComponent<Collider> ().bounds)) {
-					pushers.RemoveAt(pushers.Count - 1);
 					ExitCollisionWithGeneral(pusher.gameObject);
 				}
 			}
-		}
+		}*/
 	}
 
 	void FixedUpdate() {
@@ -47,20 +69,20 @@ public class PushSwitch : PassiveInteractable {
 			rune.transform.RotateAround (transform.position, Vector3.up, 2);
 	}
 
-	public override void EnterCollisionWithGeneral(GameObject other){
+	public void EnterCollisionWithPlayer() {
+		EnterCollisionWithGeneral(null);
+	}
+
+	public void EnterCollisionWithGeneral(GameObject other){
 		pushed = true;//becomes pushed when it collides with player
-		pushers.Add(other.GetComponent<Collider>());
 		//pushed is also updated for all activatable objects
 		foreach(Activatable o in triggers)
 			o.setActivated(pushed);
 	}
 	
-	public override void ExitCollisionWithGeneral(GameObject other){
-		if (pushers.Count == 0) {
-			pushed = false;//becomes pushed when it collides with player
-			//pushed is also updated for all activatable objects
-			foreach(Activatable o in triggers)
-				o.setActivated(pushed);
-		}
+	public void ExitCollisionWithGeneral(GameObject other){
+		pushed = false;//becomes pushed when it collides with player
+		foreach(Activatable o in triggers)
+			o.setActivated(pushed);
 	}
 }

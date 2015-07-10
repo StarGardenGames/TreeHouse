@@ -524,10 +524,6 @@ public class PlayerController : PhysicalObject
 			colliderDim = colliderWidth;
 		if (trajectory.normalized == Vector3.forward || trajectory.normalized == Vector3.back)
 			colliderDim = colliderDepth;
-		// Rune Switch
-		if (other.GetComponent<PushSwitch>()) {
-			other.GetComponent<PushSwitch>().EnterCollisionWithPlayer();
-		}
 		// Bounce Pad
 		if (trajectory.normalized == Vector3.down && other.GetComponent<BouncePad>()) {
 			velocity.y = other.GetComponent<BouncePad>().GetBouncePower();
