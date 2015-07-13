@@ -40,7 +40,10 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
 	
 	// Events to notify listeners of state changes
 	public event System.Action<bool> GamePausedEvent;
-	public event System.Action<PerspectiveType> PerspectiveShiftEvent;
+	public event System.Action<PerspectiveType> PerspectiveShiftEvent;//called at end  of shift
+	//either PerspectiveShiftSuccessEvent or PerspectiveShiftFailEvent will be call at the beginning of shifts
+	public event System.Action PerspectiveShiftSuccessEvent;
+	public event System.Action PerspectiveShiftFailEvent;
 
 	
 	
@@ -114,17 +117,6 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
 		this.targetState = targetState;
 		
 		EnterState(targetState);
-		
-		// Set transition state and target state
-		/*currentState = ViewType.TRANSITION;
-		this.targetState = targetState;
-
-		// Set the camer'as mount to the target settings
-		if (targetState == ViewType.STANDARD_2D)
-			CameraController.instance.SetMount(view_mounts[(int)ViewType.STANDARD_2D], view_settings[(int)ViewType.STANDARD_2D]);
-		else
-			CameraController.instance.SetMount(view_mounts[(int)ViewType.STANDARD_3D], view_settings[(int)ViewType.STANDARD_3D]);
-		*/
 	}
 
 	// Pause the game
@@ -197,9 +189,13 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
             // Begin transition to that state (since this involves the shift animation we use the transition state)
             EnterTransition(newPerspective);
 
-            if (PlayerController.instance.Check2DIntersect())
-                StartCoroutine(FailTimer());
-			else
+            if (PlayerController.instance.Check2DIntersect()){
+                RaisePerspectiveShiftFailEvent();
+					 StartCoroutine(FailTimer());
+				}else{
+					RaisePerspectiveShiftSuccessEvent();
+				}
+		  }else{
 				PlayerController.instance.Flip();
         }
     }
@@ -242,10 +238,21 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
 	}
 
     // Alert listeners that the perspective should shift
-    private void RaisePerspectiveShiftEvent()
-    {
+    private void RaisePerspectiveShiftEvent(){
         if (PerspectiveShiftEvent != null)
             PerspectiveShiftEvent(currentPerspective);
+    }
+	 
+	 // Alert listeners that the perspective should shift
+    private void RaisePerspectiveShiftSuccessEvent(){
+        if (PerspectiveShiftSuccessEvent != null)
+            PerspectiveShiftSuccessEvent();
+    }
+	 
+	 // Alert listeners that the perspective should shift
+    private void RaisePerspectiveShiftFailEvent(){
+        if (PerspectiveShiftFailEvent != null)
+            PerspectiveShiftFailEvent();
     }
 
     #endregion Event Raising Functions
