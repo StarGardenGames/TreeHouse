@@ -67,7 +67,7 @@ public class PlayerController : PhysicalObject
 	Edge grabbedEdge = null;
 	byte edgeState = 0;//0: not near an edge, 1: close to an edge, 2:hanging
 	bool climbing = false;
-
+	
     #endregion
 
 	//setup singleton
@@ -97,8 +97,8 @@ public class PlayerController : PhysicalObject
         colliderDepth = GetComponent<Collider>().bounds.max.z - GetComponent<Collider>().bounds.min.z;
 
 		//Register Flip method to the shift event
-		//CameraController2.instance.ShiftCompleteEvent += Flip;
-
+		GameStateManager.instance.PerspectiveShiftSuccessEvent += Flip;
+		
 		anim = GetComponentInChildren<Animator>();
 		model = anim.gameObject;
 
