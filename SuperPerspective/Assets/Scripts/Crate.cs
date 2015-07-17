@@ -39,10 +39,26 @@ public class Crate : ActiveInteractable {
 		CameraController.instance.ShiftStartEvent += checkBreak;
 		colCheck = new CollisionChecker (GetComponent<Collider> ());
 		startPos = transform.position;
-		range = colliderWidth * 0.85f;
+		range = colliderWidth * 0.9f;
 
 		for (int i = 0; i < 4; i++)
 			axisBlocked[i] = false;
+	}
+
+	void Update() {
+		if (grabbed) {
+			if (GameStateManager.instance.currentPerspective == PerspectiveType.p3D) {
+				if (Vector3.Distance(player.transform.position, transform.position) > range * (1 + Margin)) {
+					player.GetComponent<PlayerController>().Grab(null);
+					grabbed = false;
+				}
+			} else {
+				if (Vector2.Distance(new Vector2(player.transform.position.x, player.transform.position.y), new Vector2(transform.position.x, transform.position.y)) > range * (1 + Margin)) {
+					player.GetComponent<PlayerController>().Grab(null);
+					grabbed = false;
+				}
+			}
+		}
 	}
 
 	void FixedUpdate() {
@@ -289,10 +305,6 @@ public class Crate : ActiveInteractable {
 			colliderDim = colliderDepth;
 		if (other.GetComponent<PushSwitchOld>() && colliderDim == colliderWidth) {
 			transform.Translate(0, 0.1f, 0);
-		}
-		// Rune Switch
-		if (other.GetComponent<PushSwitch>()) {
-			other.GetComponent<PushSwitch>().EnterCollisionWithGeneral(gameObject);
 		}
 		//Collision w/ PlayerInteractable
 		foreach(Interactable c in other.GetComponents<Interactable>()){
