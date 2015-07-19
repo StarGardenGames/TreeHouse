@@ -7,171 +7,122 @@ using SuperPerspective.Singleton;
 ///     Sends notifications on user input and allows polling for current input state of buttons and axes.
 ///     Also notifies listeners when the game's perspective changes.
 /// </summary>
-public class InputManager : Singleton<InputManager>
-{
+public class InputManager : Singleton<InputManager>{
 	//suppress warnings
 	#pragma warning disable 414
+
+	#region Properties & Variables
+
+	// Button press events
+	public event System.Action JumpPressedEvent;         // Jump
+	public event System.Action InteractPressedEvent;     // Interaction
+	public event System.Action GrabPressedEvent;         // Grab
+	public event System.Action ShiftPressedEvent;
+	public event System.Action PausePressedEvent;
+	public event System.Action LeanLeftPressedEvent;
+	public event System.Action LeanRightPressedEvent;
+	public event System.Action LeanLeftReleasedEvent;
+	public event System.Action LeanRightReleasedEvent;
 	
-    #region Properties & Variables
+	// Game's pause state
+	private bool continuePressed = false;//used as an alternate way to unpause
 
-    // Button press events
-    public event System.Action JumpPressed;         // Jump
-    public event System.Action InteractPressed;     // Interaction
-    public event System.Action GrabPressed;         // Grab
-
-    // Perspective change event
-    // TODO: emove this functionality since it's now in the camera script
-    public event System.Action ShiftPressedEvent;
-    
-    // Game pause event
-    public event System.Action PausePressedEvent;
-
-    // Game's pause state
-	 private bool continuePressed = false;//used as an alternate way to unpause
-    private bool _paused = false;
-    public bool paused
-    {
-        get { return _paused; }
-    }
-
-    // Perspective shift properties
-    // TODO: Move this funcionality to the camera script
+	// Perspective shift properties
+	// TODO: Move this funcionality to the camera script
 	private const float FAIL_TIME = 0.5f;
 	private float flipTimer = 0;
 	private bool flipFailed = false;
 
-    #endregion Properties & Variables
+	#endregion Properties & Variables
 
 
-    #region Monobehavior Implementation
-	
+	#region Monobehavior Implementation
+
 	// listens to player input and raises events for listeners.
 	void Update () {
+		if(Input.GetButtonDown("Pause") || continuePressed){
+			RaiseEvent(PausePressedEvent);
+			continuePressed = false;
+		}
+		if(Input.GetButtonDown("Jump")) 					
+			RaiseEvent(JumpPressedEvent);
+		
+		if(Input.GetButtonDown("Interaction"))			
+			RaiseEvent(InteractPressedEvent);
+		
+		if(Input.GetButtonDown("Grab"))						
+			RaiseEvent(GrabPressedEvent);
+		
+		if(Input.GetButtonDown("PerspectiveShift"))		
+			RaiseEvent(ShiftPressedEvent);
+		
+		if(Input.GetButtonDown("LeanLeft"))					
+			RaiseEvent(LeanLeftPressedEvent);
+		
+		if(Input.GetButtonDown("LeanRight"))				
+			RaiseEvent(LeanRightPressedEvent);
+		
+		if(Input.GetButtonUp("LeanLeft"))
+			RaiseEvent(LeanLeftReleasedEvent);
+		
+		if(Input.GetButtonUp("LeanRight"))
+			RaiseEvent(LeanRightReleasedEvent);
+	}
 
-        // Check pause button
-        if (Input.GetButtonDown("Pause") || continuePressed){
-            continuePressed = false;
-				RaiseGamePauseEvent();
-		  }
-
-        // Check jump button
-        if (Input.GetButtonDown("Jump"))
-            RaiseJumpPressedEvent();
-
-        // Check interaction button
-        if (Input.GetButtonDown("Interaction"))
-            RaiseInteractPressedEvent();
-
-	    // Check grab button
-        if (Input.GetButtonDown("Grab"))
-            RaiseGrabPressedEvent();
-
-        // Check perspective shift
-        if (Input.GetButtonDown("PerspectiveShift"))
-            RaiseShiftPressedEvent();
-
-    }
-
-    #endregion MonobehaviorImplementation
+	#endregion MonobehaviorImplementation
 
 
-    #region Public Interface
+	#region Public Interface
 
-    // Returns the player's movement on the horizontal axis in 2D and the vertical axis in 3D 
-    public float GetForwardMovement()
-    {
-        if (GameStateManager.instance.currentPerspective == PerspectiveType.p3D)
-        {
-            return Input.GetAxis("Vertical");
-        }
-        else
-        {
-            return Input.GetAxis("Horizontal");
-        }
-    }
-
-    // Returns the player's movement on the horizontal axis in 3D and zero in 2D
-    public float GetSideMovement()
-    {
+	// Returns the player's movement on the horizontal axis in 2D and the vertical axis in 3D 
+	public float GetForwardMovement(){
 		if (GameStateManager.instance.currentPerspective == PerspectiveType.p3D)
-            return Input.GetAxis("Horizontal");
-        else
-            return 0f;
-    }
+			return Input.GetAxis("Vertical");
+		else
+			return Input.GetAxis("Horizontal");
+	}
 
-    // Returns true if the jump button is currently pressed
-    public bool JumpStatus()
-    {
-        return Input.GetButton("Jump");
-    }
+	// Returns the player's movement on the horizontal axis in 3D and zero in 2D
+	public float GetSideMovement(){
+		if (GameStateManager.instance.currentPerspective == PerspectiveType.p3D)
+			return Input.GetAxis("Horizontal");
+		else
+			return 0f;
+	}
 
-    // Returns true if the interaction button is currently pressed
-    public bool InteractStatus()
-    {
-        return Input.GetButton("Interaction");
-    }
+	// Returns true if the jump button is currently pressed
+	public bool JumpStatus(){
+		return Input.GetButton("Jump");
+	}
 
-    // Returns true if the grab button is currently pressed
-    public bool GrabStatus()
-    {
-        return Input.GetButton("Grab");
-    }
+	// Returns true if the interaction button is currently pressed
+	public bool InteractStatus(){
+		return Input.GetButton("Interaction");
+	}
 
-	public void SetFailFlag() {
+	// Returns true if the grab button is currently pressed
+	// NOTE: refers to crate grabbing
+	public bool GrabStatus(){
+		return Input.GetButton("Grab");
+	}
+
+	public void SetFailFlag(){
 		flipFailed = true;
 	}
 
-    #endregion Public Interface
+	#endregion Public Interface
 
+	#region Event Raising Functions
+	
+	private void RaiseEvent(System.Action gameEvent){
+		if(gameEvent != null)
+			gameEvent();
+	}
+	
+	public void ContinuePressed(){
+		continuePressed = true;
+	}
+	
 
-    #region Event Raising Functions
-
-    // Called when the player shifts perspective
-    private void RaiseShiftPressedEvent()
-    {
-        // Alert listeners of the new perspective
-        if (ShiftPressedEvent != null)
-        {
-            ShiftPressedEvent();
-        }
-    }
-
-    // Called when the player pauses the game
-    // TODO: Remove pause state tracking, it's now in the camera script
-    private void RaiseGamePauseEvent()
-    {
-        // Change the pause state
-        _paused = !_paused;
-
-        // Alert listeners of the new pause state
-        if (PausePressedEvent != null)
-            PausePressedEvent();
-    }
-
-    // Called when the player presses the jump button
-    private void RaiseJumpPressedEvent()
-    {
-        if (JumpPressed != null)
-            JumpPressed();
-    }
-
-    // Called when the player presses the interaction button
-    private void RaiseInteractPressedEvent()
-    {
-        if (InteractPressed != null)
-            InteractPressed();
-    }
-
-    // Called when the player presses the grab button
-    private void RaiseGrabPressedEvent()
-    {
-        if (GrabPressed != null)
-            GrabPressed();
-    }
-	 
-	 public void ContinuePressed(){
-		 continuePressed = true;
-	 }
-
-    #endregion Event Raising Functions
+	#endregion Event Raising Functions
 }

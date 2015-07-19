@@ -56,7 +56,7 @@ public class CameraController : PersistentSingleton<CameraController	>
 	// Since the behavior in each state is the same we execute behavior in Update and just check conditions to change state
 	void Update(){
 		checkStateChange();
-		checkCamereaLean();
+		//checkCamereaLean();
 	}
 	
 	void checkStateChange(){		
@@ -65,7 +65,7 @@ public class CameraController : PersistentSingleton<CameraController	>
 			transform.position = Vector3.SmoothDamp(transform.position, mount.position, ref velocity, smoothTime);
 
 			// If we haven't matched the 2D mount's rotation yet rotate to match
-			if (!(transform.rotation == mount.rotation) && GameStateManager.instance.paused)
+			if (!(transform.rotation == mount.rotation))
 				 transform.rotation = Quaternion.RotateTowards(transform.rotation, mount.rotation, turnSpeed);
 
 			// Check if the shift is complete
