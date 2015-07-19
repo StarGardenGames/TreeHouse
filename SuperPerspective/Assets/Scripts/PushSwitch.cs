@@ -45,7 +45,8 @@ public class PushSwitch : MonoBehaviour {
 				ExitCollisionWithGeneral(null);
 			}
 		} else {
-			if (Physics.Raycast(transform.position + Vector3.forward * parentPlatform.transform.lossyScale.z / 2f, -Vector3.forward, out hit, parentPlatform.transform.lossyScale.z, LayerMask.NameToLayer("RaycastIgnore"))) {
+			if (Physics.Raycast(transform.position + (Vector3.forward * (parentPlatform.GetComponent<Collider>().bounds.extents.z + 1f)), -Vector3.forward, out hit,
+			                    parentPlatform.GetComponent<Collider>().bounds.extents.z * 2 + 2f, LayerMask.NameToLayer("RaycastIgnore"))) {
 				if (!pushed)
 					EnterCollisionWithGeneral(hit.collider.gameObject);
 			} else if (pushed) {
