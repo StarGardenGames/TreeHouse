@@ -64,8 +64,8 @@ public class PlayerController : PhysicalObject
 
 	//Vars for edge grabbing
 	private Vector3[] cuboid;
-	Edge grabbedEdge = null;
-	byte edgeState = 0;//0: not near an edge, 1: close to an edge, 2:hanging
+	public Edge grabbedEdge = null;
+	public byte edgeState = 0;//0: not near an edge, 1: close to an edge, 2:hanging
 	bool climbing = false;
 	
    #endregion
@@ -159,10 +159,9 @@ public class PlayerController : PhysicalObject
 				climbing = anim.GetCurrentAnimatorStateInfo(0).IsName("HangUp");
 			  
             //update cuboid for edges
-				Vector3 halfScale = gameObject.transform.GetChild(3).transform.lossyScale * .5f;
-				cuboid[0] = gameObject.transform.GetChild(3).transform.position - halfScale;
-				cuboid[1] = gameObject.transform.GetChild(3).transform.position + halfScale;
-
+				Vector3 halfScale = gameObject.transform.lossyScale * .5f;
+				cuboid[0] = gameObject.transform.position - halfScale;
+				cuboid[1] = gameObject.transform.position + halfScale;
             if (zlockFlag)
             {
                 DoZLock();
@@ -591,7 +590,6 @@ public class PlayerController : PhysicalObject
 				if(grabbedEdge != null && e!= null){
 					if(grabbedEdge == e){
 						this.edgeState = 0;
-						Debug.Log("state is 0");
 						grabbedEdge =null;
 					}
 				}
