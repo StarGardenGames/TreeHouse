@@ -3,7 +3,7 @@ using System.Collections;
 
 public class PushSwitch : MonoBehaviour {
 
-	#pragma warning disable 114
+	#pragma warning disable 114, 414
 
 	public GameObject parentPlatform;
 

@@ -66,7 +66,7 @@ public class CheckpointManager : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		//register interact button to leaving the menu
-		InputManager.instance.InteractPressed += exitMenu;
+		InputManager.instance.InteractPressedEvent += exitMenu;
 		//init menu
 		initMenu();
 	}

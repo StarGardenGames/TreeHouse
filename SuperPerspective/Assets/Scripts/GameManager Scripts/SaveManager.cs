@@ -32,6 +32,8 @@ public class SaveManager : MonoBehaviour {
 
 	//called from menu when Play is clicked
 	public void loadSave(){
+		if(CheckpointManager.instance == null)
+			return;
 		//init points reached
 		string pointsReachedStr = PlayerPrefs.GetString(currentSave + "_pointsReached");
 		char[] chars = pointsReachedStr.ToCharArray(0,pointsReachedStr.Length);
