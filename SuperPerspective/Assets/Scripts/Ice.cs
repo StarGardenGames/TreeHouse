@@ -99,29 +99,6 @@ public class Ice : ActiveInteractable {
 			velocity.z = newVelocity.z;
 			svFlag = false;
 		}
-
-		//Adding in pushing sound, initialize after break sound -Nick
-		
-		//Init
-		if (gameObject.GetComponent<AudioSource> ().clip.name != "IceMove" && !respawnFlag && grounded) {
-			gameObject.GetComponent<AudioSource> ().clip =  Resources.Load ("Sound/SFX/Objects/Ice/IceMove")  as AudioClip;
-			gameObject.GetComponent<AudioSource> ().loop = true;
-			gameObject.GetComponent<AudioSource>().volume = 0;
-			gameObject.GetComponent<AudioSource>().Play ();
-			
-		}
-		
-		//Check
-		if (velocity.magnitude > 0.1f && grounded){
-			if(gameObject.GetComponent<AudioSource>().volume < 1){
-				gameObject.GetComponent<AudioSource>().volume += 0.5f;
-			}
-		}
-		else{
-			gameObject.GetComponent<AudioSource>().volume = 0;
-		}
-		
-		//End Nick stuff
 		
 		//CheckCollisions();
 	}
@@ -291,15 +268,6 @@ public class Ice : ActiveInteractable {
 			}
 			respawnFlag = true;
 		}
-
-		//Adding in break sound -Nick
-		gameObject.GetComponent<AudioSource>().loop = false;
-		gameObject.GetComponent<AudioSource>().Stop ();
-		gameObject.GetComponent<AudioSource>().clip = Resources.Load ("Sound/SFX/Objects/Ice/IceBreak")  as AudioClip;
-		gameObject.GetComponent<AudioSource>().volume = 1;
-		gameObject.GetComponent<AudioSource>().Play();
-		
-		//End Nick stuff
 	}
 	
 	// Used to check collisions with special objects
