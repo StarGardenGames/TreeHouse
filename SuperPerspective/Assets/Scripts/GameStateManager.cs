@@ -14,12 +14,6 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
 	#pragma warning disable 414, 649
 	
 	#region Properties & Variables
-
-	public ViewType testState;
-	
-	void Update(){
-		testState = currentState;
-	}
 	
 	// State variables
 	public ViewType currentState { get; private set; }
@@ -36,7 +30,7 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
 	// view mounts & settings
 	private const int NUM_VIEW_TYPES = 8;
 	private Transform[] view_mounts = new Transform[NUM_VIEW_TYPES];
-	private Matrix4x4[] view_settings = new Matrix4x4[NUM_VIEW_TYPES];
+	private PerspectiveType[] view_perspectives = new PerspectiveType[NUM_VIEW_TYPES];
 	
 	// Events to notify listeners of state changes
 	public event System.Action<bool> GamePausedEvent;
@@ -50,7 +44,7 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
 	#region Monobehavior Implementation
 
 	void Start () {
-		InitViewSettings();
+		InitViewPerspectives();
 		InitViewMounts();
 		
 		//determine wheather or not to start on menu
@@ -74,14 +68,14 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
 		CameraController.instance.ShiftCompleteEvent += HandleShiftComplete;
 	}
 	
-	void InitViewSettings(){
-		view_settings[(int)ViewType.STANDARD_3D] =   CameraMatrixTypes.Standard3D;
-		view_settings[(int)ViewType.STANDARD_2D] =   CameraMatrixTypes.Standard2D;
-		view_settings[(int)ViewType.PAUSED] =        CameraMatrixTypes.Standard3D;  
-		view_settings[(int)ViewType.MENU] =          CameraMatrixTypes.Standard2D; 
-		view_settings[(int)ViewType.LEAN_LEFT] =		CameraMatrixTypes.Standard3D; 
-		view_settings[(int)ViewType.LEAN_RIGHT] =		CameraMatrixTypes.Standard3D; 
-		view_settings[(int)ViewType.BACKWARD] =		CameraMatrixTypes.Standard3D;
+	void InitViewPerspectives(){
+		view_perspectives[(int)ViewType.STANDARD_3D] =   PerspectiveType.p3D;
+		view_perspectives[(int)ViewType.STANDARD_2D] =   PerspectiveType.p2D;
+		view_perspectives[(int)ViewType.PAUSED] =        PerspectiveType.p3D;  
+		view_perspectives[(int)ViewType.MENU] =          PerspectiveType.p2D; 
+		view_perspectives[(int)ViewType.LEAN_LEFT] =		 PerspectiveType.p3D; 
+		view_perspectives[(int)ViewType.LEAN_RIGHT] =	 PerspectiveType.p3D; 
+		view_perspectives[(int)ViewType.BACKWARD] =		 PerspectiveType.p3D;
 	}
 	
 	void InitViewMounts(){
@@ -107,16 +101,14 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
 	
 	private void EnterState(ViewType targetState){
 		previousState = currentState;
-		currentState = targetState;
-		CameraController.instance.SetMount(view_mounts[(int)targetState],view_settings[(int)targetState]);
+		this.targetState = targetState;
+		CameraController.instance.SetMount(view_mounts[(int)targetState],view_perspectives[(int)targetState]);
 	}
 
 	// Enter transition state between 2D and 3D or vice-versa
 	private void EnterTransition(ViewType targetState){
 		// Pause the game during the transition
 		RaisePauseEvent(true);
-		
-		this.targetState = targetState;
 		
 		EnterState(targetState);
 		
@@ -193,12 +185,12 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
 	}
     
 	private void HandleShiftComplete(){
-		if (!IsPauseState(currentState)){
-			EnterState(currentState);
+		currentState = targetState;
 		
-			// Alert listeners to change in perspective
-			RaisePerspectiveShiftEvent();
-			
+	
+		RaisePerspectiveShiftEvent();
+		
+		if (!IsPauseState(currentState)){	
 			// Unpause Game
 			RaisePauseEvent(false);
 		}

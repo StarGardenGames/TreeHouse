@@ -29,20 +29,6 @@ public class Edge : MonoBehaviour {
 	
 	float edgeFactor = .5f;//factor by which top check is smaller
 
-	
-	public byte test_status;
-	public bool overlapping;
-	public bool playerCanGrab;
-	public Vector3[] myCuboid ;
-	public Vector3[] playerCuboid;
-	public void Update(){
-		test_status = status;
-		overlapping = isOverlaping(cuboid, player.getCuboid());
-		playerCanGrab = player.isFalling() && (player.is3D() || validIn2D);
-		myCuboid = cuboid;
-		playerCuboid= player.getCuboid();
-	}
-	
 	public void FixedUpdate(){
 		
 		if(!init)
