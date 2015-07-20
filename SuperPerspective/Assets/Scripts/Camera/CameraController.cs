@@ -12,7 +12,7 @@ public class CameraController : PersistentSingleton<CameraController	>
 {
 	
 	//suppress warnings
-	#pragma warning disable 472
+	#pragma warning disable 472, 414
 	
 	#region Properties & Variables
 
@@ -56,7 +56,6 @@ public class CameraController : PersistentSingleton<CameraController	>
 	// Since the behavior in each state is the same we execute behavior in Update and just check conditions to change state
 	void Update(){
 		checkStateChange();
-		checkCamereaLean();
 	}
 	
 	void checkStateChange(){		
@@ -65,7 +64,7 @@ public class CameraController : PersistentSingleton<CameraController	>
 			transform.position = Vector3.SmoothDamp(transform.position, mount.position, ref velocity, smoothTime);
 
 			// If we haven't matched the 2D mount's rotation yet rotate to match
-			if (!(transform.rotation == mount.rotation) && GameStateManager.instance.paused)
+			if (!(transform.rotation == mount.rotation))
 				 transform.rotation = Quaternion.RotateTowards(transform.rotation, mount.rotation, turnSpeed);
 
 			// Check if the shift is complete
@@ -73,36 +72,9 @@ public class CameraController : PersistentSingleton<CameraController	>
 				// IF the shift is over alert listeners
 				if (CheckTransition()){
 					shiftComplete = true;
-					RaiseShiftCompleteEvent();
+					RaiseEvent(ShiftCompleteEvent);
 				}
 			}
-		}
-	}
-	
-	void checkCamereaLean(){
-		if(GameStateManager.instance.currentState==ViewType.STANDARD_3D){
-			//determine target
-			float targetAngle = 0;
-			if (Input.GetKey(KeyCode.Semicolon)){
-				targetAngle = maxLeanAngle;
-			}
-			if (Input.GetKey(KeyCode.Quote)){
-				targetAngle = -maxLeanAngle;
-			}
-			
-			//determine if rotation is necessary
-			if(leanAngle == targetAngle)
-				return;
-			
-			//adjust leanAngle
-			float leanDelta = leanDegreesPerSecond * Time.deltaTime * ((targetAngle > leanAngle)? 1 : -1);
-			bool passedTarget = (leanAngle - targetAngle > 0) != (leanAngle + leanDelta - targetAngle > 0);
-			if(passedTarget)
-				leanDelta = targetAngle - leanAngle;
-			leanAngle += leanDelta;
-			
-			transform.RotateAround(PlayerController.instance.gameObject.transform.position,
-				Vector3.up, leanDelta);
 		}
 	}
 
@@ -111,18 +83,10 @@ public class CameraController : PersistentSingleton<CameraController	>
 
     #region Event Raising
 
-    // Alert listeners that the perspective shift has started
-    private void RaiseShiftStartEvent()
-    {
-        if (ShiftStartEvent != null)
-            ShiftStartEvent();
-    }
-
-	// Alert listeners (Gameplay state manager) that the perspective shift is complete
-	private void RaiseShiftCompleteEvent()
-	{
-		if (ShiftCompleteEvent != null)
-			ShiftCompleteEvent();
+	
+	private void RaiseEvent(System.Action gameEvent){
+		if(gameEvent != null)
+			gameEvent();
 	}
 
     #endregion Event Raising
@@ -130,17 +94,18 @@ public class CameraController : PersistentSingleton<CameraController	>
 
     #region Public Interface
 
-    public void SetMount(Transform newMount, Matrix4x4 newViewSettings)
+    public void SetMount(Transform newMount, PerspectiveType newPerspective)
     {
         if (newMount != mount)
         {
             mount = newMount;
-            targetMatrix = newViewSettings;
+				targetMatrix = (newPerspective == PerspectiveType.p3D)? CameraMatrixTypes.Standard3D
+					: CameraMatrixTypes.Standard2D;
             shiftComplete = false;
             if (blender != null)
                 blender.BlendToMatrix(targetMatrix, cameraBlendSpeed);
 
-            RaiseShiftStartEvent();
+				RaiseEvent(ShiftStartEvent);
         }
     }
 

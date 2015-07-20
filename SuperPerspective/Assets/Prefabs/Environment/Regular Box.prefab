@@ -9,6 +9,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 472290}
   - 114: {fileID: 11474880}
+  - 65: {fileID: 6572414}
   m_Layer: 0
   m_Name: Regular Box
   m_TagString: Terrain
@@ -27,7 +28,6 @@ GameObject:
   - 33: {fileID: 3364408}
   - 23: {fileID: 2302932}
   - 95: {fileID: 9541378}
-  - 65: {fileID: 6518332}
   m_Layer: 0
   m_Name: rocky-box
   m_TagString: Untagged
@@ -42,7 +42,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 169188}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -32.1107025, y: 1.32000005, z: -3.57717991}
+  m_LocalPosition: {x: -15.4142685, y: 2.1400001, z: 4.10437393}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 497734}
@@ -91,18 +91,18 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 178480}
   m_Mesh: {fileID: 4300000, guid: 20ddc61fec29ad449a6f9ba9522c8ec7, type: 3}
---- !u!65 &6518332
+--- !u!65 &6572414
 BoxCollider:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 178480}
+  m_GameObject: {fileID: 169188}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: .0109316818, y: .00999999978, z: .00981062464}
-  m_Center: {x: -.000302332483, y: 0, z: 2.1084059e-05}
+  m_Size: {x: 1.80190849, y: 1.62071002, z: 1.68002403}
+  m_Center: {x: -.0572118759, y: -.000535488129, z: -.00861883163}
 --- !u!95 &9541378
 Animator:
   serializedVersion: 3

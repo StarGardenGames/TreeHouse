@@ -8,33 +8,30 @@ using System.Collections;
 public class LevelGeometry : MonoBehaviour
 {
 
-    #region Properties & Variables
+	#region Properties & Variables
 
-    public GameObject parentPlatform;   // The platform this geometry belongs to
+	public GameObject parentPlatform;   // The platform this geometry belongs to
 
-    private BoxCollider boxCollider;    // Reference to this object's BoxCollider
-    private Vector3 colliderSize;       // Stores the collider's beginning size, usually (1, 1, 1)
+	private BoxCollider boxCollider;    // Reference to this object's BoxCollider
+	private Vector3 colliderSize;       // Stores the collider's beginning size, usually (1, 1, 1)
 	private Vector3 startCenter;
 	private Quaternion startRotation;
 	private float zDiff;
 
-    #endregion Properties & Variables
+	#endregion Properties & Variables
 
 
-    #region Monobehavior Implementation
+	#region Monobehavior Implementation
 
-    void Awake()
-    {
+	void Awake(){
 		if (parentPlatform == null) {
 			parentPlatform = GameObject.Find("Ground");
 		}
-
-    }
+	}
 	
-	void Start () 
-    {
-        // Register to perspective shift event
-        GameStateManager.instance.PerspectiveShiftEvent += AdjustPosition;
+	void Start () {
+      // Register to perspective shift event
+		GameStateManager.instance.PerspectiveShiftEvent += AdjustPosition;
 		boxCollider = GetComponent<BoxCollider>();
 		startCenter = boxCollider.center;
 		colliderSize = boxCollider.size;

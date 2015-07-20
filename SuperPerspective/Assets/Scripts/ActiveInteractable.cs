@@ -70,7 +70,7 @@ public class ActiveInteractable : PhysicalObject {
 			notiMarker.updateVisible(notiShown);
 		}
 		//register interactpressed to the InputManager
-		InputManager.instance.InteractPressed += InteractPressed;
+		InputManager.instance.InteractPressedEvent += InteractPressed;
 	}
 
 	protected void FixedUpdateLogic() {

@@ -7,41 +7,41 @@ public class PlayerController : PhysicalObject
 	//suppress warnings
 	#pragma warning disable 1691,168,219,414
 
-    #region Properties & Variables
+   #region Properties & Variables
 
 	//singleton
 	public static PlayerController instance;
 
-    // Movement Parameters
-    public float acceleration;
-    public float decelleration;
-    public float maxSpeed;
-	 public float hangMaxSpeed;
-    public float gravity;
-    public float terminalVelocity;
-    public float jump;
-    public float jumpMargin;
-    private bool _paused;
+	// Movement Parameters
+	public float acceleration;
+	public float decelleration;
+	public float maxSpeed;
+	public float hangMaxSpeed;
+	public float gravity;
+	public float terminalVelocity;
+	public float jump;
+	public float jumpMargin;
+	private bool _paused;
 
-    // Layer mask used for collision checks
-    private int layerMask;  // Not needed?
+	// Layer mask used for collision checks
+	private int layerMask;  // Not needed?
 
-    // Verticle movement flags
-    private bool grounded;
-    public bool falling;
-    private bool canJump;
-    private bool lastInput;
+	// Verticle movement flags
+	private bool grounded;
+	public bool falling;
+	private bool canJump;
+	private bool lastInput;
 	private bool bounced;
-    private float jumpPressedTime;
+	private float jumpPressedTime;
 
-    // Raycasting Variables
-    public int verticalRays = 8;
+	// Raycasting Variables
+	public int verticalRays = 8;
 	float Margin = 0.05f;
-    
-    private Rect box;
-    private float colliderHeight;
-    private float colliderWidth;
-    private float colliderDepth;
+
+	private Rect box;
+	private float colliderHeight;
+	private float colliderWidth;
+	private float colliderDepth;
 
 	private CollisionChecker colCheck;
 
@@ -64,11 +64,11 @@ public class PlayerController : PhysicalObject
 
 	//Vars for edge grabbing
 	private Vector3[] cuboid;
-	Edge grabbedEdge = null;
-	byte edgeState = 0;//0: not near an edge, 1: close to an edge, 2:hanging
+	public Edge grabbedEdge = null;
+	public byte edgeState = 0;//0: not near an edge, 1: close to an edge, 2:hanging
 	bool climbing = false;
 	
-    #endregion
+   #endregion
 
 	//setup singleton
 	void Awake(){
@@ -80,21 +80,21 @@ public class PlayerController : PhysicalObject
 	
     // Initialization
 	void Start () {
-		  base.Init();
-        // Set player as falling 
-        // TODO: Since the player often falls through the ground we should cast a ray down and immediately place then on the ground.
-        grounded = false;
-        falling = true;
-        canJump = false;
-        lastInput = false;
+		base.Init();
+		// Set player as falling 
+		// TODO: Since the player often falls through the ground we should cast a ray down and immediately place then on the ground.
+		grounded = false;
+		falling = true;
+		canJump = false;
+		lastInput = false;
 
-        // Initialize the layer mask
-        layerMask = LayerMask.NameToLayer("normalCollisions");
+		// Initialize the layer mask
+		layerMask = LayerMask.NameToLayer("normalCollisions");
 
-        // Get the collider dimensions to use for raycasting
-        colliderHeight = GetComponent<Collider>().bounds.max.y - GetComponent<Collider>().bounds.min.y;
-        colliderWidth = GetComponent<Collider>().bounds.max.x - GetComponent<Collider>().bounds.min.x;
-        colliderDepth = GetComponent<Collider>().bounds.max.z - GetComponent<Collider>().bounds.min.z;
+		// Get the collider dimensions to use for raycasting
+		colliderHeight = GetComponent<Collider>().bounds.max.y - GetComponent<Collider>().bounds.min.y;
+		colliderWidth = GetComponent<Collider>().bounds.max.x - GetComponent<Collider>().bounds.min.x;
+		colliderDepth = GetComponent<Collider>().bounds.max.z - GetComponent<Collider>().bounds.min.z;
 
 		//Register Flip method to the shift event
 		GameStateManager.instance.PerspectiveShiftSuccessEvent += Flip;
@@ -105,10 +105,10 @@ public class PlayerController : PhysicalObject
 		//cuboid
 		cuboid = new Vector3[2];
 
-		colCheck = new CollisionChecker (GetComponent<Collider> ());
+		colCheck = new CollisionChecker(GetComponent<Collider> ());
 
-        // Register event handlers
-        GameStateManager.instance.GamePausedEvent += OnPauseGame;
+		// Register event handlers
+		GameStateManager.instance.GamePausedEvent += OnPauseGame;
 	}
 
     void Update()
@@ -159,10 +159,9 @@ public class PlayerController : PhysicalObject
 				climbing = anim.GetCurrentAnimatorStateInfo(0).IsName("HangUp");
 			  
             //update cuboid for edges
-				Vector3 halfScale = gameObject.transform.GetChild(3).transform.lossyScale * .5f;
-				cuboid[0] = gameObject.transform.GetChild(3).transform.position - halfScale;
-				cuboid[1] = gameObject.transform.GetChild(3).transform.position + halfScale;
-
+				Vector3 halfScale = gameObject.transform.lossyScale * .5f;
+				cuboid[0] = gameObject.transform.position - halfScale;
+				cuboid[1] = gameObject.transform.position + halfScale;
             if (zlockFlag)
             {
                 DoZLock();
@@ -591,7 +590,6 @@ public class PlayerController : PhysicalObject
 				if(grabbedEdge != null && e!= null){
 					if(grabbedEdge == e){
 						this.edgeState = 0;
-						Debug.Log("state is 0");
 						grabbedEdge =null;
 					}
 				}

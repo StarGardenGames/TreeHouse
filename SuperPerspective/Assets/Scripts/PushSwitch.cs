@@ -3,7 +3,7 @@ using System.Collections;
 
 public class PushSwitch : MonoBehaviour {
 
-	#pragma warning disable 114
+	#pragma warning disable 114, 414
 
 	public GameObject parentPlatform;
 
@@ -38,7 +38,7 @@ public class PushSwitch : MonoBehaviour {
 		}
 		RaycastHit hit;
 		if (GameStateManager.instance.currentPerspective == PerspectiveType.p3D) {
-			if (Physics.Raycast(transform.position + Vector3.forward, -Vector3.forward, out hit, 2f, LayerMask.NameToLayer("RaycastIgnore"))) {
+			if (Physics.Raycast(transform.position + Vector3.forward * 2f, -Vector3.forward, out hit, 4f, LayerMask.NameToLayer("RaycastIgnore"))) {
 				if (!pushed)
 					EnterCollisionWithGeneral(hit.collider.gameObject);
 			} else if (pushed) {

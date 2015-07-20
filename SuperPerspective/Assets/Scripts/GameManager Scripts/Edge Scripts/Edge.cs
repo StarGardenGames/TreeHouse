@@ -30,6 +30,7 @@ public class Edge : MonoBehaviour {
 	float edgeFactor = .5f;//factor by which top check is smaller
 
 	public void FixedUpdate(){
+		
 		if(!init)
 			return;
 		bool playerCanGrab = player.isFalling() && (player.is3D() || validIn2D);
