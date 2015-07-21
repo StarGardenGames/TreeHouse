@@ -21,7 +21,7 @@ public class BackgroundObject : MonoBehaviour {
 
 				m.SetColor ("_TintColor", tint);
 
-				print(m.color);
+				//print(m.color);
 			}
 		}
 	}
