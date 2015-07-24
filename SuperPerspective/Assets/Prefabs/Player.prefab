@@ -4325,7 +4325,8 @@ MonoBehaviour:
   decelleration: 15
   maxSpeed: 7
   hangMaxSpeed: 3
-  gravity: 1.5
+  upGravity: 1.5
+  downGravity: 1
   terminalVelocity: 60
   jump: 22
   jumpMargin: .100000001

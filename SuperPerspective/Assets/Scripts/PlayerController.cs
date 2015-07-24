@@ -17,7 +17,8 @@ public class PlayerController : PhysicalObject
 	public float decelleration;
 	public float maxSpeed;
 	public float hangMaxSpeed;
-	public float gravity;
+	public float upGravity;
+	public float downGravity;
 	public float terminalVelocity;
 	public float jump;
 	public float jumpMargin;
@@ -168,25 +169,7 @@ public class PlayerController : PhysicalObject
                 zlockFlag = false;
             }
 
-            // ------------------------------------------------------------------------------------------------------
-            // VERTICAL MOVEMENT VELOCITY CALCULATIONS
-            // ------------------------------------------------------------------------------------------------------
-            if (edgeState != 2 && !climbing)
-            {
-                // Apply Gravity
-                if (!grounded)
-                    velocity = new Vector3(velocity.x, Mathf.Max(velocity.y - gravity, -terminalVelocity), velocity.z);
 
-                // Determine if the player is falling
-                if (velocity.y < 0f && edgeState == 0)
-                    falling = true;
-            }
-            else
-            {
-                //if holding on to edge set velocity to 0 and set falling to false
-                velocity.y = 0;
-                falling = false;
-            }
 
             // ------------------------------------------------------------------------------------------------------
             // X-AXIS MOVEMENT VELOCITY CALCULATIONS
@@ -337,7 +320,7 @@ public class PlayerController : PhysicalObject
             // ------------------------------------------------------------------------------------------------------
             // COLLISION CHECKING
             // ------------------------------------------------------------------------------------------------------
-            CheckCollisions();
+            //CheckCollisions();
     }
 
 	public void CheckCollisions(){
@@ -406,7 +389,6 @@ public class PlayerController : PhysicalObject
 		}
 		if (close != -1) {
 			if (!pushFlag) {
-				//transform.Translate(Vector3.right * Mathf.Sign(velocity.x) * (close - colliderWidth / 2));
 				velocity = new Vector3(0f, velocity.y, velocity.z);
 			}
 		}
@@ -435,7 +417,6 @@ public class PlayerController : PhysicalObject
 		}
 		if (close != -1) {
 			if (!pushFlag) {
-				//transform.Translate(Vector3.forward * Mathf.Sign(velocity.z) * (close - colliderDepth / 2));
 				velocity = new Vector3(velocity.x, velocity.y, 0f);
 			}
 		}
@@ -444,11 +425,38 @@ public class PlayerController : PhysicalObject
 
 	// LateUpdate is used to actually move the position of the player
 	void LateUpdate () {
+		if (!_paused) {
+			// ------------------------------------------------------------------------------------------------------
+			// VERTICAL MOVEMENT VELOCITY CALCULATIONS
+			// ------------------------------------------------------------------------------------------------------
+			if (edgeState != 2 && !climbing)
+			{
+				// Apply Gravity
+				if (!grounded) {
+					if (velocity.y <= 0)
+						velocity = new Vector3(velocity.x, Mathf.Max(velocity.y - upGravity, -terminalVelocity), velocity.z);
+					else
+						velocity = new Vector3(velocity.x, Mathf.Max(velocity.y - downGravity, -terminalVelocity), velocity.z);
+				}
+				
+				// Determine if the player is falling
+				if (velocity.y < 0f && edgeState == 0)
+					falling = true;
+			}
+			else
+			{
+				//if holding on to edge set velocity to 0 and set falling to false
+				velocity.y = 0;
+				falling = false;
+			}
+		}
+
+		CheckCollisions();
+
         if (!_paused)
         {
             if (crate != null)
             {
-                //crate.transform.Translate(Vector3.Dot(velocity, grabAxis) * grabAxis * 0.75f * Time.deltaTime);
 				Vector3 drag = Vector3.Dot(velocity, grabAxis) * grabAxis * 0.75f;
 				crate.SetVelocity(drag.x, drag.z);
                 transform.Translate(drag * Time.deltaTime);
@@ -474,6 +482,7 @@ public class PlayerController : PhysicalObject
 		// True if any ray hits a collider
 		bool connected = false;
 
+		// TODO: Fix this to use the appropriate ground in case of multiple grounds
 		GameObject grnd = GameObject.Find("Ground");
 		float gz = grnd.transform.lossyScale.z;
 
@@ -511,9 +520,7 @@ public class PlayerController : PhysicalObject
 
 		return connected;
 	}
-
-	// Used to check collisions with special objects
-	// Make this more object oriented? Collidable interface?
+	
 	private void CollideWithObject(RaycastHit hitInfo, Vector3 trajectory) {
 		GameObject other = hitInfo.collider.gameObject;
 		float colliderDim = 0;

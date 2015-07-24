@@ -129,6 +129,10 @@ Prefab:
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 53f8b1826de3d374f8355fae10d2e3a1, type: 2}
   m_IsPrefabParent: 0
+--- !u!1 &544762554 stripped
+GameObject:
+  m_PrefabParentObject: {fileID: 101652, guid: e4067e0e5b5e9d0478ed1b3467c1b695, type: 2}
+  m_PrefabInternal: {fileID: 1950818325}
 --- !u!1001 &1045218659
 Prefab:
   m_ObjectHideFlags: 0
@@ -270,6 +274,70 @@ Prefab:
       propertyPath: m_RootOrder
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 11444580, guid: e4067e0e5b5e9d0478ed1b3467c1b695, type: 2}
+      propertyPath: parentPlatform
+      value: 
+      objectReference: {fileID: 544762554}
+    - target: {fileID: 11414118, guid: e4067e0e5b5e9d0478ed1b3467c1b695, type: 2}
+      propertyPath: parentPlatform
+      value: 
+      objectReference: {fileID: 544762554}
+    - target: {fileID: 11419092, guid: e4067e0e5b5e9d0478ed1b3467c1b695, type: 2}
+      propertyPath: parentPlatform
+      value: 
+      objectReference: {fileID: 544762554}
+    - target: {fileID: 11413944, guid: e4067e0e5b5e9d0478ed1b3467c1b695, type: 2}
+      propertyPath: parentPlatform
+      value: 
+      objectReference: {fileID: 544762554}
+    - target: {fileID: 11477820, guid: e4067e0e5b5e9d0478ed1b3467c1b695, type: 2}
+      propertyPath: parentPlatform
+      value: 
+      objectReference: {fileID: 544762554}
+    - target: {fileID: 11421426, guid: e4067e0e5b5e9d0478ed1b3467c1b695, type: 2}
+      propertyPath: parentPlatform
+      value: 
+      objectReference: {fileID: 544762554}
+    - target: {fileID: 11458780, guid: e4067e0e5b5e9d0478ed1b3467c1b695, type: 2}
+      propertyPath: parentPlatform
+      value: 
+      objectReference: {fileID: 544762554}
+    - target: {fileID: 11461974, guid: e4067e0e5b5e9d0478ed1b3467c1b695, type: 2}
+      propertyPath: parentPlatform
+      value: 
+      objectReference: {fileID: 544762554}
+    - target: {fileID: 11496386, guid: e4067e0e5b5e9d0478ed1b3467c1b695, type: 2}
+      propertyPath: parentPlatform
+      value: 
+      objectReference: {fileID: 544762554}
+    - target: {fileID: 11449320, guid: e4067e0e5b5e9d0478ed1b3467c1b695, type: 2}
+      propertyPath: parentPlatform
+      value: 
+      objectReference: {fileID: 544762554}
+    - target: {fileID: 11477924, guid: e4067e0e5b5e9d0478ed1b3467c1b695, type: 2}
+      propertyPath: parentPlatform
+      value: 
+      objectReference: {fileID: 544762554}
+    - target: {fileID: 11434304, guid: e4067e0e5b5e9d0478ed1b3467c1b695, type: 2}
+      propertyPath: parentPlatform
+      value: 
+      objectReference: {fileID: 544762554}
+    - target: {fileID: 11441242, guid: e4067e0e5b5e9d0478ed1b3467c1b695, type: 2}
+      propertyPath: parentPlatform
+      value: 
+      objectReference: {fileID: 544762554}
+    - target: {fileID: 11419236, guid: e4067e0e5b5e9d0478ed1b3467c1b695, type: 2}
+      propertyPath: parentPlatform
+      value: 
+      objectReference: {fileID: 544762554}
+    - target: {fileID: 11478940, guid: e4067e0e5b5e9d0478ed1b3467c1b695, type: 2}
+      propertyPath: parentPlatform
+      value: 
+      objectReference: {fileID: 544762554}
+    - target: {fileID: 11478150, guid: e4067e0e5b5e9d0478ed1b3467c1b695, type: 2}
+      propertyPath: parentPlatform
+      value: 
+      objectReference: {fileID: 544762554}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: e4067e0e5b5e9d0478ed1b3467c1b695, type: 2}
   m_IsPrefabParent: 0

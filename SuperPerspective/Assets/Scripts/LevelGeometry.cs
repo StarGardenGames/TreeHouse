@@ -49,16 +49,17 @@ public class LevelGeometry : MonoBehaviour
     private void AdjustPosition(PerspectiveType p)
     {
 		//Mathf.Pow(Mathf.Sin(rot * Mathf.Deg2Rad), 2)
-		float rot = Mathf.Floor(transform.rotation.eulerAngles.y);
-		float sign = 1;
-		if (rot >= 90 && rot <= 270)
-			sign = -1;
+		float rot = Mathf.Rad2Deg * Mathf.Acos(Vector3.Dot(Vector3.forward, transform.forward));
+		if (Mathf.Round(rot) == 90 && Mathf.Round(Vector3.Angle(transform.right, Vector3.forward)) == 0)
+			rot = 270;
 		if (p == PerspectiveType.p2D)
 		{
 			boxCollider.size = new Vector3(colliderSize.x * Mathf.Cos(rot * Mathf.Deg2Rad) + (parentPlatform.transform.lossyScale.z / transform.lossyScale.x) * Mathf.Sin(rot * Mathf.Deg2Rad), colliderSize.y, 
 			                               colliderSize.z * Mathf.Sin(rot * Mathf.Deg2Rad) + (parentPlatform.transform.lossyScale.z / transform.lossyScale.z) * Mathf.Cos(rot * Mathf.Deg2Rad));
-			boxCollider.center = new Vector3(sign * (parentPlatform.transform.position.z - transform.position.z) * (1 / (transform.localScale.x)) * Mathf.Sin(rot * Mathf.Deg2Rad), startCenter.y, 
-			                                 sign * (parentPlatform.transform.position.z - transform.position.z) * (1 / (transform.localScale.z)) * Mathf.Cos(rot * Mathf.Deg2Rad));
+			if (Mathf.Round(rot) == 90 || Mathf.Round(rot) == 270)
+				boxCollider.center = new Vector3(-(parentPlatform.transform.position.z - transform.position.z) * (1 / Mathf.Abs(transform.localScale.x)) * Mathf.Sin(rot * Mathf.Deg2Rad), startCenter.y, startCenter.z);
+			else
+				boxCollider.center = new Vector3(startCenter.x, startCenter.y, (parentPlatform.transform.position.z - transform.position.z) * (1 / Mathf.Abs(transform.localScale.z)) * Mathf.Cos(rot * Mathf.Deg2Rad));
 		}
         else if (p == PerspectiveType.p3D)
         {
