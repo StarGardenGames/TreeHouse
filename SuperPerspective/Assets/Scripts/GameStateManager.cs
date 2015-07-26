@@ -11,7 +11,7 @@ using SuperPerspective.Singleton;
 public class GameStateManager : PersistentSingleton<GameStateManager>
 {
 	//suppress warnings
-	#pragma warning disable 414, 649
+	#pragma warning disable 414, 649, 472
 	
 	#region Properties & Variables
 	
@@ -31,6 +31,7 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
 	private const int NUM_VIEW_TYPES = 8;
 	private Transform[] view_mounts = new Transform[NUM_VIEW_TYPES];
 	private PerspectiveType[] view_perspectives = new PerspectiveType[NUM_VIEW_TYPES];
+	private bool[] view_pause = new bool[NUM_VIEW_TYPES];
 	
 	// Events to notify listeners of state changes
 	public event System.Action<bool> GamePausedEvent;
@@ -41,24 +42,12 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
 	
 	#endregion Properties & Variables
 	
-	#region Managing Backward Movement
-	void Update(){
-		if(currentPerspective == PerspectiveType.p3D){
-			if(InputManager.instance.GetForwardMovement() == -1 && currentState == ViewType.STANDARD_3D){
-				EnterState(ViewType.BACKWARD);
-			}
-			if(InputManager.instance.GetForwardMovement() == 1 && currentState == ViewType.BACKWARD){
-				EnterState(ViewType.STANDARD_3D);
-			}			
-		}
-	}
-	#endregion Managing Backward Movement
-	
 	#region Monobehavior Implementation
 
 	void Start () {
 		InitViewPerspectives();
 		InitViewMounts();
+		InitViewPauseStates();
 		
 		//determine wheather or not to start on menu
 		if(view_mounts[(int)ViewType.MENU] == null){
@@ -66,7 +55,7 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
 			StartGame();
 		}else{
 			currentPerspective = PerspectiveType.p3D;
-			EnterMenu();
+			EnterState(ViewType.MENU);
 		}
 
 		// Register event handlers to InputManagers
@@ -78,7 +67,7 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
 		InputManager.instance.LeanRightReleasedEvent += HandleLeanRightReleased;
 
 		// Register to switch state to proper gameplay when shift is complete
-		CameraController.instance.ShiftCompleteEvent += HandleShiftComplete;
+		CameraController.instance.TransitionCompleteEvent += HandleTransitionComplete;
 	}
 	
 	void InitViewPerspectives(){
@@ -109,104 +98,80 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
 		}
 	}
 
+	void InitViewPauseStates(){
+		view_pause[(int)ViewType.STANDARD_3D] =   false;
+		view_pause[(int)ViewType.STANDARD_2D] =   false;
+		view_pause[(int)ViewType.PAUSED] =        true; 
+		view_pause[(int)ViewType.MENU] =          true; 
+		view_pause[(int)ViewType.LEAN_LEFT] =		 false; 
+		view_pause[(int)ViewType.LEAN_RIGHT] =	 false; 
+		view_pause[(int)ViewType.BACKWARD] =		 false;
+	}
+	
 	#endregion Monobehavior Implementation
 
-	#region State Change Functions
+	#region Managing Backward Movement
+	void Update(){
+		if(currentPerspective == PerspectiveType.p3D){
+			if(InputManager.instance.GetForwardMovement() == -1 && currentState == ViewType.STANDARD_3D){
+				EnterState(ViewType.BACKWARD);
+			}
+			if(InputManager.instance.GetForwardMovement() == 1 && currentState == ViewType.BACKWARD){
+				EnterState(ViewType.STANDARD_3D);
+			}			
+		}
+	}
+	#endregion Managing Backward Movement
 	
-	private void EnterState(ViewType targetState){
-		previousState = currentState;
-		this.targetState = targetState;
-		CameraController.instance.SetMount(view_mounts[(int)targetState],view_perspectives[(int)targetState]);
-	}
-
-	// Enter transition state between 2D and 3D or vice-versa
-	private void EnterTransition(ViewType targetState){
-		// Pause the game during the transition
-		RaisePauseEvent(true);
-		
-		EnterState(targetState);
-	}
-
-	// Pause the game
-	private void EnterPause(){
-		EnterState(ViewType.PAUSED);
-		RaisePauseEvent(true);
-	}
-
-	// Exits the pause state
-	private void ExitPause(){
-	  EnterState(previousState);
-	  RaisePauseEvent(false);
-	}
-
-	private void EnterMenu(){
-		EnterState(ViewType.MENU);
-		RaisePauseEvent(true);
-	}
-
-	private void ExitMenu(){
-		EnterState(previousState);
-		RaisePauseEvent(false);
-	}
-	
-   #endregion State Change Functions
-
 	#region Event Handlers
 
 	//TODO review
 	private void HandlePausePressed(){   
-		if (!IsPauseState(currentState)){
-			// If the current state is a gameplay state pause the game
-			EnterMenu();
-		}else if (currentState == ViewType.MENU){
-			// If the current state is paused then unpause
-			ExitMenu();
+		switch(currentState){
+			case ViewType.MENU:
+				if(previousState != null)
+					EnterState(previousState);
+				break;
+			case ViewType.PAUSED:
+				EnterState(previousState);
+				break;
+			default:
+				EnterState(ViewType.PAUSED);
+				break;
 		}
 	}
 
 	private void HandleShiftPressed(){
-		// Shift perspective if current state is a gameplay state
 		if (!IsPauseState(currentState)){
-			// Find the target state to switch to
-			ViewType newPerspective = (currentState == ViewType.STANDARD_2D) ? ViewType.STANDARD_3D : ViewType.STANDARD_2D;
+			ViewType newState = (view_perspectives[(int)currentState] == PerspectiveType.p3D) ?
+				ViewType.STANDARD_2D : ViewType.STANDARD_3D;
 
-			// Find the corresponding perspective to store for external reference
-			currentPerspective = (newPerspective == ViewType.STANDARD_2D) ? PerspectiveType.p2D : PerspectiveType.p3D;
+			EnterState(newState);
 
-			// Begin transition to that state (since this involves the shift animation we use the transition state)
-			EnterTransition(newPerspective);
-
-			if (PlayerController.instance.Check2DIntersect()){
+			if(PlayerController.instance.Check2DIntersect()){
 				RaisePerspectiveShiftFailEvent();
 				StartCoroutine(FailTimer());
 			}else{
 				RaisePerspectiveShiftSuccessEvent();
 			}
-		}else{
-			PlayerController.instance.Flip();
 		}
 	}
 
 	// TODO Review (handle pause and handle menu are pretty much the same)
 	private void HandleMenuEnterPressed(){
-		if (!IsPauseState(currentState)){
-			EnterMenu();
-		}
 		if (currentState == ViewType.MENU){
-			ExitMenu();
+			EnterState(previousState);
+		}else{
+			EnterState(ViewType.MENU);
 		}
 	}
     
-	private void HandleShiftComplete(){
+	private void HandleTransitionComplete(){
 		currentState = targetState;
-		
-	
+
 		RaisePerspectiveShiftEvent();
-		
-		if (!IsPauseState(currentState)){	
-			// Unpause Game
-			RaisePauseEvent(false);
-		}
+	
+		RaisePauseEvent(view_pause[(int)currentState]);
 	}
 
 	private void HandleLeanLeftPressed(){
@@ -230,9 +195,21 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
 	}
   
 	#endregion Event Handlers
+	
+	#region State Change Functions
+	
+	private void EnterState(ViewType targetState){
+		RaisePauseEvent(IsPauseState(targetState));
+		previousState = currentState;
+		this.targetState = targetState;
+		currentPerspective = view_perspectives[(int)targetState];
+		CameraController.instance.SetMount(view_mounts[(int)targetState],currentPerspective);
+	}
+	
+   #endregion State Change Functions
 
    #region Event Raising Functions
-
+	
 	// Alert listeners that the game is being paused or unpaused
 	private void RaisePauseEvent(bool paused){
 		this.paused = paused;
@@ -264,9 +241,7 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
 
 	// Called by main menu to begin gameplay
 	public void StartGame(){
-		EnterTransition(ViewType.STANDARD_2D);
-		currentPerspective = PerspectiveType.p2D;
-		RaisePauseEvent(false);
+		EnterState(ViewType.STANDARD_2D);
 	}
 	#endregion Public Interface
 
@@ -284,14 +259,11 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
 		currentPerspective = (targetState == ViewType.STANDARD_2D) ? PerspectiveType.p3D : PerspectiveType.p2D;
 
 		// Find the corresponding perspective to store for external reference
-		if (targetState == ViewType.STANDARD_2D)
-			EnterTransition(ViewType.STANDARD_3D);
-		else
-			EnterTransition(ViewType.STANDARD_2D);
+		EnterState(targetState);
 	}
 
 	private bool IsPauseState(ViewType targetState){
-		return targetState == ViewType.PAUSED || targetState == ViewType.MENU;
+		return view_pause[(int)targetState] || currentPerspective != view_perspectives[(int)targetState];
 	}
 	
    #endregion
