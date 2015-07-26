@@ -38,9 +38,9 @@ public class CameraController : PersistentSingleton<CameraController	>
 	
 	
 	// Event to alert Gameplay State Manager of completed shift
-	public event System.Action ShiftStartEvent;
-	public event System.Action ShiftCompleteEvent;
-	private bool shiftComplete = false;
+	public event System.Action TransitionStartEvent;
+	public event System.Action TransitionCompleteEvent;
+	private bool transitionComplete = false;
 
 	#endregion Properties & Variables
 
@@ -68,11 +68,11 @@ public class CameraController : PersistentSingleton<CameraController	>
 				 transform.rotation = Quaternion.RotateTowards(transform.rotation, mount.rotation, turnSpeed);
 
 			// Check if the shift is complete
-			if (!shiftComplete){
+			if (!transitionComplete){
 				// IF the shift is over alert listeners
-				if (CheckTransition()){
-					shiftComplete = true;
-					RaiseEvent(ShiftCompleteEvent);
+				if (CheckTransitionOver()){
+					transitionComplete = true;
+					RaiseEvent(TransitionCompleteEvent);
 				}
 			}
 		}
@@ -101,11 +101,11 @@ public class CameraController : PersistentSingleton<CameraController	>
             mount = newMount;
 				targetMatrix = (newPerspective == PerspectiveType.p3D)? CameraMatrixTypes.Standard3D
 					: CameraMatrixTypes.Standard2D;
-            shiftComplete = false;
+            transitionComplete = false;
             if (blender != null)
                 blender.BlendToMatrix(targetMatrix, cameraBlendSpeed);
 
-				RaiseEvent(ShiftStartEvent);
+				RaiseEvent(TransitionStartEvent);
         }
     }
 
@@ -114,7 +114,7 @@ public class CameraController : PersistentSingleton<CameraController	>
 
     #region Helper Functions
 
-    private bool CheckTransition()
+    private bool CheckTransitionOver()
     {
         Vector3 positionDif = transform.position - mount.position;
         if (positionDif.magnitude > shiftThreshold)

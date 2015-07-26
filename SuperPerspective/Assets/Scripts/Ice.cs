@@ -38,7 +38,7 @@ public class Ice : ActiveInteractable {
 		// Register CheckGrab to grab input event
 		//InputManager.instance.InteractPressed += CheckGrab;
 		GameStateManager.instance.PerspectiveShiftEvent += Shift;
-		CameraController.instance.ShiftStartEvent += checkBreak;
+		CameraController.instance.TransitionStartEvent += checkBreak;
 		colCheck = new CollisionChecker (GetComponent<Collider> ());
 		startPos = transform.position;
 		//range = colliderWidth >= colliderDepth ? colliderWidth * 0.85f : colliderDepth * 0.85f;
