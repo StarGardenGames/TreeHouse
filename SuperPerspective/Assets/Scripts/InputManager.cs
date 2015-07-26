@@ -23,6 +23,8 @@ public class InputManager : Singleton<InputManager>{
 	public event System.Action LeanRightPressedEvent;
 	public event System.Action LeanLeftReleasedEvent;
 	public event System.Action LeanRightReleasedEvent;
+	public event System.Action BackwardMovementEvent;
+	public event System.Action ForwardMovementEvent;
 	
 	// Game's pause state
 	private bool continuePressed = false;//used as an alternate way to unpause
@@ -32,9 +34,10 @@ public class InputManager : Singleton<InputManager>{
 	private const float FAIL_TIME = 0.5f;
 	private float flipTimer = 0;
 	private bool flipFailed = false;
+	
+	private float previousForwardMovement = 0;
 
 	#endregion Properties & Variables
-
 
 	#region Monobehavior Implementation
 
@@ -67,6 +70,14 @@ public class InputManager : Singleton<InputManager>{
 		
 		if(Input.GetButtonUp("LeanRight"))
 			RaiseEvent(LeanRightReleasedEvent);
+		
+		if(previousForwardMovement != -1 && GetForwardMovement() == -1)
+			RaiseEvent(BackwardMovementEvent);
+		
+		if(previousForwardMovement != 1 && GetForwardMovement() == 1)
+			RaiseEvent(ForwardMovementEvent);
+		
+		previousForwardMovement = GetForwardMovement();
 	}
 
 	#endregion MonobehaviorImplementation
