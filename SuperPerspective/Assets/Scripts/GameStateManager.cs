@@ -41,6 +41,19 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
 	
 	#endregion Properties & Variables
 	
+	#region Managing Backward Movement
+	void Update(){
+		if(currentPerspective == PerspectiveType.p3D){
+			if(InputManager.instance.GetForwardMovement() == -1 && currentState == ViewType.STANDARD_3D){
+				EnterState(ViewType.BACKWARD);
+			}
+			if(InputManager.instance.GetForwardMovement() == 1 && currentState == ViewType.BACKWARD){
+				EnterState(ViewType.STANDARD_3D);
+			}			
+		}
+	}
+	#endregion Managing Backward Movement
+	
 	#region Monobehavior Implementation
 
 	void Start () {
@@ -87,6 +100,7 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
 		mounts[3] = GameObject.Find("PauseMount");
 		mounts[4] = GameObject.Find("LeanLeftCameraMount");
 		mounts[5] = GameObject.Find("LeanRightCameraMount");
+		mounts[6] = GameObject.Find("BackwardCameraMount");
 		
 		//find transforms
 		for(int i = 0; i < mounts.Length; i++){
@@ -111,7 +125,6 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
 		RaisePauseEvent(true);
 		
 		EnterState(targetState);
-		
 	}
 
 	// Pause the game
@@ -197,25 +210,26 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
 	}
 
 	private void HandleLeanLeftPressed(){
-		if(!IsPauseState(currentState))
+		if(!IsPauseState(currentState) && currentPerspective == PerspectiveType.p3D)
 			EnterState(ViewType.LEAN_LEFT);
 	}
 	
 	private void HandleLeanRightPressed(){
-		if(!IsPauseState(currentState))
+		if(!IsPauseState(currentState) && currentPerspective == PerspectiveType.p3D)
 			EnterState(ViewType.LEAN_RIGHT);
 	}
 	
 	private void HandleLeanLeftReleased(){
-		if(currentState == ViewType.LEAN_LEFT)
+		if(currentState == ViewType.LEAN_LEFT && currentPerspective == PerspectiveType.p3D)
 			EnterState(ViewType.STANDARD_3D);
 	}
 	
 	private void HandleLeanRightReleased(){
-		if(currentState == ViewType.LEAN_RIGHT)
+		if(currentState == ViewType.LEAN_RIGHT && currentPerspective == PerspectiveType.p3D)
 			EnterState(ViewType.STANDARD_3D);
 	}
-   #endregion Event Handlers
+  
+	#endregion Event Handlers
 
    #region Event Raising Functions
 
