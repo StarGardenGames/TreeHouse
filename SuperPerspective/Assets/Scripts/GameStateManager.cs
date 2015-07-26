@@ -65,6 +65,8 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
 		InputManager.instance.LeanRightPressedEvent += HandleLeanRightPressed;
 		InputManager.instance.LeanLeftReleasedEvent += HandleLeanLeftReleased;
 		InputManager.instance.LeanRightReleasedEvent += HandleLeanRightReleased;
+		InputManager.instance.BackwardMovementEvent += HandleBackwardMovement;
+		InputManager.instance.ForwardMovementEvent += HandleForwardMovement;
 
 		// Register to switch state to proper gameplay when shift is complete
 		CameraController.instance.TransitionCompleteEvent += HandleTransitionComplete;
@@ -109,19 +111,6 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
 	}
 	
 	#endregion Monobehavior Implementation
-
-	#region Managing Backward Movement
-	void Update(){
-		if(currentPerspective == PerspectiveType.p3D){
-			if(InputManager.instance.GetForwardMovement() == -1 && currentState == ViewType.STANDARD_3D){
-				EnterState(ViewType.BACKWARD);
-			}
-			if(InputManager.instance.GetForwardMovement() == 1 && currentState == ViewType.BACKWARD){
-				EnterState(ViewType.STANDARD_3D);
-			}			
-		}
-	}
-	#endregion Managing Backward Movement
 	
 	#region Event Handlers
 
@@ -194,6 +183,18 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
 			EnterState(ViewType.STANDARD_3D);
 	}
   
+	private void HandleBackwardMovement(){
+		if(InputManager.instance.GetForwardMovement() == -1 && currentState == ViewType.STANDARD_3D){
+			EnterState(ViewType.BACKWARD);
+		}
+	}
+	
+	private void HandleForwardMovement(){
+		if(InputManager.instance.GetForwardMovement() == 1 && currentState == ViewType.BACKWARD){
+			EnterState(ViewType.STANDARD_3D);
+		}	
+	}
+	
 	#endregion Event Handlers
 	
 	#region State Change Functions
