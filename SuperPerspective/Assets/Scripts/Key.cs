@@ -23,6 +23,10 @@ public class Key : Interactable {
 		keysHeld++;
 	}
 
+	public static void ClearKeys() {
+		keysHeld = 0;
+	}
+
 	public override void EnterCollisionWithPlayer () {
 		if (!active)
 			return;
