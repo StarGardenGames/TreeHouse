@@ -53,7 +53,7 @@ public class BoundObject : MonoBehaviour {
 	}
 
 	public void bind(){
-		bool pMode = PlayerController.instance.is3D();
+		bool pMode = (GameStateManager.instance.currentPerspective == PerspectiveType.p3D);
 		//find velocity
 		PhysicalObject po = gameObject.GetComponent<PhysicalObject>();
 		Vector3 vel = Vector3.zero;

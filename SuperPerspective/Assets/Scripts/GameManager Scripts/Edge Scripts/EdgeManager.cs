@@ -39,13 +39,22 @@ public class EdgeManager : MonoBehaviour {
 		Vector3 posTop = new Vector3(0,.5f,0);
 
 		for(int i = 0; i < terrain.Length; i++){
-			//width, height, and depth of terrain, modified for edge
-			float w = terrain[i].transform.lossyScale.x + xx;
-			float d = terrain[i].transform.lossyScale.z + zz;
-			float h = terrain[i].transform.lossyScale.y - yy;
+			Vector3 boxSize = terrain[i].GetComponent<LevelGeometry>().getTrueBoxColliderSize();
+			Vector3 boxCenter = terrain[i].GetComponent<LevelGeometry>().getTrueBoxColliderCenter();
 			
-			Vector3 top = terrain[i].transform.position + h * posTop;
-	
+			float w = terrain[i].transform.lossyScale.x * boxSize.x + xx;
+			float d = terrain[i].transform.lossyScale.z * boxSize.z + zz;
+			float h = terrain[i].transform.lossyScale.y * boxSize.y - yy;
+			
+			Vector3 transformScale = terrain[i].transform.lossyScale;
+			
+			Vector3 center = 
+				(Vector3.right * boxCenter.x * transformScale.x) +
+				(Vector3.up * boxCenter.y * transformScale.y) +
+				(Vector3.forward * boxCenter.z * transformScale.z);
+			
+			Vector3 top = terrain[i].transform.position + center + h * posTop;
+			
 			GameObject rightEdge = Instantiate(edgePrefab, top + w * posRight, Quaternion.identity) as GameObject;
 			GameObject backEdge = Instantiate(edgePrefab, top + d * posBack, Quaternion.identity) as GameObject;
 			GameObject leftEdge = Instantiate(edgePrefab, top + w * posLeft, Quaternion.identity) as GameObject;
