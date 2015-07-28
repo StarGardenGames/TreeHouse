@@ -3,8 +3,29 @@ using System.Collections;
 
 public class Edge : MonoBehaviour {
 	//suppress warnings
-	#pragma warning disable 162
+	#pragma warning disable 162, 649, 219
 
+	
+	public byte testStatus;
+	public Vector3[] testCuboid;
+	public Vector3[] testPlayerCuboid;
+	public bool testPlayerGrab;
+	public bool testOverlap;
+	public float testdiff;
+	public void Update(){
+		if(!init)
+			return;
+		testStatus = status;
+		testCuboid = cuboid;
+		testPlayerCuboid = player.getCuboid();
+		testPlayerGrab = player.isFalling() && (player.is3D() || validIn2D);
+		testOverlap = isOverlaping(cuboid, player.getCuboid());
+		Vector3 playerPos = player.gameObject.transform.position;
+		if(or%2 == 0)
+			testdiff = Mathf.Abs(playerPos.x - transform.position.x);
+		else
+			testdiff = Mathf.Abs(playerPos.z - transform.position.z);
+	}
 	
 	int or = 0; //orientation of game object (0-3: right,back,left,front)
 	
@@ -28,7 +49,7 @@ public class Edge : MonoBehaviour {
 	float hangCounter = 0.0f;
 	
 	float edgeFactor = .5f;//factor by which top check is smaller
-
+	
 	public void FixedUpdate(){
 		
 		if(!init)
@@ -69,7 +90,7 @@ public class Edge : MonoBehaviour {
 				diff = Mathf.Abs(playerPos.x - transform.position.x);
 			else
 				diff = Mathf.Abs(playerPos.z - transform.position.z);
-			if(diff < .0001f){
+			if(diff < .1f){
 				if(status == 0){
 					playerAboveEdge = player.getCuboid()[1].y > cuboid[1].y;
 					status = 1;
@@ -134,7 +155,7 @@ public class Edge : MonoBehaviour {
 		this.edgeIndex = edgeIndex;
 		//set parent
 		transform.parent = EdgeManager.instance.transform;
-		//init player reference
+		//set player variable
 		player = PlayerController.instance;
 		//scale
 		Vector3 scale = gameObject.transform.localScale;
@@ -152,7 +173,7 @@ public class Edge : MonoBehaviour {
 		this.overlapIndex = overlapIndex;
 
 		//overlaps
-		checkOverlaps();
+		//checkOverlaps();
 
 		//init cubiod
 		Vector3 halfScale = gameObject.transform.localScale * .5f;
@@ -273,7 +294,7 @@ public class Edge : MonoBehaviour {
 					max = ((overBot == null)? overTop[1][0] : Mathf.Max(overTop[1][0],overBot[1][0]));
 				}
 			}
-			//shorter current edge and create a new edge
+			//shorten current edge and create a new edge
 			if(or%2 == 0){//left/right
 				//reference variables
 				float posZ = gameObject.transform.position.z;
@@ -281,13 +302,12 @@ public class Edge : MonoBehaviour {
 				//create new edge
 				float newZ = (max + posZ + halfScaleZ) * .5f;
 				Vector3 newPos = new Vector3(gameObject.transform.position.x,gameObject.transform.position.y,newZ);
-				GameObject newEdge = Instantiate(EdgeManager.instance.edgePrefab, newPos, Quaternion.identity) as GameObject;
 				float newDepth = posZ + halfScaleZ - max;
-				if(newDepth <=0)
-					Destroy(newEdge);
-				else
+				if(newDepth > 0){
+					/*GameObject newEdge = Instantiate(EdgeManager.instance.edgePrefab, newPos, Quaternion.identity) as GameObject;
 					newEdge.GetComponent<Edge>().Init(or, 0, newDepth, overlapIndex, 
-						"split_"+EdgeManager.instance.getGlobalIndex());
+						"split_"+EdgeManager.instance.getGlobalIndex());*/
+				}
 				//shorten current edge
 				float myZ = (min + posZ - halfScaleZ) * .5f;
 				Vector3 myPos = gameObject.transform.position;
@@ -309,13 +329,12 @@ public class Edge : MonoBehaviour {
 				//create new edge
 				float newX = (max + posX + halfScaleX) * .5f;
 				Vector3 newPos = new Vector3(newX,gameObject.transform.position.y,gameObject.transform.position.z);
-				GameObject newEdge = Instantiate(EdgeManager.instance.edgePrefab, newPos, Quaternion.identity) as GameObject;
 				float newWidth = posX + halfScaleX - max;
-				if(newWidth <= 0)
-					Destroy(newEdge);
-				else
+				if(newWidth > 0){
+					/*GameObject newEdge = Instantiate(EdgeManager.instance.edgePrefab, newPos, Quaternion.identity) as GameObject;
 					newEdge.GetComponent<Edge>().Init(or, newWidth, 0, overlapIndex,
-						"split_"+EdgeManager.instance.getGlobalIndex());
+						"split_"+EdgeManager.instance.getGlobalIndex());*/
+				}
 				//shorten current edge
 				float myX = (min + posX - halfScaleX) * .5f;
 				Vector3 myPos = gameObject.transform.position;
@@ -368,4 +387,5 @@ public class Edge : MonoBehaviour {
 	public int getOrientation(){
 		return or;
 	}
+
 }

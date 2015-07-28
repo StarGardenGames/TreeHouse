@@ -67,6 +67,14 @@ public class LevelGeometry : MonoBehaviour
 			boxCollider.size = colliderSize;
         }
     }
+	 
+	public Vector3 getTrueBoxColliderCenter(){
+		return startCenter;
+	}
 
+	public Vector3 getTrueBoxColliderSize(){
+		return colliderSize;
+	}
+	
     #endregion Perspective Shift Event
 }

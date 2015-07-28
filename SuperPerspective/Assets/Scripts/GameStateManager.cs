@@ -51,10 +51,8 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
 		
 		//determine wheather or not to start on menu
 		if(view_mounts[(int)ViewType.MENU] == null){
-			currentPerspective = PerspectiveType.p2D;
 			StartGame();
 		}else{
-			currentPerspective = PerspectiveType.p3D;
 			EnterState(ViewType.MENU);
 		}
 
