@@ -3,10 +3,7 @@ using System.Collections;
 
 public class BackgroundObject : MonoBehaviour {
 
-	// Use this for initialization
-	void Start () {
-	
-	}
+	#pragma warning disable 219
 	
 	// Update is called once per frame
 	void Update () {

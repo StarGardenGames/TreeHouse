@@ -36,7 +36,7 @@ public class Crate : ActiveInteractable {
 		// Register CheckGrab to grab input event
 		//InputManager.instance.InteractPressed += CheckGrab;
 		GameStateManager.instance.PerspectiveShiftEvent += Shift;
-		CameraController.instance.ShiftStartEvent += checkBreak;
+		CameraController.instance.TransitionStartEvent += checkBreak;
 		colCheck = new CollisionChecker (GetComponent<Collider> ());
 		startPos = transform.position;
 		range = colliderWidth * 0.9f;
