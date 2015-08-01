@@ -202,7 +202,7 @@ public class PlayerController : PhysicalObject
 					//clamp motion
 					float newX = gameObject.transform.position.x;
 					float edgeX = grabbedEdge.gameObject.transform.position.x;
-					float edgeScale = grabbedEdge.gameObject.transform.localScale.x;
+					float edgeScale = grabbedEdge.gameObject.transform.lossyScale.x;
 					float minBound = edgeX - edgeScale * .5f;
 					float maxBound = edgeX + edgeScale * .5f;
 					if (!(minBound <= newX && newX <= maxBound))
@@ -254,7 +254,7 @@ public class PlayerController : PhysicalObject
 					//clamp position
 					float newZ = gameObject.transform.position.z + (newVelocityZ/50f);
 					float edgeZ = grabbedEdge.gameObject.transform.position.z;
-					float edgeScale = grabbedEdge.gameObject.transform.localScale.z;
+					float edgeScale = grabbedEdge.gameObject.transform.lossyScale.z;
 					float minBound = edgeZ - edgeScale * .5f;
 					float maxBound = edgeZ + edgeScale * .5f;
 					if (!(minBound <= newZ && newZ <= maxBound))

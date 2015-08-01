@@ -63,7 +63,7 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
 		InputManager.instance.LeanRightPressedEvent += HandleLeanRightPressed;
 		InputManager.instance.LeanLeftReleasedEvent += HandleLeanLeftReleased;
 		InputManager.instance.LeanRightReleasedEvent += HandleLeanRightReleased;
-		InputManager.instance.BackwardMovementEvent += HandleBackwardMovement;
+		//InputManager.instance.BackwardMovementEvent += HandleBackwardMovement;
 		InputManager.instance.ForwardMovementEvent += HandleForwardMovement;
 
 		// Register to switch state to proper gameplay when shift is complete
