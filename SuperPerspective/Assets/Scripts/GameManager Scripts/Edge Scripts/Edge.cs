@@ -51,9 +51,10 @@ public class Edge : MonoBehaviour {
 	float edgeFactor = .5f;//factor by which top check is smaller
 	
 	public void FixedUpdate(){
-		
 		if(!init)
 			return;
+		 	updateCuboid();
+		
 		bool playerCanGrab = player.isFalling() && (player.is3D() || validIn2D);
 		//if locked on
 		if(status >= 2){
@@ -150,19 +151,20 @@ public class Edge : MonoBehaviour {
 	//args2: depth of terrain
 	//args3: bool[] showing overlapping terrains
 	//args4: how many of the terrains have been checked
-	public void Init(int or, float width, float depth, int overlapIndex, string edgeIndex){
+	public void Init(int or, float width, float depth, int overlapIndex, string edgeIndex, Transform parent){
 		//set index
 		this.edgeIndex = edgeIndex;
 		//set parent
-		transform.parent = EdgeManager.instance.transform;
+		transform.parent = parent;
 		//set player variable
 		player = PlayerController.instance;
 		//scale
 		Vector3 scale = gameObject.transform.localScale;
+		Vector3 parScale = parent.transform.lossyScale;
 		if(or%2 == 0)//if left or right
-			scale.z = depth;
+			scale.z = depth / parScale.z;
 		else//if front or back
-			scale.x = width;
+			scale.x = width / parScale.x;
 		
 		gameObject.transform.localScale = scale;
 
@@ -176,17 +178,16 @@ public class Edge : MonoBehaviour {
 		//checkOverlaps();
 
 		//init cubiod
-		Vector3 halfScale = gameObject.transform.localScale * .5f;
+		
 		cuboid = new Vector3[2];
-		cuboid[0] = gameObject.transform.position - halfScale;
-		cuboid[1] = gameObject.transform.position + halfScale;
+		updateCuboid();
 		
 		//initialization has been completed
 		init = true;
 	}
 
-	public void Init(int or, float width, float depth, string edgeIndex){
-		Init(or, width, depth, 0, edgeIndex);
+	public void Init(int or, float width, float depth, string edgeIndex, Transform transform){
+		Init(or, width, depth, 0, edgeIndex, transform);
 	}
 
 	bool SpaceAboveFree(){
@@ -234,7 +235,15 @@ public class Edge : MonoBehaviour {
 		return true;
 	}
 	
-	
+	void updateCuboid(){
+		Vector3 parScale = gameObject.transform.parent.transform.lossyScale;
+		Vector3 halfScale = gameObject.transform.localScale * .5f;
+		halfScale.x *= parScale.x;
+		halfScale.y *= parScale.y;
+		halfScale.z *= parScale.z;
+		cuboid[0] = gameObject.transform.position - halfScale;
+		cuboid[1] = gameObject.transform.position + halfScale;
+	}
 	
 	public void checkOverlaps(){
 		//reference to terrain in edgemanager

@@ -11,6 +11,8 @@ public class EdgeManager : MonoBehaviour {
 
 	int index = 0;
 	
+	bool generated = false;
+	
 	void Start () {
 		//sigleton
 		if(instance == null)
@@ -21,11 +23,14 @@ public class EdgeManager : MonoBehaviour {
 		//init terrain
 		terrain = GameObject.FindGameObjectsWithTag("Terrain");
 
-		//generate edges
-		if(terrain != null)
-			GenerateEdges();
 	}
 
+	void FixedUpdate(){
+		//generate edges
+		if(terrain != null && generated == false)
+			GenerateEdges();
+	}
+	
 	public void GenerateEdges(){
 		float xx = edgePrefab.transform.lossyScale.x;
 		float yy = edgePrefab.transform.lossyScale.y;
@@ -42,10 +47,21 @@ public class EdgeManager : MonoBehaviour {
 			Vector3 boxSize = terrain[i].GetComponent<LevelGeometry>().getTrueBoxColliderSize();
 			Vector3 boxCenter = terrain[i].GetComponent<LevelGeometry>().getTrueBoxColliderCenter();
 			
-			float w = terrain[i].transform.lossyScale.x * boxSize.x + xx;
-			float d = terrain[i].transform.lossyScale.z * boxSize.z + zz;
-			float h = terrain[i].transform.lossyScale.y * boxSize.y - yy;
+			float w = terrain[i].transform.lossyScale.x * boxSize.x;
+			float d = terrain[i].transform.lossyScale.z * boxSize.z;
+			float h = terrain[i].transform.lossyScale.y * boxSize.y;
 			
+			int orOffset = (int)Mathf.Round((float)(terrain[i].transform.rotation.eulerAngles.y / 90.0));
+			if(orOffset % 2 == 1){
+				float t = w;
+				w = d;
+				d = t;
+			}
+			
+			w+=xx;
+			d+=zz;
+			h-=yy;
+	
 			Vector3 transformScale = terrain[i].transform.lossyScale;
 			
 			Vector3 center = 
@@ -60,13 +76,19 @@ public class EdgeManager : MonoBehaviour {
 			GameObject leftEdge = Instantiate(edgePrefab, top + w * posLeft, Quaternion.identity) as GameObject;
 			GameObject frontEdge = Instantiate(edgePrefab, top + d * posFront, Quaternion.identity) as GameObject;
 			
-			rightEdge.GetComponent<Edge>().Init( 0, w - xx, d - zz, "orig_"+index);
-			backEdge.GetComponent<Edge>().Init( 1, w - xx, d - zz, "orig_"+(index+1));
-			leftEdge.GetComponent<Edge>().Init( 2, w - xx, d - zz, "orig_"+(index+2));
-			frontEdge.GetComponent<Edge>().Init( 3, w - xx, d - zz, "orig_"+(index+3));
+			rightEdge.GetComponent<Edge>().Init(0, w - xx, d - zz, 
+				"orig_"+index,terrain[i].transform);
+			backEdge.GetComponent<Edge>().Init(1, w - xx, d - zz, 
+				"orig_"+(index+1),terrain[i].transform);
+			leftEdge.GetComponent<Edge>().Init(2, w - xx, d - zz, 
+				"orig_"+(index+2),terrain[i].transform);
+			frontEdge.GetComponent<Edge>().Init(3, w - xx, d - zz, 
+				"orig_"+(index+3),terrain[i].transform);
 						
 			index += 4;
 		}
+		
+		generated = true;
 	}
 
 	//check if terrain i overlaps with arbitrary cuboid
