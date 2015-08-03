@@ -358,6 +358,10 @@ Prefab:
       propertyPath: m_LocalScale.y
       value: 4
       objectReference: {fileID: 0}
+    - target: {fileID: 167840, guid: 394da313d60456149a3d364c9bb7f7be, type: 2}
+      propertyPath: m_TagString
+      value: Terrain
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 394da313d60456149a3d364c9bb7f7be, type: 2}
   m_IsPrefabParent: 0
@@ -705,6 +709,10 @@ Prefab:
     - target: {fileID: 167840, guid: 394da313d60456149a3d364c9bb7f7be, type: 2}
       propertyPath: m_Name
       value: Tall Block (6)
+      objectReference: {fileID: 0}
+    - target: {fileID: 167840, guid: 394da313d60456149a3d364c9bb7f7be, type: 2}
+      propertyPath: m_TagString
+      value: Terrain
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 394da313d60456149a3d364c9bb7f7be, type: 2}
@@ -1224,6 +1232,10 @@ Prefab:
       propertyPath: m_LocalScale.y
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 167840, guid: 394da313d60456149a3d364c9bb7f7be, type: 2}
+      propertyPath: m_TagString
+      value: Terrain
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 394da313d60456149a3d364c9bb7f7be, type: 2}
   m_IsPrefabParent: 0
@@ -1730,6 +1742,10 @@ Prefab:
       propertyPath: m_LocalScale.y
       value: 6
       objectReference: {fileID: 0}
+    - target: {fileID: 167840, guid: 394da313d60456149a3d364c9bb7f7be, type: 2}
+      propertyPath: m_TagString
+      value: Terrain
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 394da313d60456149a3d364c9bb7f7be, type: 2}
   m_IsPrefabParent: 0
@@ -2029,6 +2045,10 @@ Prefab:
     - target: {fileID: 433692, guid: 394da313d60456149a3d364c9bb7f7be, type: 2}
       propertyPath: m_LocalScale.y
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 167840, guid: 394da313d60456149a3d364c9bb7f7be, type: 2}
+      propertyPath: m_TagString
+      value: Terrain
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 394da313d60456149a3d364c9bb7f7be, type: 2}
@@ -2424,6 +2444,10 @@ Prefab:
       propertyPath: m_Name
       value: Tall Block (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 167840, guid: 394da313d60456149a3d364c9bb7f7be, type: 2}
+      propertyPath: m_TagString
+      value: Terrain
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 394da313d60456149a3d364c9bb7f7be, type: 2}
   m_IsPrefabParent: 0
@@ -2735,6 +2759,10 @@ Prefab:
     - target: {fileID: 433692, guid: 394da313d60456149a3d364c9bb7f7be, type: 2}
       propertyPath: m_LocalScale.x
       value: 6.2630105
+      objectReference: {fileID: 0}
+    - target: {fileID: 167840, guid: 394da313d60456149a3d364c9bb7f7be, type: 2}
+      propertyPath: m_TagString
+      value: Terrain
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 394da313d60456149a3d364c9bb7f7be, type: 2}
@@ -3339,6 +3367,10 @@ Prefab:
       propertyPath: m_LocalScale.z
       value: 5
       objectReference: {fileID: 0}
+    - target: {fileID: 167840, guid: 394da313d60456149a3d364c9bb7f7be, type: 2}
+      propertyPath: m_TagString
+      value: Terrain
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 394da313d60456149a3d364c9bb7f7be, type: 2}
   m_IsPrefabParent: 0
@@ -3609,6 +3641,10 @@ Prefab:
     - target: {fileID: 167840, guid: 394da313d60456149a3d364c9bb7f7be, type: 2}
       propertyPath: m_Name
       value: Tall Block (5)
+      objectReference: {fileID: 0}
+    - target: {fileID: 167840, guid: 394da313d60456149a3d364c9bb7f7be, type: 2}
+      propertyPath: m_TagString
+      value: Terrain
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 394da313d60456149a3d364c9bb7f7be, type: 2}
@@ -4150,6 +4186,10 @@ Prefab:
       propertyPath: m_LocalScale.z
       value: 5
       objectReference: {fileID: 0}
+    - target: {fileID: 167840, guid: 394da313d60456149a3d364c9bb7f7be, type: 2}
+      propertyPath: m_TagString
+      value: Terrain
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 394da313d60456149a3d364c9bb7f7be, type: 2}
   m_IsPrefabParent: 0
@@ -4265,6 +4305,10 @@ Prefab:
     - target: {fileID: 433692, guid: 394da313d60456149a3d364c9bb7f7be, type: 2}
       propertyPath: m_LocalScale.y
       value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 167840, guid: 394da313d60456149a3d364c9bb7f7be, type: 2}
+      propertyPath: m_TagString
+      value: Terrain
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 394da313d60456149a3d364c9bb7f7be, type: 2}
