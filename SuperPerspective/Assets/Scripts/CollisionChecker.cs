@@ -15,6 +15,16 @@ public class CollisionChecker {
 		colliderDepth = col.bounds.size.z;
 	}
 	
+	public RaycastHit[] CheckCollisionOnAxis(char axis, Vector3 velocity, float Margin){
+		switch(axis){
+			case 'X': return CheckXCollision(velocity, Margin);
+			case 'Y': return CheckYCollision(velocity, Margin);
+			case 'Z': return CheckZCollision(velocity, Margin);
+			default:
+				throw new System.ArgumentException("Invalid Axis Character");
+		}
+	}
+	
 	public RaycastHit[] CheckXCollision(Vector3 velocity, float Margin) {
 		colliderWidth = col.bounds.max.x - col.bounds.min.x;
 		Vector3[] startPoints = new Vector3[5];

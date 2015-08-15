@@ -300,7 +300,7 @@ public class PlayerController : PhysicalObject
 					orientation = Mathf.Rad2Deg * Mathf.Atan2(-velocity.z, velocity.x) + 90;
 				}else if(edgeState >= 2){
 					orientation = (-1 - grabbedEdge.getOrientation()) * 90;
-				}				
+				}
 				model.transform.rotation = Quaternion.AngleAxis(orientation, Vector3.up);
 			
 				// ------------------------------------------------------------------------------------------------------
@@ -312,21 +312,26 @@ public class PlayerController : PhysicalObject
 				else if(animEdgeState == 3){
 						if(Mathf.Abs(velocity.z) < 0.1 && Mathf.Abs(velocity.x) < 0.1)
 							anim.SetInteger("EdgeState", edgeState);
-				}else if(!anim.GetCurrentAnimatorStateInfo(0).IsName("HangBegin") && !anim.GetCurrentAnimatorStateInfo(0).IsName("HangShimmying"))
+				}else if(!anim.GetCurrentAnimatorStateInfo(0).IsName("HangBegin") && !anim.GetCurrentAnimatorStateInfo(0).IsName("HangShimmying")){
 					anim.SetInteger("EdgeState", edgeState);
 				}
-						
-
-            // ------------------------------------------------------------------------------------------------------
-            // COLLISION CHECKING
-            // ------------------------------------------------------------------------------------------------------
-            //CheckCollisions();
+			}
     }
 
 	public void CheckCollisions(){
+		CheckCollisionsOnAxis('Y');
+		pushFlag = false;
+		CheckCollisionsOnAxis('X');
+		CheckCollisionsOnAxis('Z');
+	}
+	
+	void CheckCollisionsOnAxis(char axis){
+		int axisIndex = getAxisIndex(axis);
+		Vector3 axisVector = getAxisVector(axis);
+		
 		Vector3 trajectory;
 
-		RaycastHit[] hits = colCheck.CheckYCollision (velocity, Margin);
+		RaycastHit[] hits = colCheck.CheckCollisionOnAxis(axis,velocity, Margin);
 
 		float close = -1;
 		for (int i = 0; i < hits.Length; i++) {
@@ -334,95 +339,85 @@ public class PlayerController : PhysicalObject
 			if (hitInfo.collider != null)
 			{
 				if (hitInfo.collider.gameObject.tag == "Intangible") {
-					trajectory = velocity.y * Vector3.up;
+					trajectory = velocity[axisIndex] * axisVector;
 					CollideWithObject(hitInfo, trajectory);
 				} else if (close == -1 || close > hitInfo.distance) {
 					close = hitInfo.distance;
-					if (velocity.y < 0) {
-						grounded = true;
-						falling = false;
-						canJump = true;
+					if(axis == 'Y'){
+						if (velocity.y < 0) {
+							grounded = true;
+							falling = false;
+							canJump = true;
+						}
+						// Z-lock
+						if (hitInfo.collider.gameObject.GetComponent<LevelGeometry>())
+							zlock = hitInfo.transform.position.z;
+						else
+							zlock = int.MinValue;
+					}else{
+						transform.Translate(
+							axisVector * 
+							Mathf.Sign(velocity[axisIndex]) * 
+							(hitInfo.distance - getDimensionAlongAxis(axis) / 2)
+						);
 					}
-					// Z-lock
-					if (hitInfo.collider.gameObject.GetComponent<LevelGeometry>())
-						zlock = hitInfo.transform.position.z;
-					else
-						zlock = int.MinValue;
-					trajectory = velocity.y * Vector3.up;
+					trajectory = velocity[axisIndex] * axisVector;
 					CollideWithObject(hitInfo, trajectory);
 				}
 			}
 		}
-		if (close == -1) {
-			grounded = false;
-		} else {
-			if (!bounced) {
-				transform.Translate(Vector3.up * Mathf.Sign(velocity.y) * (close - colliderHeight / 2));
-				velocity = new Vector3(velocity.x, 0f, velocity.z);
-			} else {
-				bounced = false;
-			}
-		}
-
-		// Third check the player's velocity along the X axis and check for collisions in that direction is non-zero
-
-		// If any rays connected move the player and set grounded to true since we're now on the ground
-		pushFlag = false;
-
-		hits = colCheck.CheckXCollision (velocity, Margin);
-
-		close = -1;
-		for (int i = 0; i < hits.Length; i++) {
-			RaycastHit hitInfo = hits[i];
-			if (hitInfo.collider != null)
-			{
-				if (hitInfo.collider.gameObject.tag == "Intangible") {
-					trajectory = velocity.x * Vector3.right;
-					CollideWithObject(hitInfo, trajectory);
-				} else if (close == -1 || close > hitInfo.distance) {
-					close = hitInfo.distance;
-					transform.Translate(Vector3.right * Mathf.Sign(velocity.x) * (hitInfo.distance - colliderWidth / 2));
-					trajectory = velocity.x * Vector3.right;
-					CollideWithObject(hitInfo, trajectory);
-				}
-			}
-		}
-		if (close != -1) {
-			if (!pushFlag) {
-				velocity = new Vector3(0f, velocity.y, velocity.z);
-			}
-		}
-
 		
-		// Fourth do the same along the Z axis  
-
-		// If any rays connected move the player and set grounded to true since we're now on the ground
-		hits = colCheck.CheckZCollision (velocity, Margin);
-
-		close = -1;
-		for (int i = 0; i < hits.Length; i++) {
-			RaycastHit hitInfo = hits[i];
-			if (hitInfo.collider != null)
-			{
-				if (hitInfo.collider.gameObject.tag == "Intangible") {
-					trajectory = velocity.z * Vector3.forward;
-					CollideWithObject(hitInfo, trajectory);
-				} else if (close == -1 || close > hitInfo.distance) {
-					close = hitInfo.distance;
-					transform.Translate(Vector3.forward * Mathf.Sign(velocity.z) * (hitInfo.distance - colliderDepth / 2));
-					trajectory = velocity.z * Vector3.forward;
-					CollideWithObject(hitInfo, trajectory);
-				}
-			}
-		}
 		if (close != -1) {
-			if (!pushFlag) {
-				velocity = new Vector3(velocity.x, velocity.y, 0f);
+			if(axis == 'Y'){
+				if (!bounced) {
+					transform.Translate(
+						axisVector * 
+						Mathf.Sign(velocity[axisIndex]) * 
+						(close - getDimensionAlongAxis(axis) / 2)
+					);
+					velocity[axisIndex] = 0f;
+				} else {
+					bounced = false;
+				}
+			}else{
+				if(!pushFlag) velocity[axisIndex] = 0f;
 			}
+		} else if(axis == 'Y'){
+			grounded = false;
 		}
-
 	}
-
+	
+	//Convenience Methods for Axis calculations
+	private int getAxisIndex(char axis){
+		switch(axis){
+			case 'X': return 0;
+			case 'Y': return 1;
+			case 'Z': return 2;
+			default:
+				throw new System.ArgumentException("Invalid Axis Character");
+		}
+	}
+	
+	Vector3 getAxisVector(char axis){
+		switch(axis){
+			case 'X': return Vector3.right;
+			case 'Y': return Vector3.up;
+			case 'Z': return Vector3.forward;
+			default:
+				throw new System.ArgumentException("Invalid Axis Character");
+		}
+	}
+	
+	float getDimensionAlongAxis(char axis){
+		switch(axis){
+			case 'X': return colliderWidth;
+			case 'Y': return colliderHeight;
+			case 'Z': return colliderDepth;
+			default:
+				throw new System.ArgumentException("Invalid Axis Character");
+		}
+	}
+	
 	// LateUpdate is used to actually move the position of the player
 	void LateUpdate () {
 		if (!_paused) {
