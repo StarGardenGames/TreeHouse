@@ -38,6 +38,7 @@ public class PlayerController : PhysicalObject
 	// Raycasting Variables
 	public int verticalRays = 8;
 	float Margin = 0.05f;
+	float verticalOverlapThreshhold = .3f;
 
 	private Rect box;
 	private float colliderHeight;
@@ -70,7 +71,7 @@ public class PlayerController : PhysicalObject
 	bool climbing = false;
 	
    #endregion
-
+	
 	//setup singleton
 	void Awake(){
 		if(instance == null)
@@ -318,6 +319,8 @@ public class PlayerController : PhysicalObject
 			}
     }
 
+	#region Collisions
+	 
 	public void CheckCollisions(){
 		CheckCollisionsOnAxis('Y');
 		pushFlag = false;
@@ -338,6 +341,15 @@ public class PlayerController : PhysicalObject
 			RaycastHit hitInfo = hits[i];
 			if (hitInfo.collider != null)
 			{
+				if(axis != 'Y'){
+					float verticalOverlap = getVerticalOverlap(hitInfo);
+					bool significantVerticalOverlap = 
+						verticalOverlap > verticalOverlapThreshhold;
+					if(!significantVerticalOverlap){
+						transform.Translate(new Vector3(0f,verticalOverlap,0f));
+						continue;
+					}
+				}
 				if (hitInfo.collider.gameObject.tag == "Intangible") {
 					trajectory = velocity[axisIndex] * axisVector;
 					CollideWithObject(hitInfo, trajectory);
@@ -417,6 +429,62 @@ public class PlayerController : PhysicalObject
 				throw new System.ArgumentException("Invalid Axis Character");
 		}
 	}
+	
+	float getDimensionAlongAxis(Vector3 axis){
+		Vector3 norm = axis.normalized;
+		if(Mathf.Abs(norm.x) == 1) return colliderWidth;
+		if(Mathf.Abs(norm.y) == 1) return colliderHeight;
+		if(Mathf.Abs(norm.z) == 1) return colliderDepth;
+		throw new System.ArgumentException("Input Vector must only have values along one axis");
+	}
+	
+	//Methods related to Insignificant Ovelap Adjustments
+	private float getVerticalOverlap(RaycastHit hitInfo){
+		Collider hitCollider = hitInfo.collider;
+		float hitColliderHeight = hitCollider.bounds.max.y - hitCollider.bounds.min.y;
+		float myBottomY = GetComponent<Collider>().bounds.min.y;
+		float hitTopY = hitCollider.bounds.max.y;
+		float overlap = hitTopY - myBottomY;
+		return overlap;
+	}
+	
+	//Checks Type of Object and collides accordingly
+	private void CollideWithObject(RaycastHit hitInfo, Vector3 trajectory) {
+		GameObject other = hitInfo.collider.gameObject;
+		float colliderDim = 0;
+		if (trajectory.normalized == Vector3.up || trajectory.normalized == Vector3.down)
+			colliderDim = colliderHeight;
+		if (trajectory.normalized == Vector3.right || trajectory.normalized == Vector3.left)
+			colliderDim = colliderWidth;
+		if (trajectory.normalized == Vector3.forward || trajectory.normalized == Vector3.back)
+			colliderDim = colliderDepth;
+		// Bounce Pad
+		if (trajectory.normalized == Vector3.down && other.GetComponent<BouncePad>()) {
+			velocity.y = other.GetComponent<BouncePad>().GetBouncePower();
+			other.GetComponent<BouncePad>().Animate();
+			anim.SetTrigger("Jump");
+			bounced = true;
+		}
+		// Crate
+		if (trajectory.normalized != Vector3.down && trajectory.normalized != Vector3.zero && other.GetComponent<Crate>() && !other.GetComponent<Crate>().IsAxisBlocked(trajectory)) {
+			other.GetComponent<Crate>().SetVelocity((trajectory*0.75f).x, (trajectory*0.75f).z);
+			pushFlag = true;
+			if (crate == null && velocity != Vector3.zero)
+				anim.SetBool("Pushing", true);
+		} else if (crate == null) {
+			anim.SetBool("Pushing", false);
+		}
+		// PushSwitchOld
+		if (other.GetComponent<PushSwitchOld>() && colliderDim == colliderWidth) {
+			transform.Translate(0, 0.1f, 0);
+		}
+  		//Collision w/ PlayerInteractable
+		foreach (Interactable c in other.GetComponents<Interactable>()) {
+			c.EnterCollisionWithPlayer ();
+		}
+	}
+	
+	#endregion Collisions
 	
 	// LateUpdate is used to actually move the position of the player
 	void LateUpdate () {
@@ -516,58 +584,10 @@ public class PlayerController : PhysicalObject
 		return connected;
 	}
 	
-	private void CollideWithObject(RaycastHit hitInfo, Vector3 trajectory) {
-		GameObject other = hitInfo.collider.gameObject;
-		float colliderDim = 0;
-		if (trajectory.normalized == Vector3.up || trajectory.normalized == Vector3.down)
-			colliderDim = colliderHeight;
-		if (trajectory.normalized == Vector3.right || trajectory.normalized == Vector3.left)
-			colliderDim = colliderWidth;
-		if (trajectory.normalized == Vector3.forward || trajectory.normalized == Vector3.back)
-			colliderDim = colliderDepth;
-		// Bounce Pad
-		if (trajectory.normalized == Vector3.down && other.GetComponent<BouncePad>()) {
-			velocity.y = other.GetComponent<BouncePad>().GetBouncePower();
-			other.GetComponent<BouncePad>().Animate();
-			anim.SetTrigger("Jump");
-			bounced = true;
-		}
-		// Crate
-		if (trajectory.normalized != Vector3.down && trajectory.normalized != Vector3.zero && other.GetComponent<Crate>() && !other.GetComponent<Crate>().IsAxisBlocked(trajectory)) {
-			other.GetComponent<Crate>().SetVelocity((trajectory*0.75f).x, (trajectory*0.75f).z);
-			pushFlag = true;
-			if (crate == null && velocity != Vector3.zero)
-				anim.SetBool("Pushing", true);
-		} else if (crate == null) {
-			anim.SetBool("Pushing", false);
-		}
-		if (other.GetComponent<PushSwitchOld>() && colliderDim == colliderWidth) {
-			transform.Translate(0, 0.1f, 0);
-		}
-  		//Collision w/ PlayerInteractable
-		foreach (Interactable c in other.GetComponents<Interactable>()) {
-			c.EnterCollisionWithPlayer ();
-		}
-	}
-
 	public void Flip() {
 		DoZLock();
 	}
 
-	public void Grab(Crate crate) {
-		this.crate = crate;
-		if (crate == null)
-			return;
-		if (GameStateManager.instance.currentPerspective == PerspectiveType.p2D || Mathf.Abs (crate.transform.position.x - transform.position.x) > Mathf.Abs (crate.transform.position.z - transform.position.z)) {
-			grabAxis = Vector3.right * Mathf.Sign(crate.transform.position.x - transform.position.x);
-		} else {
-			grabAxis = Vector3.forward * Mathf.Sign(crate.transform.position.z - transform.position.z);
-		}
-	}
-
-	public Vector3[] getCuboid(){
-		return cuboid;
-	}
 
 	#region EdgeGrabbing
 		
@@ -615,10 +635,26 @@ public class PlayerController : PhysicalObject
 		}
 	}
 	
+	public void Grab(Crate crate) {
+		this.crate = crate;
+		if (crate == null)
+			return;
+		if (GameStateManager.instance.currentPerspective == PerspectiveType.p2D || Mathf.Abs (crate.transform.position.x - transform.position.x) > Mathf.Abs (crate.transform.position.z - transform.position.z)) {
+			grabAxis = Vector3.right * Mathf.Sign(crate.transform.position.x - transform.position.x);
+		} else {
+			grabAxis = Vector3.forward * Mathf.Sign(crate.transform.position.z - transform.position.z);
+		}
+	}
+	
 	#endregion EdgeGrabbing
 
+	#region Accessor Methods
 	public bool is3D(){
 		return GameStateManager.instance.currentPerspective== PerspectiveType.p3D;
+	}
+	
+	public Vector3[] getCuboid(){
+		return cuboid;
 	}
 	
 	public float getOrientation(){
@@ -634,6 +670,8 @@ public class PlayerController : PhysicalObject
 		return velocity;
 	}
 
+	#endregion Accessor Methods
+	
 	private void OnPauseGame(bool p)
 	{
 	  _paused = p;
