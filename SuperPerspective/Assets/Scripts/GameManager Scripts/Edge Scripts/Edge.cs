@@ -13,27 +13,25 @@ public class Edge : MonoBehaviour {
 
 	byte status = 0; //0: no overlap, 1: lined up, 2: latched, 3: rested latch
 
-	bool validIn2D = true;
-
 	PlayerController player;
 	
 	bool init = false;//indicates whether Edge has been initiated
 	
 	bool playerAboveEdge = false;
 	
-	public string edgeIndex = "n/a";
+	bool rotatedTerrain = false;
+	
+	public int edgeIndex = 0;
 
 	float hangThresh = 35;//time to wait till player can climb
 	float hangCounter = 0.0f;
-	
-	float edgeFactor = .5f;//factor by which top check is smaller
 	
 	public void FixedUpdate(){
 		if(!init)
 			return;
 		updateCuboid();
 		
-		bool playerCanGrab = player.isFalling() && (player.is3D() || validIn2D);
+		bool playerCanGrab = player.isFalling();
 		//if locked on
 		if(status >= 2){
 			//check if rested latch can be entered
@@ -84,12 +82,6 @@ public class Edge : MonoBehaviour {
 			status = 0;
 			player.UpdateEdgeState(this, status);
 		}
-
-		//check for making the player let go
-		if(status != 0 && !player.is3D() && !validIn2D){
-			status = 0;
-			player.UpdateEdgeState(this, status);
-		}	
 	}
 
 	public bool GrabButtonDown(){
@@ -128,17 +120,14 @@ public class Edge : MonoBehaviour {
 	//args2: depth of terrain
 	//args3: bool[] showing overlapping terrains
 	//args4: how many of the terrains have been checked
-	public void Init(int or, float width, float depth, int overlapIndex, string edgeIndex, Transform parent){
-		//set index
+	public void Init(int or, float width, float depth, int overlapIndex, int edgeIndex, Transform parent, 
+		bool rotatedTerrain){
 		this.edgeIndex = edgeIndex;
-		//set parent
 		transform.parent = parent;
-		//set player variable
 		player = PlayerController.instance;
-		//orientation
-		this.or = or;
-		//overlapIndex
+		this.or = or; //orientation
 		this.overlapIndex = overlapIndex;
+		this.rotatedTerrain = rotatedTerrain;
 		
 		updateDimensions(or,width,depth);
 		
@@ -151,8 +140,8 @@ public class Edge : MonoBehaviour {
 		init = true;
 	}
 
-	public void Init(int or, float width, float depth, string edgeIndex, Transform transform){
-		Init(or, width, depth, 0, edgeIndex, transform);
+	public void Init(int or, float width, float depth, int edgeIndex, Transform transform, bool rotatedTerrain){
+		Init(or, width, depth, 0, edgeIndex, transform, rotatedTerrain);
 	}
 
 	bool SpaceAboveFree(){
@@ -211,10 +200,21 @@ public class Edge : MonoBehaviour {
 		cuboid[1] = gameObject.transform.position + halfScale;
 	}
 	
+	private void updateDimensions(int or, float width, float depth){
+		Vector3 scale = gameObject.transform.localScale;
+		Vector3 parScale = findAdjustedParentScale();
+		
+		if(or%2 == 0)//if left or right
+			scale.z = depth / parScale.z;
+		else//if front or back
+			scale.x = width / parScale.x;
+		gameObject.transform.localScale = scale;
+	}
+	
 	private void shortenSides(){
 		Vector3 lossyScale = gameObject.transform.lossyScale;
 		Vector3 localScale = gameObject.transform.localScale;
-		Vector3 parentScale = gameObject.transform.parent.lossyScale;
+		Vector3 parentScale = findAdjustedParentScale();
 		if(or%2==0){//left/right
 			if(lossyScale.z >= 1)
 				localScale.z -= 1f / parentScale.z;
@@ -229,16 +229,16 @@ public class Edge : MonoBehaviour {
 		gameObject.transform.localScale = localScale;
 	}
 
-	private void updateDimensions(int or, float width, float depth){
-		Vector3 scale = gameObject.transform.localScale;
-		Vector3 parScale = transform.parent.lossyScale;
-		if(or%2 == 0)//if left or right
-			scale.z = depth / parScale.z;
-		else//if front or back
-			scale.x = width / parScale.x;
-		
-		gameObject.transform.localScale = scale;
+	private Vector3 findAdjustedParentScale(){
+		Vector3 parScale = gameObject.transform.parent.lossyScale;
+		if(rotatedTerrain){
+			float t = parScale.x;
+			parScale.x = parScale.z;
+			parScale.z = t;
+		}
+		return parScale;
 	}
+	
 	
 	public void resetStatus(){
 		status = 0;

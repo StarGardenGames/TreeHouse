@@ -31,68 +31,82 @@ public class EdgeManager : MonoBehaviour {
 			GenerateEdges();
 	}
 	
-	public void GenerateEdges(){
-		Vector3 edgeScale = edgePrefab.transform.lossyScale;
-		
-		Vector3 posBack = new Vector3 (0, 0, .5f);
-		Vector3 posLeft = new Vector3 (-.5f, 0, 0);
-		Vector3 posRight = new Vector3 (.5f,0,0);
-		Vector3 posFront = new Vector3 (0, 0, -.5f);
-
-		Vector3 posTop = new Vector3(0,.5f,0);
-
-		for(int i = 0; i < terrain.Length; i++){
-			Vector3 boxSize = terrain[i].GetComponent<LevelGeometry>().getTrueBoxColliderSize();
-			Vector3 boxCenter = terrain[i].GetComponent<LevelGeometry>().getTrueBoxColliderCenter();
+	public void GenerateEdges(){		
+		for(int i = 0; i < terrain.Length; i++){	
+			Vector3 trueEdgeScale = clone(edgePrefab.transform.lossyScale);
 			
-			Vector3 transformScale = terrain[i].transform.lossyScale;			
+			Vector3 trueTerrainScale = findTrueTerrainScale(terrain[i]);
 			
-			Vector3 trueEdgeScale = new Vector3(
-				edgeScale.x, edgeScale.y, edgeScale.z
-			);
-			
-			Vector3 trueTerrainScale = new Vector3(
-				boxSize.x * transformScale.x,
-				boxSize.y * transformScale.y,
-				boxSize.z * transformScale.z
-			);
-			
-			Vector3 trueTerrainCenter = 
-				(Vector3.right * boxCenter.x * transformScale.x) +
-				(Vector3.up * boxCenter.y * transformScale.y) +
-				(Vector3.forward * boxCenter.z * transformScale.z);
-			
-			int orOffset = (int)Mathf.Round((float)(terrain[i].transform.rotation.eulerAngles.y / 90.0));
-			if(orOffset % 2 == 1){
+			if(isTerrainOnRotatedQuadrant(terrain[i])){
 				trueEdgeScale = flipXZ(trueEdgeScale);
 				trueTerrainScale = flipXZ(trueTerrainScale);
-				trueTerrainCenter = flipXZ(trueTerrainCenter);
 			}
 			
-			if(index == 0 || index==4)Debug.Log(trueTerrainScale);
+			Vector3 topCenter = findTerrainTopCenterForEdge(terrain[i], trueTerrainScale, trueEdgeScale);
 			
-			Vector3 top = terrain[i].transform.position + trueTerrainCenter + (trueTerrainScale.y-trueEdgeScale.y) * posTop;
-			
-			GameObject rightEdge = Instantiate(edgePrefab, top + (trueTerrainScale.x+trueEdgeScale.x) * posRight, Quaternion.identity) as GameObject;
-			GameObject backEdge = Instantiate(edgePrefab, top + (trueTerrainScale.z+trueEdgeScale.z) * posBack, Quaternion.identity) as GameObject;
-			GameObject leftEdge = Instantiate(edgePrefab, top + (trueTerrainScale.x+trueEdgeScale.x) * posLeft, Quaternion.identity) as GameObject;
-			GameObject frontEdge = Instantiate(edgePrefab, top + (trueTerrainScale.z+trueEdgeScale.z) * posFront, Quaternion.identity) as GameObject;
-			
-			rightEdge.GetComponent<Edge>().Init(0, trueTerrainScale.x, trueTerrainScale.z, 
-				"orig_"+index,terrain[i].transform);
-			backEdge.GetComponent<Edge>().Init(1, trueTerrainScale.x, trueTerrainScale.z, 
-				"orig_"+(index+1),terrain[i].transform);
-			leftEdge.GetComponent<Edge>().Init(2, trueTerrainScale.x, trueTerrainScale.z,
-				"orig_"+(index+2),terrain[i].transform);
-			frontEdge.GetComponent<Edge>().Init(3, trueTerrainScale.x, trueTerrainScale.z, 
-				"orig_"+(index+3),terrain[i].transform);
-						
-			index += 4;
+			CreateEdgesAroundTerrain(terrain[i], topCenter, trueTerrainScale, trueEdgeScale);
 		}
 		
 		generated = true;
 	}
+	
+	private Vector3 clone(Vector3 original){
+		return new Vector3(original.x, original.y, original.z);
+	}
+	
+	private Vector3 findTrueTerrainScale(GameObject terrain){
+		Vector3 boxSize = terrain.GetComponent<LevelGeometry>().getTrueBoxColliderSize();
+		Vector3 transformScale = terrain.transform.lossyScale;	
+		return new Vector3(
+				boxSize.x * transformScale.x,
+				boxSize.y * transformScale.y,
+				boxSize.z * transformScale.z
+			);
+	}
+	
+	private Vector3 findTrueTerrainCenter(GameObject terrain){
+		Vector3 boxCenter = terrain.GetComponent<LevelGeometry>().getTrueBoxColliderCenter();
+		Vector3 transformScale = terrain.transform.lossyScale;	
+		
+		return 	(Vector3.right * boxCenter.x * transformScale.x) +
+					(Vector3.up * boxCenter.y * transformScale.y) +
+					(Vector3.forward * boxCenter.z * transformScale.z);
+	}
+	
+	private bool isTerrainOnRotatedQuadrant(GameObject terrain){
+		int quad = (int)Mathf.Round((float)(terrain.transform.rotation.eulerAngles.y / 90.0));
+		return quad % 2 == 1;
+	}
+	
+	private Vector3 findTerrainTopCenterForEdge(GameObject terrain, Vector3 terrainScale, 
+		Vector3 edgeScale){
+		return
+			terrain.transform.position + 
+			(terrainScale.y-edgeScale.y) * Vector3.up * .5f;
+	}
 
+	private void CreateEdgesAroundTerrain(GameObject terrain, Vector3 top, Vector3 terrainScale, Vector3 edgeScale){
+		CreateEdge(terrain, top, Vector3.right, (terrainScale+edgeScale).x * .5f, terrainScale);
+		CreateEdge(terrain, top, Vector3.forward, (terrainScale+edgeScale).z * .5f, terrainScale);
+		CreateEdge(terrain, top, Vector3.left, (terrainScale+edgeScale).x * .5f, terrainScale);
+		CreateEdge(terrain, top, Vector3.back, (terrainScale+edgeScale).z * .5f, terrainScale);
+	}
+	
+	private void CreateEdge(GameObject terrain, Vector3 top, Vector3 offsetDir, float offsetMag, Vector3 terrainScale){
+		GameObject edge = Instantiate(edgePrefab, top + offsetMag * offsetDir, Quaternion.identity) as GameObject;
+		
+		int or = 0;
+		if(offsetDir == Vector3.right) 	or = 0;
+		if(offsetDir == Vector3.forward) or = 1;
+		if(offsetDir == Vector3.left) 	or = 2;
+		if(offsetDir == Vector3.back) 	or = 3;
+		
+		edge.GetComponent<Edge>().Init(or, terrainScale.x, terrainScale.z, 
+			index,terrain.transform,isTerrainOnRotatedQuadrant(terrain));
+			
+		index++;
+	}
+	
 	//convenience method for flipping the x and z values in a Vector3
 	private Vector3 flipXZ(Vector3 input){
 		return new Vector3(
