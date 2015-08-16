@@ -4,6 +4,8 @@ using System.Collections;
 [RequireComponent(typeof(LineRenderer))]
 public class PlayerController : PhysicalObject
 {
+	public bool testClimbing;
+	
 	//suppress warnings
 	#pragma warning disable 1691,168,219,414
 
@@ -41,9 +43,9 @@ public class PlayerController : PhysicalObject
 	float verticalOverlapThreshhold = .3f;
 
 	private Rect box;
-	private float colliderHeight;
-	private float colliderWidth;
-	private float colliderDepth;
+	public float colliderHeight;
+	public float colliderWidth;
+	public float colliderDepth;
 
 	private CollisionChecker colCheck;
 
@@ -115,6 +117,8 @@ public class PlayerController : PhysicalObject
 
     void Update()
     {
+		 testClimbing = climbing;
+		 
         if (!_paused)
         {
             // See if the player is pressing the jump button this frame
@@ -169,8 +173,6 @@ public class PlayerController : PhysicalObject
                 DoZLock();
                 zlockFlag = false;
             }
-
-
 
             // ------------------------------------------------------------------------------------------------------
             // X-AXIS MOVEMENT VELOCITY CALCULATIONS
@@ -280,7 +282,7 @@ public class PlayerController : PhysicalObject
 
             velocity.z = newVelocityZ;
 
-            bool walking = edgeState != 2 && (Mathf.Abs(velocity.z) > 0.1 || Mathf.Abs(velocity.x) >= 0.1)/* && grounded*/;
+            bool walking = edgeState != 2 && (Mathf.Abs(velocity.z) > 0.1 || Mathf.Abs(velocity.x) >= 0.1);
 				bool shimmying = edgeState == 2 && ( Mathf.Abs(velocity.z) > 0.1 || Mathf.Abs(velocity.x) >= 0.1 );
             bool running = (Mathf.Abs(velocity.z) >= maxSpeed / 2 || Mathf.Abs(velocity.x) >= maxSpeed / 2);
             anim.SetBool("Walking", walking && !running && crate == null);
@@ -588,7 +590,6 @@ public class PlayerController : PhysicalObject
 		DoZLock();
 	}
 
-
 	#region EdgeGrabbing
 		
 	//This can only be called from self
@@ -616,8 +617,9 @@ public class PlayerController : PhysicalObject
 					}
 				}
 				//adjust animation state
-				if(animState!= -1)
+				if(animState!= -1){
 					anim.SetInteger("EdgeState", animState);
+				}
 				break;
 			case 1:
 				this.edgeState = 1;
@@ -629,7 +631,7 @@ public class PlayerController : PhysicalObject
 				velocity = Vector3.zero;
 				//lock y
 				Vector3 pos = gameObject.transform.position;
-				pos.y = e.gameObject.transform.position.y + (e.gameObject.transform.localScale.y * .5f) - (gameObject.transform.localScale.y * .5f);
+				pos.y = e.gameObject.transform.position.y + (e.gameObject.transform.lossyScale.y * .5f) - (colliderHeight * .5f);
 				gameObject.transform.position = pos;
 				break;
 		}
