@@ -343,54 +343,6 @@ public class PlayerController : PhysicalObject
 		RaycastHit[] hits = colCheck.CheckCollisionOnAxis(axis,velocity, Margin);
 
 		float close = -1;
-		bool gflag = false;
-		for (int i = 0; i < hits.Length; i++) {
-			RaycastHit hitInfo = hits[i];
-			if (hitInfo.collider != null)
-			{
-				if (hitInfo.collider.gameObject.tag == "Intangible") {
-					trajectory = velocity.y * Vector3.up;
-					CollideWithObject(hitInfo, trajectory);
-				} else if (close == -1 || close > hitInfo.distance) {
-					close = hitInfo.distance;
-					if (velocity.y < 0) {
-						gflag = true;
-						grounded = true;
-						falling = false;
-						canJump = true;
-						launched = 0;
-					}
-				}
-				if(axis != 'Y'){
-					float verticalOverlap = getVerticalOverlap(hitInfo);
-					bool significantVerticalOverlap = 
-						verticalOverlap > verticalOverlapThreshhold;
-					if(!significantVerticalOverlap){
-						transform.Translate(new Vector3(0f,verticalOverlap,0f));
-						continue;
-					}
-				}
-			}
-		}
-		if (!gflag) {
-			grounded = false;
-		} else {
-			if (!bounced) {
-				transform.Translate(Vector3.up * Mathf.Sign(velocity.y) * (close - colliderHeight / 2));
-				velocity = new Vector3(velocity.x, 0f, velocity.z);
-			} else {
-				bounced = false;
-			}
-		}
-
-		// Third check the player's velocity along the X axis and check for collisions in that direction is non-zero
-
-		// If any rays connected move the player and set grounded to true since we're now on the ground
-		pushFlag = false;
-
-		hits = colCheck.CheckXCollision (velocity, Margin);
-
-		close = -1;
 		for (int i = 0; i < hits.Length; i++) {
 			RaycastHit hitInfo = hits[i];
 			if (hitInfo.collider != null)
