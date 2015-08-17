@@ -59,6 +59,7 @@ public class PlayerController : PhysicalObject
 	private Crate crate = null;
 	private bool pushFlag = false;
 	private Vector3 grabAxis = Vector3.zero;
+	private int launched;
 
 	//direction of player
 	private float orientation = 0;
@@ -134,13 +135,13 @@ public class PlayerController : PhysicalObject
             //      even if they pressed the jump button while in midair if they were close enough to the ground
             if ((grounded || edgeState == 2) && Time.time - jumpPressedTime < jumpMargin && crate == null)
             {
-					anim.SetTrigger("Jump");
-					grounded = false;
-					velocity = new Vector3(velocity.x, jump, velocity.z);
-					jumpPressedTime = 0;
-					ReleaseEdge();
-					//update edgeState for animation
-					anim.SetInteger("EdgeState", 6);
+				anim.SetTrigger("Jump");
+				grounded = false;
+				velocity = new Vector3(velocity.x, jump, velocity.z);
+				jumpPressedTime = 0;
+				ReleaseEdge();
+				//update edgeState for animation
+				anim.SetInteger("EdgeState", 6);
             }
 
             lastInput = input;
@@ -179,12 +180,12 @@ public class PlayerController : PhysicalObject
             if (edgeState != 2 && !climbing)
             {
                 float xAxis = InputManager.instance.GetForwardMovement();
-                if (xAxis != 0)
+                if (xAxis != 0 && launched == 0)
                 {
                     newVelocityX += acceleration * Mathf.Sign(xAxis);
                     newVelocityX = Mathf.Clamp(newVelocityX, -maxSpeed * Mathf.Abs(xAxis), maxSpeed * Mathf.Abs(xAxis));
                 }
-                else if (velocity.x != 0)
+                else if (velocity.x != 0 && launched == 0)
                 {
                     int modifier = velocity.x > 0 ? -1 : 1;
                     newVelocityX += Mathf.Min(decelleration, Mathf.Abs(velocity.x)) * modifier;
@@ -226,6 +227,9 @@ public class PlayerController : PhysicalObject
 
             velocity.x = newVelocityX;
 
+			if (launched > 0)
+				launched--;
+
             // ------------------------------------------------------------------------------------------------------
             // Z-AXIS MOVEMENT VELOCITY CALCULATIONS
             // ------------------------------------------------------------------------------------------------------
@@ -235,12 +239,12 @@ public class PlayerController : PhysicalObject
             {
                 float zAxis = -InputManager.instance.GetSideMovement();
 
-                if (zAxis != 0)
+                if (zAxis != 0 && launched == 0)
                 {
                     newVelocityZ += acceleration * Mathf.Sign(zAxis);
                     newVelocityZ = Mathf.Clamp(newVelocityZ, -maxSpeed * Mathf.Abs(zAxis), maxSpeed * Mathf.Abs(zAxis));
                 }
-                else if (velocity.z != 0)
+				else if (velocity.z != 0 && launched == 0)
                 {
                     int modifier = velocity.z > 0 ? -1 : 1;
                     newVelocityZ += Mathf.Min(decelleration, Mathf.Abs(velocity.z)) * modifier;
@@ -329,6 +333,7 @@ public class PlayerController : PhysicalObject
 		RaycastHit[] hits = colCheck.CheckYCollision (velocity, Margin);
 
 		float close = -1;
+		bool gflag = false;
 		for (int i = 0; i < hits.Length; i++) {
 			RaycastHit hitInfo = hits[i];
 			if (hitInfo.collider != null)
@@ -339,9 +344,11 @@ public class PlayerController : PhysicalObject
 				} else if (close == -1 || close > hitInfo.distance) {
 					close = hitInfo.distance;
 					if (velocity.y < 0) {
+						gflag = true;
 						grounded = true;
 						falling = false;
 						canJump = true;
+						launched = 0;
 					}
 					// Z-lock
 					if (hitInfo.collider.gameObject.GetComponent<LevelGeometry>())
@@ -353,7 +360,7 @@ public class PlayerController : PhysicalObject
 				}
 			}
 		}
-		if (close == -1) {
+		if (!gflag) {
 			grounded = false;
 		} else {
 			if (!bounced) {
@@ -423,6 +430,44 @@ public class PlayerController : PhysicalObject
 
 	}
 
+	public void Reset() {
+		base.Init();
+		// Set player as falling 
+		// TODO: Since the player often falls through the ground we should cast a ray down and immediately place then on the ground.
+		grounded = false;
+		falling = true;
+		canJump = false;
+		lastInput = false;
+		
+		// Initialize the layer mask
+		layerMask = LayerMask.NameToLayer("normalCollisions");
+		
+		// Get the collider dimensions to use for raycasting
+		colliderHeight = GetComponent<Collider>().bounds.max.y - GetComponent<Collider>().bounds.min.y;
+		colliderWidth = GetComponent<Collider>().bounds.max.x - GetComponent<Collider>().bounds.min.x;
+		colliderDepth = GetComponent<Collider>().bounds.max.z - GetComponent<Collider>().bounds.min.z;
+		
+		//Register Flip method to the shift event
+		//GameStateManager.instance.PerspectiveShiftSuccessEvent += Flip;
+		
+		anim = GetComponentInChildren<Animator>();
+		model = anim.gameObject;
+		
+		//cuboid
+		cuboid = new Vector3[2];
+		
+		colCheck = new CollisionChecker(GetComponent<Collider> ());
+
+		verticalRays = 8;
+		Margin = 0.05f;
+		zlock = int.MinValue;
+
+		// Register event handlers
+		//GameStateManager.instance.GamePausedEvent += OnPauseGame;
+
+		_paused = false;
+	}
+
 	// LateUpdate is used to actually move the position of the player
 	void LateUpdate () {
 		if (!_paused) {
@@ -471,7 +516,7 @@ public class PlayerController : PhysicalObject
     private void DoZLock() {
 		if (crate != null)
 			zlock = crate.transform.position.z;
-		if (zlock > int.MinValue) {
+		if (zlock > int.MinValue && grounded) {
 			Vector3 pos = transform.position;
 			pos.z = zlock;
 			transform.position = pos;
@@ -484,7 +529,6 @@ public class PlayerController : PhysicalObject
 
 		// TODO: Fix this to use the appropriate ground in case of multiple grounds
 		GameObject grnd = GameObject.Find("Ground");
-		float gz = grnd.transform.lossyScale.z;
 
 		//reference variables
 		float minX 		= GetComponent<Collider>().bounds.min.x + Margin;
@@ -493,7 +537,7 @@ public class PlayerController : PhysicalObject
 		float minY 		= GetComponent<Collider>().bounds.min.y + Margin;
 		float centerY 	= GetComponent<Collider>().bounds.center.y;
 		float maxY 		= GetComponent<Collider>().bounds.max.y - Margin;
-		float centerZ	= GetComponent<Collider>().bounds.center.z - gz/2;
+		float centerZ	= grnd.GetComponent<Collider>().bounds.min.z - 1;
 
 		//array of startpoints
 		Vector3[] startPoints = {
@@ -532,7 +576,8 @@ public class PlayerController : PhysicalObject
 			colliderDim = colliderDepth;
 		// Bounce Pad
 		if (trajectory.normalized == Vector3.down && other.GetComponent<BouncePad>()) {
-			velocity.y = other.GetComponent<BouncePad>().GetBouncePower();
+			velocity = other.transform.up * other.GetComponent<BouncePad>().GetBouncePower();
+			launched = 50;
 			other.GetComponent<BouncePad>().Animate();
 			anim.SetTrigger("Jump");
 			bounced = true;
@@ -556,7 +601,8 @@ public class PlayerController : PhysicalObject
 	}
 
 	public void Flip() {
-		DoZLock();
+		if (GameStateManager.instance.currentPerspective == PerspectiveType.p3D)
+			DoZLock();
 	}
 
 	public void Grab(Crate crate) {
@@ -625,7 +671,11 @@ public class PlayerController : PhysicalObject
 	public bool is3D(){
 		return GameStateManager.instance.currentPerspective== PerspectiveType.p3D;
 	}
-	
+
+	public bool GrabbedCrate() {
+		return crate != null;
+	}
+
 	public float getOrientation(){
 		return orientation;
 	}

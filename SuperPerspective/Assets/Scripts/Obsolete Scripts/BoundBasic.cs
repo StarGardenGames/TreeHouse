@@ -25,6 +25,12 @@ public class BoundBasic : MonoBehaviour {
 		if(back) pos.x = Mathf.Max (bounds.xMin, pos.x);
 		if(right) pos.z = Mathf.Max (bounds.yMin, pos.z);
 		if(left) pos.z = Mathf.Min (bounds.yMax, pos.z);
+		if (pos != transform.position) {
+			if (gameObject.GetComponent<Ice>()) {
+				transform.position -= gameObject.GetComponent<Ice>().getVelocity();
+				gameObject.GetComponent<Ice>().setVelocity(Vector3.zero);
+			}
+		}
 		transform.position = pos;
 	}
 }

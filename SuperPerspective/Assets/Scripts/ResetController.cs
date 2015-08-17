@@ -6,15 +6,15 @@ public class ResetController : MonoBehaviour {
 	static bool camReset = false;
 
 	void Update () {
-		if (Input.GetKey(KeyCode.R)) {
+		if (Input.GetKey(KeyCode.Backspace)) {
 			Reset();
 		}
 	}
 
 	void FixedUpdate() {
 		if (camReset) {
-			GameStateManager.instance.StartGame();
-			CameraController.instance.SetMount(GameObject.Find("2DCameraMount").transform, PerspectiveType.p2D);
+			GameStateManager.instance.Reset();
+			PlayerController.instance.Reset();
 			camReset = false;
 		}
 	}
@@ -23,6 +23,6 @@ public class ResetController : MonoBehaviour {
 		Key.ClearKeys();
 		camReset = true;
 		Application.LoadLevel(Application.loadedLevel);
-		//GameStateManager.Destroy(GameStateManager.instance);
+		InputManager.Destroy(InputManager.instance);
 	}
 }

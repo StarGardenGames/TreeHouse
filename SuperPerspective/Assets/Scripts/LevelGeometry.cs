@@ -25,18 +25,19 @@ public class LevelGeometry : MonoBehaviour
 
 	void Awake(){
 		if (parentPlatform == null) {
-			parentPlatform = GameObject.Find("Ground");
+			parentPlatform = GameObject.FindGameObjectWithTag("Ground");
 		}
 	}
 	
 	void Start () {
       // Register to perspective shift event
-		GameStateManager.instance.PerspectiveShiftEvent += AdjustPosition;
 		boxCollider = GetComponent<BoxCollider>();
 		startCenter = boxCollider.center;
 		colliderSize = boxCollider.size;
 
-		AdjustPosition(PerspectiveType.p2D);
+		GameStateManager.instance.PerspectiveShiftEvent += AdjustPosition;
+
+		AdjustPosition(GameStateManager.instance.currentPerspective);
 	}
 
     #endregion Monobehavior Implementation
@@ -46,9 +47,8 @@ public class LevelGeometry : MonoBehaviour
 
     
     // Adjusts the collider to the appropriate shape when the perspective shift event occurs.
-    private void AdjustPosition(PerspectiveType p)
+	private void AdjustPosition(PerspectiveType p)
     {
-		//Mathf.Pow(Mathf.Sin(rot * Mathf.Deg2Rad), 2)
 		float rot = Mathf.Rad2Deg * Mathf.Acos(Vector3.Dot(Vector3.forward, transform.forward));
 		if (Mathf.Round(rot) == 90 && Mathf.Round(Vector3.Angle(transform.right, Vector3.forward)) == 0)
 			rot = 270;
@@ -75,6 +75,6 @@ public class LevelGeometry : MonoBehaviour
 	public Vector3 getTrueBoxColliderSize(){
 		return colliderSize;
 	}
-	
+
     #endregion Perspective Shift Event
 }

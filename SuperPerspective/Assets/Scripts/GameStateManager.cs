@@ -129,7 +129,7 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
 	}
 
 	private void HandleShiftPressed(){
-		if (!IsPauseState(currentState)){
+		if (!IsPauseState(currentState) && !PlayerController.instance.GrabbedCrate()){
 			ViewType newState = (view_perspectives[(int)currentState] == PerspectiveType.p3D) ?
 				ViewType.STANDARD_2D : ViewType.STANDARD_3D;
 
@@ -242,6 +242,32 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
 	public void StartGame(){
 		EnterState(ViewType.STANDARD_2D);
 	}
+
+	public void Reset(){
+		InitViewPerspectives();
+		InitViewMounts();
+		InitViewPauseStates();
+		
+		//determine wheather or not to start on menu
+		if(view_mounts[(int)ViewType.MENU] == null){
+			StartGame();
+		}else{
+			EnterState(ViewType.MENU);
+		}
+
+		// Register event handlers to InputManagers
+		InputManager.instance.ShiftPressedEvent += HandleShiftPressed;
+		InputManager.instance.PausePressedEvent += HandlePausePressed;
+		InputManager.instance.LeanLeftPressedEvent += HandleLeanLeftPressed;
+		InputManager.instance.LeanRightPressedEvent += HandleLeanRightPressed;
+		InputManager.instance.LeanLeftReleasedEvent += HandleLeanLeftReleased;
+		InputManager.instance.LeanRightReleasedEvent += HandleLeanRightReleased;
+		//InputManager.instance.BackwardMovementEvent += HandleBackwardMovement;
+		InputManager.instance.ForwardMovementEvent += HandleForwardMovement;
+		
+		// Register to switch state to proper gameplay when shift is complete
+		CameraController.instance.TransitionCompleteEvent += HandleTransitionComplete;
+	}
 	#endregion Public Interface
 
 	#region Helper Functions
@@ -255,10 +281,10 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
 		}
 
 		// Find the corresponding perspective to store for external reference
-		currentPerspective = (targetState == ViewType.STANDARD_2D) ? PerspectiveType.p3D : PerspectiveType.p2D;
+		currentPerspective = PerspectiveType.p3D;
 
 		// Find the corresponding perspective to store for external reference
-		EnterState(targetState);
+		EnterState(ViewType.STANDARD_3D);
 	}
 
 	private bool IsPauseState(ViewType targetState){
