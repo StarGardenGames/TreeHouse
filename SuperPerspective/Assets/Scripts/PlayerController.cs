@@ -359,6 +359,8 @@ public class PlayerController : PhysicalObject
 						falling = false;
 						canJump = true;
 						launched = 0;
+					}
+				}
 				if(axis != 'Y'){
 					float verticalOverlap = getVerticalOverlap(hitInfo);
 					bool significantVerticalOverlap = 
@@ -542,7 +544,8 @@ public class PlayerController : PhysicalObject
 			colliderDim = colliderDepth;
 		// Bounce Pad
 		if (trajectory.normalized == Vector3.down && other.GetComponent<BouncePad>()) {
-			velocity.y = other.GetComponent<BouncePad>().GetBouncePower();
+			velocity = other.transform.up * other.GetComponent<BouncePad>().GetBouncePower();
+			launched = 50;
 			other.GetComponent<BouncePad>().Animate();
 			anim.SetTrigger("Jump");
 			bounced = true;
@@ -663,41 +666,6 @@ public class PlayerController : PhysicalObject
 		}
 
 		return connected;
-	}
-	
-	private void CollideWithObject(RaycastHit hitInfo, Vector3 trajectory) {
-		GameObject other = hitInfo.collider.gameObject;
-		float colliderDim = 0;
-		if (trajectory.normalized == Vector3.up || trajectory.normalized == Vector3.down)
-			colliderDim = colliderHeight;
-		if (trajectory.normalized == Vector3.right || trajectory.normalized == Vector3.left)
-			colliderDim = colliderWidth;
-		if (trajectory.normalized == Vector3.forward || trajectory.normalized == Vector3.back)
-			colliderDim = colliderDepth;
-		// Bounce Pad
-		if (trajectory.normalized == Vector3.down && other.GetComponent<BouncePad>()) {
-			velocity = other.transform.up * other.GetComponent<BouncePad>().GetBouncePower();
-			launched = 50;
-			other.GetComponent<BouncePad>().Animate();
-			anim.SetTrigger("Jump");
-			bounced = true;
-		}
-		// Crate
-		if (trajectory.normalized != Vector3.down && trajectory.normalized != Vector3.zero && other.GetComponent<Crate>() && !other.GetComponent<Crate>().IsAxisBlocked(trajectory)) {
-			other.GetComponent<Crate>().SetVelocity((trajectory*0.75f).x, (trajectory*0.75f).z);
-			pushFlag = true;
-			if (crate == null && velocity != Vector3.zero)
-				anim.SetBool("Pushing", true);
-		} else if (crate == null) {
-			anim.SetBool("Pushing", false);
-		}
-		if (other.GetComponent<PushSwitchOld>() && colliderDim == colliderWidth) {
-			transform.Translate(0, 0.1f, 0);
-		}
-  		//Collision w/ PlayerInteractable
-		foreach (Interactable c in other.GetComponents<Interactable>()) {
-			c.EnterCollisionWithPlayer ();
-		}
 	}
 
 	public void Flip() {
