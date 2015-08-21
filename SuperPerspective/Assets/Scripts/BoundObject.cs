@@ -35,14 +35,6 @@ public class BoundObject : MonoBehaviour {
 			bounds[boundIndex].height - (halfDepth *2)
 		);
 
-		//get bounds for 2d mode
-		/*altLeftBound = IslandControl.instance.altBounds [boundIndex, 0];
-		if (altLeftBound != -1)
-			altLeftBound += halfWidth;
-		altRightBound = IslandControl.instance.altBounds [boundIndex, 1];
-		if (altRightBound != -1)
-			altRightBound -= halfWidth;*/
-
 		//bind to new bounds
 		bind ();
 	}

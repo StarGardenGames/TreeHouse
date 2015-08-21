@@ -24,12 +24,13 @@ public class LevelGeometry : MonoBehaviour
 	#region Monobehavior Implementation
 
 	void Awake(){
-		if (parentPlatform == null) {
-			parentPlatform = GameObject.FindGameObjectWithTag("Ground");
-		}
+		
 	}
 	
 	void Start () {
+		parentPlatform = IslandControl.instance.findGround(this.gameObject);
+		if(parentPlatform == null)
+			Debug.Log("Couldn't find ground");
       // Register to perspective shift event
 		boxCollider = GetComponent<BoxCollider>();
 		startCenter = boxCollider.center;
@@ -52,7 +53,7 @@ public class LevelGeometry : MonoBehaviour
 		float rot = Mathf.Rad2Deg * Mathf.Acos(Vector3.Dot(Vector3.forward, transform.forward));
 		if (Mathf.Round(rot) == 90 && Mathf.Round(Vector3.Angle(transform.right, Vector3.forward)) == 0)
 			rot = 270;
-		if (p == PerspectiveType.p2D)
+		if (p == PerspectiveType.p2D && parentPlatform!=null)
 		{
 			boxCollider.size = new Vector3(colliderSize.x * Mathf.Cos(rot * Mathf.Deg2Rad) + (parentPlatform.transform.lossyScale.z / transform.lossyScale.x) * Mathf.Sin(rot * Mathf.Deg2Rad), colliderSize.y, 
 			                               colliderSize.z * Mathf.Sin(rot * Mathf.Deg2Rad) + (parentPlatform.transform.lossyScale.z / transform.lossyScale.z) * Mathf.Cos(rot * Mathf.Deg2Rad));

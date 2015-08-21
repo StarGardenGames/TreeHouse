@@ -61,8 +61,6 @@ public class IslandControl : MonoBehaviour {
 					continue;
 			if (!onlyX && zz > islandBounds [i].yMax)
 					continue;
-			if(yy <= grounds[i].transform.position.y)
-				continue;
 			valid [i] = true;
 			curValid = i;
 			numValid++;
@@ -85,5 +83,16 @@ public class IslandControl : MonoBehaviour {
 
 		return curValid;
 		
+	}
+	
+	public GameObject findGround(GameObject obj){
+		Vector3 pos = obj.transform.position;
+		int boundIndex = getBound (pos.x, pos.y, pos.z, !PlayerController.instance.is3D());
+		if(boundIndex == -1){
+			Debug.Log("There is no valid bound for "+obj);
+			Destroy(this);
+			return null;
+		}
+		return grounds[boundIndex];
 	}
 }
