@@ -178,7 +178,7 @@ GameObject:
   - 108: {fileID: 80889757}
   m_Layer: 0
   m_Name: Spotlight (4)
-  m_TagString: Untagged
+  m_TagString: Light_3D
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -789,7 +789,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 8
+  m_RootOrder: 2
 --- !u!1 &365419134
 GameObject:
   m_ObjectHideFlags: 0
@@ -1035,7 +1035,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 490738, guid: 53f8b1826de3d374f8355fae10d2e3a1, type: 2}
       propertyPath: m_RootOrder
-      value: 7
+      value: 6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 53f8b1826de3d374f8355fae10d2e3a1, type: 2}
@@ -1329,7 +1329,7 @@ GameObject:
   - 108: {fileID: 467713069}
   m_Layer: 0
   m_Name: Spotlight (11)
-  m_TagString: Untagged
+  m_TagString: Light_3D
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1757,7 +1757,7 @@ GameObject:
   - 108: {fileID: 572444859}
   m_Layer: 0
   m_Name: Spotlight (14)
-  m_TagString: Untagged
+  m_TagString: Light_3D
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1825,7 +1825,7 @@ GameObject:
   - 108: {fileID: 625156004}
   m_Layer: 0
   m_Name: Spotlight (2)
-  m_TagString: Untagged
+  m_TagString: Light_2D
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2107,7 +2107,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 474902, guid: deeffe6947fd84f4abd7f5a4c2fa3ea1, type: 2}
       propertyPath: m_RootOrder
-      value: 20
+      value: 11
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: deeffe6947fd84f4abd7f5a4c2fa3ea1, type: 2}
@@ -2451,7 +2451,7 @@ Transform:
   - {fileID: 416792316}
   - {fileID: 374003267}
   m_Father: {fileID: 0}
-  m_RootOrder: 12
+  m_RootOrder: 8
 --- !u!1 &1054765080
 GameObject:
   m_ObjectHideFlags: 0
@@ -2488,7 +2488,7 @@ Transform:
   - {fileID: 366573648}
   - {fileID: 697015830}
   m_Father: {fileID: 0}
-  m_RootOrder: 9
+  m_RootOrder: 3
 --- !u!1 &1055827944
 GameObject:
   m_ObjectHideFlags: 0
@@ -2525,7 +2525,7 @@ Transform:
   - {fileID: 1698474734}
   - {fileID: 1171799923}
   m_Father: {fileID: 0}
-  m_RootOrder: 6
+  m_RootOrder: 0
 --- !u!1001 &1057787010
 Prefab:
   m_ObjectHideFlags: 0
@@ -2591,7 +2591,7 @@ GameObject:
   - 108: {fileID: 1065478757}
   m_Layer: 0
   m_Name: Spotlight (5)
-  m_TagString: Untagged
+  m_TagString: Light_2D
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2717,7 +2717,7 @@ GameObject:
   - 108: {fileID: 1108336148}
   m_Layer: 0
   m_Name: Spotlight (15)
-  m_TagString: Untagged
+  m_TagString: Light_3D
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3017,7 +3017,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 462438, guid: dc4f5f54459af5142ba84a63f23c513f, type: 2}
       propertyPath: m_RootOrder
-      value: 5
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 196462, guid: dc4f5f54459af5142ba84a63f23c513f, type: 2}
       propertyPath: m_Name
@@ -3049,7 +3049,7 @@ GameObject:
   - 108: {fileID: 1266615340}
   m_Layer: 0
   m_Name: Spotlight (3)
-  m_TagString: Untagged
+  m_TagString: Light_2D
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3098,6 +3098,26 @@ Transform:
   m_Children: []
   m_Father: {fileID: 416792316}
   m_RootOrder: 2
+--- !u!1 &1289101847 stripped
+GameObject:
+  m_PrefabParentObject: {fileID: 146284, guid: 460dc94b41849c4459973ec740ce5a13, type: 2}
+  m_PrefabInternal: {fileID: 1725500454}
+--- !u!114 &1289101850
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1289101847}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8ea7992ba12689e4488390773917d492, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  testInten2D: []
+  testInten3D: []
+  light2D: []
+  light3D: []
+  lightTransitionTime: 2
 --- !u!1 &1294334798
 GameObject:
   m_ObjectHideFlags: 0
@@ -3109,7 +3129,7 @@ GameObject:
   - 108: {fileID: 1294334799}
   m_Layer: 0
   m_Name: Spotlight
-  m_TagString: Untagged
+  m_TagString: Light_2D
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3225,7 +3245,7 @@ Transform:
   - {fileID: 2046820557}
   - {fileID: 1963791068}
   m_Father: {fileID: 0}
-  m_RootOrder: 10
+  m_RootOrder: 5
 --- !u!1 &1338259171
 GameObject:
   m_ObjectHideFlags: 0
@@ -3351,7 +3371,7 @@ GameObject:
   - 108: {fileID: 1354024663}
   m_Layer: 0
   m_Name: Spotlight (8)
-  m_TagString: Untagged
+  m_TagString: Light_3D
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3538,7 +3558,7 @@ GameObject:
   - 108: {fileID: 1483806276}
   m_Layer: 0
   m_Name: Spotlight (13)
-  m_TagString: Untagged
+  m_TagString: Light_3D
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3598,7 +3618,7 @@ GameObject:
   - 108: {fileID: 1489679664}
   m_Layer: 0
   m_Name: Spotlight (6)
-  m_TagString: Untagged
+  m_TagString: Light_3D
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3662,7 +3682,7 @@ GameObject:
   - 108: {fileID: 1599704624}
   m_Layer: 0
   m_Name: Spotlight (12)
-  m_TagString: Untagged
+  m_TagString: Light_3D
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3882,7 +3902,7 @@ Light:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1619740410}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 6
   m_Type: 1
   m_Color: {r: 1, g: .956862748, b: .839215696, a: 1}
@@ -3919,7 +3939,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_RootOrder: 1
 --- !u!4 &1633522536 stripped
 Transform:
   m_PrefabParentObject: {fileID: 421240, guid: 7fd469d6414f9914c87f30f4eaf3fb4e, type: 2}
@@ -4049,7 +4069,7 @@ GameObject:
   - 108: {fileID: 1655622210}
   m_Layer: 0
   m_Name: Spotlight (7)
-  m_TagString: Untagged
+  m_TagString: Light_3D
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -4211,9 +4231,10 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 448176, guid: 460dc94b41849c4459973ec740ce5a13, type: 2}
       propertyPath: m_RootOrder
-      value: 13
+      value: 12
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 11491856, guid: 460dc94b41849c4459973ec740ce5a13, type: 2}
   m_ParentPrefab: {fileID: 100100000, guid: 460dc94b41849c4459973ec740ce5a13, type: 2}
   m_IsPrefabParent: 0
 --- !u!1 &1734934009
@@ -4227,7 +4248,7 @@ GameObject:
   - 108: {fileID: 1734934010}
   m_Layer: 0
   m_Name: Spotlight (9)
-  m_TagString: Untagged
+  m_TagString: Light_2D
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -4389,7 +4410,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 462438, guid: dc4f5f54459af5142ba84a63f23c513f, type: 2}
       propertyPath: m_RootOrder
-      value: 15
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 196462, guid: dc4f5f54459af5142ba84a63f23c513f, type: 2}
       propertyPath: m_Name
@@ -4547,7 +4568,7 @@ GameObject:
   - 108: {fileID: 1884296929}
   m_Layer: 0
   m_Name: Spotlight (1)
-  m_TagString: Untagged
+  m_TagString: Light_2D
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -4805,7 +4826,7 @@ Transform:
   - {fileID: 776119583}
   - {fileID: 1881272221}
   m_Father: {fileID: 0}
-  m_RootOrder: 11
+  m_RootOrder: 7
 --- !u!4 &2029736944 stripped
 Transform:
   m_PrefabParentObject: {fileID: 433692, guid: 394da313d60456149a3d364c9bb7f7be, type: 2}
@@ -4847,7 +4868,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 462438, guid: dc4f5f54459af5142ba84a63f23c513f, type: 2}
       propertyPath: m_RootOrder
-      value: 11
+      value: 9
       objectReference: {fileID: 0}
     - target: {fileID: 196462, guid: dc4f5f54459af5142ba84a63f23c513f, type: 2}
       propertyPath: m_Name
@@ -4879,7 +4900,7 @@ GameObject:
   - 108: {fileID: 2054266321}
   m_Layer: 0
   m_Name: Spotlight (10)
-  m_TagString: Untagged
+  m_TagString: Light_3D
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

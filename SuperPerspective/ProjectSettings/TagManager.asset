@@ -10,6 +10,8 @@ TagManager:
   - Intangible
   - Checkpoint
   - BackgroundObject
+  - Light_2D
+  - Light_3D
   layers:
   - Default
   - TransparentFX

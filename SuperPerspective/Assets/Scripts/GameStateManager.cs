@@ -44,7 +44,9 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
 	
 	#region Monobehavior Implementation
 
-	void Start () {
+	public override void Awake () {
+		base.Awake();
+		
 		InitViewPerspectives();
 		InitViewMounts();
 		InitViewPauseStates();
