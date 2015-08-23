@@ -27,6 +27,10 @@ public class Key : Interactable {
 		keysHeld = 0;
 	}
 
+	public static int GetKeysHeld(){
+		return keysHeld;
+	}
+
 	public override void EnterCollisionWithPlayer () {
 		if (!active)
 			return;
