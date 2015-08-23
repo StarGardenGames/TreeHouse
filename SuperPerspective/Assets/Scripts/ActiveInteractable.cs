@@ -6,7 +6,9 @@ public class ActiveInteractable : PhysicalObject {
 	
 	//suppress warnings
 	#pragma warning disable 414
-	
+
+	public bool ignoreYDistance;
+
 	//player
 	protected GameObject player;
 	
@@ -77,11 +79,21 @@ public class ActiveInteractable : PhysicalObject {
 		//check distance and determine if range methods need to be called
 		float dist = 0;
 		bool is3D = player.GetComponent<PlayerController>().is3D();
-		if(is3D)
-			dist = Vector3.Distance(transform.position, player.transform.position);
-		else
-			dist = Vector2.Distance(new Vector2(transform.position.x,transform.position.y),
-			                        new Vector2(player.transform.position.x, player.transform.position.y));
+		if(is3D) {
+			if (ignoreYDistance) {
+				dist = Vector2.Distance(new Vector2(transform.position.x,transform.position.z),
+				                        new Vector2(player.transform.position.x, player.transform.position.z));
+			} else {
+				dist = Vector3.Distance(transform.position, player.transform.position);
+			}
+		} else {
+			if (ignoreYDistance) {
+				dist = Mathf.Abs(transform.position.x - player.transform.position.x);
+			} else {
+				dist = Vector2.Distance(new Vector2(transform.position.x,transform.position.y),
+				                        new Vector2(player.transform.position.x, player.transform.position.y));
+			}
+		}
 		//update inRange
 		inRange = dist < range;
 		//update player facing

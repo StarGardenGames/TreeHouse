@@ -18,7 +18,7 @@ public class Ice : ActiveInteractable {
 	
 	private CollisionChecker colCheck;
 	
-	private bool grabbed, respawnFlag, startPush;
+	private bool respawnFlag, startPush;
 	
 	private PerspectiveType persp = PerspectiveType.p3D;
 	
@@ -110,10 +110,6 @@ public class Ice : ActiveInteractable {
 		else
 			dist = Vector2.Distance(new Vector2(transform.position.x,transform.position.y),
 			                        new Vector2(player.transform.position.x, player.transform.position.y));
-		if (grabbed && dist > range) {
-			player.GetComponent<PlayerController>().Grab(null);
-			grabbed = false;
-		}
 		transform.Translate(velocity * Time.deltaTime);
 		if (respawnFlag && Vector2.Distance(new Vector2(startPos.x, startPos.y), new Vector2(player.transform.position.x, player.transform.position.y)) > colliderWidth) {
 			Vector3 pos = transform.position;
@@ -134,6 +130,8 @@ public class Ice : ActiveInteractable {
 		if (startPush) {
 			if (velocity.Equals(Vector3.zero)){
 				respawnFlag = true;
+				GetComponent<Collider>().enabled = false;
+				GetComponentInChildren<Renderer>().enabled = false;
 			}
 			startPush = false;
 		}
@@ -261,10 +259,6 @@ public class Ice : ActiveInteractable {
 	
 	void checkBreak() {
 		if (GameStateManager.instance.currentPerspective == PerspectiveType.p2D && Check2DIntersect ()) {
-			if (grabbed){
-				player.GetComponent<PlayerController> ().Grab (null);
-				grabbed = false;
-			}
 			respawnFlag = true;
 		}
 	}

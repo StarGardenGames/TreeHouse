@@ -499,7 +499,8 @@ public class PlayerController : PhysicalObject
 		// Bounce Pad
 		if (trajectory.normalized == Vector3.down && other.GetComponent<BouncePad>()) {
 			velocity = other.transform.up * other.GetComponent<BouncePad>().GetBouncePower();
-			launched = 50;
+			if (!other.transform.up.Equals(Vector3.up))
+				launched = 50;
 			other.GetComponent<BouncePad>().Animate();
 			anim.SetTrigger("Jump");
 			bounced = true;

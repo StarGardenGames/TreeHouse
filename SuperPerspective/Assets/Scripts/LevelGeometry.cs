@@ -12,6 +12,8 @@ public class LevelGeometry : MonoBehaviour
 
 	public GameObject parentPlatform;   // The platform this geometry belongs to
 
+	private float platWidth;
+
 	private BoxCollider boxCollider;    // Reference to this object's BoxCollider
 	private Vector3 colliderSize;       // Stores the collider's beginning size, usually (1, 1, 1)
 	private Vector3 startCenter;
@@ -36,6 +38,8 @@ public class LevelGeometry : MonoBehaviour
 		startCenter = boxCollider.center;
 		colliderSize = boxCollider.size;
 
+		platWidth = parentPlatform.GetComponent<Collider> ().bounds.size.z;
+
 		GameStateManager.instance.PerspectiveShiftEvent += AdjustPosition;
 
 		AdjustPosition(GameStateManager.instance.currentPerspective);
@@ -55,8 +59,8 @@ public class LevelGeometry : MonoBehaviour
 			rot = 270;
 		if (p == PerspectiveType.p2D && parentPlatform!=null)
 		{
-			boxCollider.size = new Vector3(colliderSize.x * Mathf.Cos(rot * Mathf.Deg2Rad) + (parentPlatform.transform.lossyScale.z / transform.lossyScale.x) * Mathf.Sin(rot * Mathf.Deg2Rad), colliderSize.y, 
-			                               colliderSize.z * Mathf.Sin(rot * Mathf.Deg2Rad) + (parentPlatform.transform.lossyScale.z / transform.lossyScale.z) * Mathf.Cos(rot * Mathf.Deg2Rad));
+			boxCollider.size = new Vector3(colliderSize.x * Mathf.Cos(rot * Mathf.Deg2Rad) + (platWidth / transform.lossyScale.x) * Mathf.Sin(rot * Mathf.Deg2Rad), colliderSize.y, 
+			                               colliderSize.z * Mathf.Sin(rot * Mathf.Deg2Rad) + (platWidth / transform.lossyScale.z) * Mathf.Cos(rot * Mathf.Deg2Rad));
 			if (Mathf.Round(rot) == 90 || Mathf.Round(rot) == 270)
 				boxCollider.center = new Vector3(-(parentPlatform.transform.position.z - transform.position.z) * (1 / Mathf.Abs(transform.localScale.x)) * Mathf.Sin(rot * Mathf.Deg2Rad), startCenter.y, startCenter.z);
 			else

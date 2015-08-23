@@ -38,8 +38,8 @@ public class IslandControl : MonoBehaviour {
 		for (int i = 0; i < grounds.Length; i++) {
 			gX = grounds[i].transform.position.x;
 			gZ = grounds[i].transform.position.z;
-			gW = grounds[i].transform.lossyScale.x;
-			gD = grounds[i].transform.lossyScale.z;
+			gW = grounds[i].GetComponent<Collider>().bounds.size.x;
+			gD = grounds[i].GetComponent<Collider>().bounds.size.z;
 			islandBounds[i] = new Rect(
 				gX - gW/2f, gZ - gD/2f, gW, gD);
 		}
@@ -90,7 +90,7 @@ public class IslandControl : MonoBehaviour {
 		int boundIndex = getBound (pos.x, pos.y, pos.z, !PlayerController.instance.is3D());
 		if(boundIndex == -1){
 			Debug.Log("There is no valid bound for "+obj);
-			Destroy(this);
+			//Destroy(this);
 			return null;
 		}
 		return grounds[boundIndex];

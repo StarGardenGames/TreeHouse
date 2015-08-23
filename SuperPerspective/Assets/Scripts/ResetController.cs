@@ -6,9 +6,6 @@ public class ResetController : MonoBehaviour {
 	static bool camReset = false;
 
 	void Update () {
-		if (Input.GetKey(KeyCode.Backspace)) {
-			Reset();
-		}
 	}
 
 	void FixedUpdate() {
