@@ -11,8 +11,11 @@ public class Key : Interactable {
 			GetComponentInChildren<Renderer>().transform.Rotate(Vector3.up, Mathf.PI / 4, Space.World);
 	}
 
-	public static bool UseKey() {
-		if (keysHeld > 0) {
+	public static bool UseKey(int keyRequired) {
+		if(keyRequired == null){
+			keyRequired = 1;
+		}
+		if (keysHeld > keyRequired) {
 			keysHeld--;
 			return true;
 		}
