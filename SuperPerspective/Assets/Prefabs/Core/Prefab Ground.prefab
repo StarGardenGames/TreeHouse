@@ -11,6 +11,7 @@ GameObject:
   - 33: {fileID: 3377876}
   - 23: {fileID: 2317770}
   - 95: {fileID: 9544522}
+  - 114: {fileID: 11491620}
   m_Layer: 0
   m_Name: Ground Texture
   m_TagString: Untagged
@@ -660,6 +661,17 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
+--- !u!114 &11491620
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 101764}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70ed03582f6d1af488d19f8760bd3376, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
