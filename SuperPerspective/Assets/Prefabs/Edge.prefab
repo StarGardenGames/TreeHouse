@@ -85,13 +85,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd057408a49d2a94dbcd33b687b04959, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  testStatus: 0
-  testCuboid: []
-  testPlayerCuboid: []
-  testPlayerGrab: 0
-  testOverlap: 0
-  testdiff: 0
-  edgeIndex: n/a
+  edgeIndex: 0
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1

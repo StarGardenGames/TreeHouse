@@ -22,7 +22,6 @@ public class EdgeManager : MonoBehaviour {
 
 		//init terrain
 		terrain = GameObject.FindGameObjectsWithTag("Terrain");
-
 	}
 
 	void FixedUpdate(){
@@ -33,63 +32,69 @@ public class EdgeManager : MonoBehaviour {
 	
 	public void GenerateEdges(){		
 		for(int i = 0; i < terrain.Length; i++){	
-			Vector3 trueEdgeScale = clone(edgePrefab.transform.lossyScale);
-			
-			Vector3 trueTerrainScale = findTrueTerrainScale(terrain[i]);
-			
-			if(isTerrainOnRotatedQuadrant(terrain[i])){
-				trueEdgeScale = flipXZ(trueEdgeScale);
-				trueTerrainScale = flipXZ(trueTerrainScale);
-			}
-			
-			Vector3 topCenter = findTerrainTopCenterForEdge(terrain[i], trueTerrainScale, trueEdgeScale);
-			
-			CreateEdgesAroundTerrain(terrain[i], topCenter, trueTerrainScale, trueEdgeScale);
+			CreateEdgesAroundTerrain(terrain[i]);
 		}
-		
 		generated = true;
 	}
 	
-	private Vector3 clone(Vector3 original){
-		return new Vector3(original.x, original.y, original.z);
+	private void CreateEdgesAroundTerrain(GameObject terrain){
+		Vector3 top = findTerrainTopCenterForEdge(terrain);
+		Vector3 edgeScale = findTrueEdgeScale(terrain);
+		Vector3 terrainScale = findTrueTerrainScale(terrain);
+		
+		CreateEdge(terrain, top, Vector3.right, (terrainScale+edgeScale).x * .5f, terrainScale);
+		CreateEdge(terrain, top, Vector3.forward, (terrainScale+edgeScale).z * .5f, terrainScale);
+		CreateEdge(terrain, top, Vector3.left, (terrainScale+edgeScale).x * .5f, terrainScale);
+		CreateEdge(terrain, top, Vector3.back, (terrainScale+edgeScale).z * .5f, terrainScale);
+	}
+	
+	private Vector3 findTerrainTopCenterForEdge(GameObject terrain){
+		Vector3 terrainScale = findTrueTerrainScale(terrain);
+		Vector3 centerOffset = findTrueTerrainCenter(terrain);
+		Vector3 edgeScale = findTrueEdgeScale(terrain);
+		return
+			terrain.transform.position - centerOffset + (terrainScale.y-edgeScale.y) * Vector3.up * .5f;
+	}
+	
+	private Vector3 findTrueEdgeScale(GameObject terrain){
+		Vector3 scale = edgePrefab.transform.lossyScale;
+		if(isTerrainOnRotatedQuadrant(terrain))
+			return flipXZ(scale);
+		else
+			return new Vector3(scale.x,scale.y,scale.z);
 	}
 	
 	private Vector3 findTrueTerrainScale(GameObject terrain){
 		Vector3 boxSize = terrain.GetComponent<LevelGeometry>().getTrueBoxColliderSize();
 		Vector3 transformScale = terrain.transform.lossyScale;	
-		return new Vector3(
+		Vector3 scale = new Vector3(
 				boxSize.x * transformScale.x,
 				boxSize.y * transformScale.y,
 				boxSize.z * transformScale.z
 			);
+		if(isTerrainOnRotatedQuadrant(terrain))
+			return flipXZ(scale);
+		else
+			return scale;
 	}
 	
 	private Vector3 findTrueTerrainCenter(GameObject terrain){
 		Vector3 boxCenter = terrain.GetComponent<LevelGeometry>().getTrueBoxColliderCenter();
 		Vector3 transformScale = terrain.transform.lossyScale;	
 		
-		return 	(Vector3.right * boxCenter.x * transformScale.x) +
-					(Vector3.up * boxCenter.y * transformScale.y) +
-					(Vector3.forward * boxCenter.z * transformScale.z);
+		
+		Vector3 center = 	(Vector3.right * boxCenter.x * transformScale.x) +
+							(Vector3.up * boxCenter.y * transformScale.y) +
+							(Vector3.forward * boxCenter.z * transformScale.z);
+		if(isTerrainOnRotatedQuadrant(terrain))
+			return flipXZ(center);
+		else
+			return flipXZ(center);
 	}
 	
 	private bool isTerrainOnRotatedQuadrant(GameObject terrain){
 		int quad = (int)Mathf.Round((float)(terrain.transform.rotation.eulerAngles.y / 90.0));
 		return quad % 2 == 1;
-	}
-	
-	private Vector3 findTerrainTopCenterForEdge(GameObject terrain, Vector3 terrainScale, 
-		Vector3 edgeScale){
-		return
-			terrain.transform.position + 
-			(terrainScale.y-edgeScale.y) * Vector3.up * .5f;
-	}
-
-	private void CreateEdgesAroundTerrain(GameObject terrain, Vector3 top, Vector3 terrainScale, Vector3 edgeScale){
-		CreateEdge(terrain, top, Vector3.right, (terrainScale+edgeScale).x * .5f, terrainScale);
-		CreateEdge(terrain, top, Vector3.forward, (terrainScale+edgeScale).z * .5f, terrainScale);
-		CreateEdge(terrain, top, Vector3.left, (terrainScale+edgeScale).x * .5f, terrainScale);
-		CreateEdge(terrain, top, Vector3.back, (terrainScale+edgeScale).z * .5f, terrainScale);
 	}
 	
 	private void CreateEdge(GameObject terrain, Vector3 top, Vector3 offsetDir, float offsetMag, Vector3 terrainScale){
