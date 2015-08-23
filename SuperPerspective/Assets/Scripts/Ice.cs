@@ -41,8 +41,7 @@ public class Ice : ActiveInteractable {
 		CameraController.instance.TransitionStartEvent += checkBreak;
 		colCheck = new CollisionChecker (GetComponent<Collider> ());
 		startPos = transform.position;
-		//range = colliderWidth >= colliderDepth ? colliderWidth * 0.85f : colliderDepth * 0.85f;
-		range = 2;
+		range = colliderWidth >= colliderDepth ? colliderWidth * 0.85f : colliderDepth * 0.85f;
 		
 		for (int i = 0; i < 4; i++)
 			axisBlocked[i] = false;

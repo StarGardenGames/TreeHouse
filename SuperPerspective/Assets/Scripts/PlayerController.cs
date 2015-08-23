@@ -101,9 +101,6 @@ public class PlayerController : PhysicalObject
 		colliderWidth = GetComponent<Collider>().bounds.max.x - GetComponent<Collider>().bounds.min.x;
 		colliderDepth = GetComponent<Collider>().bounds.max.z - GetComponent<Collider>().bounds.min.z;
 
-		//Register Flip method to the shift event
-		GameStateManager.instance.PerspectiveShiftSuccessEvent += Flip;
-		
 		anim = GetComponentInChildren<Animator>();
 		model = anim.gameObject;
 
@@ -169,11 +166,6 @@ public class PlayerController : PhysicalObject
 				Vector3 halfScale = gameObject.transform.lossyScale * .5f;
 				cuboid[0] = gameObject.transform.position - halfScale;
 				cuboid[1] = gameObject.transform.position + halfScale;
-            if (zlockFlag)
-            {
-                DoZLock();
-                zlockFlag = false;
-            }
 
             // ------------------------------------------------------------------------------------------------------
             // X-AXIS MOVEMENT VELOCITY CALCULATIONS
@@ -357,6 +349,12 @@ public class PlayerController : PhysicalObject
 							grounded = true;
 							falling = false;
 							canJump = true;
+							launched = 0;
+							if (GameStateManager.instance.currentPerspective == PerspectiveType.p2D) {
+								Vector3 pos = transform.position;
+								pos.z = hitInfo.collider.gameObject.transform.position.z;
+								transform.position = pos;
+							}
 						}
 						// Z-lock
 						if (hitInfo.collider.gameObject.GetComponent<LevelGeometry>())
@@ -423,9 +421,6 @@ public class PlayerController : PhysicalObject
 		colliderHeight = GetComponent<Collider>().bounds.max.y - GetComponent<Collider>().bounds.min.y;
 		colliderWidth = GetComponent<Collider>().bounds.max.x - GetComponent<Collider>().bounds.min.x;
 		colliderDepth = GetComponent<Collider>().bounds.max.z - GetComponent<Collider>().bounds.min.z;
-		
-		//Register Flip method to the shift event
-		//GameStateManager.instance.PerspectiveShiftSuccessEvent += Flip;
 		
 		anim = GetComponentInChildren<Animator>();
 		model = anim.gameObject;
@@ -568,16 +563,6 @@ public class PlayerController : PhysicalObject
         }
     }
 
-    private void DoZLock() {
-		if (crate != null)
-			zlock = crate.transform.position.z;
-		if (zlock > int.MinValue && grounded) {
-			Vector3 pos = transform.position;
-			pos.z = zlock;
-			transform.position = pos;
-		}
-	}
-
 	public bool Check2DIntersect() {
 		// True if any ray hits a collider
 		bool connected = false;
@@ -618,11 +603,6 @@ public class PlayerController : PhysicalObject
 		}
 
 		return connected;
-	}
-
-	public void Flip() {
-		if (GameStateManager.instance.currentPerspective == PerspectiveType.p3D)
-			DoZLock();
 	}
 
 	#region EdgeGrabbing
