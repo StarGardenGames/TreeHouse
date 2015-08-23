@@ -339,6 +339,13 @@ public class PlayerController : PhysicalObject
 			RaycastHit hitInfo = hits[i];
 			if (hitInfo.collider != null)
 			{
+				float verticalOverlap = getVerticalOverlap(hitInfo);
+				bool significantVerticalOverlap = 
+					verticalOverlap > verticalOverlapThreshhold;
+				if(axis != 'Y' && !significantVerticalOverlap){
+					transform.Translate(new Vector3(0f,verticalOverlap,0f));
+					continue;
+				}
 				if (hitInfo.collider.gameObject.tag == "Intangible") {
 					trajectory = velocity[axisIndex] * axisVector;
 					CollideWithObject(hitInfo, trajectory);

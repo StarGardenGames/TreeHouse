@@ -3,18 +3,6 @@ using System.Collections;
 using System;
 
 public class LightingManager : MonoBehaviour {
-
-	public float[] testInten2D;
-	public float[] testInten3D;
-	public Light[] light2D;
-	public Light[] light3D;
-	
-	void Update(){
-		testInten2D = intensities[(int)PerspectiveType.p2D];
-		testInten3D = intensities[(int)PerspectiveType.p3D];
-		light2D = lights[(int)PerspectiveType.p2D];
-		light3D = lights[(int)PerspectiveType.p3D];
-	}
 	
 	#pragma warning disable 168
 
