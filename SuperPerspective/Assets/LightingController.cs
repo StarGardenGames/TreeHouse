@@ -11,7 +11,7 @@
      public float linearFogEnd = 300.0f;
      
      public Color ambientLight = new Color(0.2f, 0.2f, 0.2f, 1.0f);
-     public float ambientIntensity = 0.45f;
+     public float ambientIntensity = 0.0f;
      public Material skyboxMaterial;
 
      public float reflectionIntensity = 0.4f;
