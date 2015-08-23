@@ -113,6 +113,7 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 422254}
+  - 114: {fileID: 11490194}
   m_Layer: 0
   m_Name: Prefab Ground
   m_TagString: Untagged
@@ -661,6 +662,18 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
+--- !u!114 &11490194
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 156570}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df8a7ab4aa5d2fd4b8fedb527b2eb0a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  scaleValue: {x: .150000006, y: 1}
 --- !u!114 &11491620
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -678,7 +691,15 @@ Prefab:
   serializedVersion: 2
   m_Modification:
     m_TransformParent: {fileID: 0}
-    m_Modifications: []
+    m_Modifications:
+    - target: {fileID: 0}
+      propertyPath: scaleValue.x
+      value: .150000006
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: scaleValue.y
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 156570}

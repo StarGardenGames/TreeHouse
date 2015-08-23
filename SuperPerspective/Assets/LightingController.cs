@@ -26,12 +26,12 @@
          RenderSettings.fogStartDistance = linearFogStart;
          RenderSettings.fogEndDistance = linearFogEnd;
          
-         RenderSettings.ambientLight = ambientLight;
-         RenderSettings.skybox = skyboxMaterial;
+         //RenderSettings.ambientLight = ambientLight;
+         //RenderSettings.skybox = skyboxMaterial;
          
-         RenderSettings.haloStrength = haloStrength;
+         //RenderSettings.haloStrength = haloStrength;
          
-         RenderSettings.flareStrength = flareStrength;
+         //RenderSettings.flareStrength = flareStrength;
      }
      
  }
