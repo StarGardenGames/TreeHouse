@@ -978,6 +978,7 @@ GameObject:
   - 82: {fileID: 8246764}
   - 81: {fileID: 8112352}
   - 114: {fileID: 11444580}
+  - 114: {fileID: 11453876}
   m_Layer: 2
   m_Name: Player
   m_TagString: Untagged
@@ -4428,6 +4429,17 @@ MonoBehaviour:
   colliderDepth: 0
   grabbedEdge: {fileID: 0}
   edgeState: 0
+--- !u!114 &11453876
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 152018}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c96d0d13b8175c4cb8279d8e3547e02, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &11456292
 MonoBehaviour:
   m_ObjectHideFlags: 1
