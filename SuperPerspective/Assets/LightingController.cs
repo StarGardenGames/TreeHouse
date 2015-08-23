@@ -11,10 +11,12 @@
      public float linearFogEnd = 300.0f;
      
      public Color ambientLight = new Color(0.2f, 0.2f, 0.2f, 1.0f);
+     public float ambientIntensity = 0.45f;
      public Material skyboxMaterial;
+
+     public float reflectionIntensity = 0.4f;
      
      public float haloStrength = 0.5f;
-     
      public float flareStrength = 1.0f;
      
      void Awake() {
@@ -27,7 +29,10 @@
          RenderSettings.fogEndDistance = linearFogEnd;
          
          //RenderSettings.ambientLight = ambientLight;
+         RenderSettings.ambientIntensity = ambientIntensity;
          //RenderSettings.skybox = skyboxMaterial;
+        RenderSettings.reflectionIntensity = reflectionIntensity;
+
          
          //RenderSettings.haloStrength = haloStrength;
          
