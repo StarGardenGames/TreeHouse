@@ -118,7 +118,7 @@ public class ActiveInteractable : PhysicalObject {
 		//update canTrigger
 		canTrigger = inRange && (playerFacing || !is3D);
 		//update notiShown
-		if(canTrigger && (!notiShown || dist < notiDist) && (Key.GetKeysHeld() > 0 && this.gameObject.GetComponent<LockedDoor>() != null) ){
+		if(canTrigger && (!notiShown || dist < notiDist) && ((this.gameObject.GetComponent<LockedDoor>() == null || Key.GetKeysHeld() > 0)) ){
 			selected = this;
 			notiShown = true;
 			notiMarker.updateVisible(true);
