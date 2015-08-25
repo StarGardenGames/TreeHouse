@@ -824,7 +824,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 474902, guid: deeffe6947fd84f4abd7f5a4c2fa3ea1, type: 2}
       propertyPath: m_LocalPosition.x
-      value: 9.93000031
+      value: -3.47000003
       objectReference: {fileID: 0}
     - target: {fileID: 177564, guid: deeffe6947fd84f4abd7f5a4c2fa3ea1, type: 2}
       propertyPath: m_IsActive
@@ -2371,6 +2371,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 73f95b62bab28154f867bad64d340f0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ignoreYDistance: 0
   myName: EDGE_toHUB
   destName: HUB_toEDGE
   particleColor: {r: 0, g: .545098066, b: 1, a: 1}

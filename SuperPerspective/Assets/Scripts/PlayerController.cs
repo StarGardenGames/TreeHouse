@@ -9,7 +9,7 @@ public class PlayerController : PhysicalObject
 	//suppress warnings
 	#pragma warning disable 1691,168,219,414
 
-   #region Properties & Variables
+   	#region Properties & Variables
 
 	//singleton
 	public static PlayerController instance;
@@ -279,22 +279,22 @@ public class PlayerController : PhysicalObject
             velocity.z = newVelocityZ;
 
             bool walking = edgeState != 2 && (Mathf.Abs(velocity.z) > 0.1 || Mathf.Abs(velocity.x) >= 0.1);
-				bool shimmying = edgeState == 2 && ( Mathf.Abs(velocity.z) > 0.1 || Mathf.Abs(velocity.x) >= 0.1 );
+			bool shimmying = edgeState == 2 && ( Mathf.Abs(velocity.z) > 0.1 || Mathf.Abs(velocity.x) >= 0.1 );
             bool running = (Mathf.Abs(velocity.z) >= maxSpeed / 2 || Mathf.Abs(velocity.x) >= maxSpeed / 2);
             anim.SetBool("Walking", walking && !running && crate == null);
             anim.SetBool("Running", running && crate == null);
 					
 				if (crate == null) {
-						anim.SetBool("Pushing", false);
-						anim.SetBool("Pulling", false);
+					anim.SetBool("Pushing", false);
+					anim.SetBool("Pulling", false);
 				} else {
 					anim.SetBool("Pushing", Vector3.Dot(velocity, grabAxis) > 0);
 					anim.SetBool("Pulling", Vector3.Dot(velocity, grabAxis) < 0);
 				}
 				// ------------------------------------------------------------------------------------------------------
-            // MANAGE EDGE STATE
+            // Update Orientation
             // ------------------------------------------------------------------------------------------------------
-				if (walking && crate == null && edgeState < 2 && !climbing)
+				if (walking && crate == null && edgeState < 2 && anim.GetInteger("EdgeState") == 0)
 				{
 					orientation = Mathf.Rad2Deg * Mathf.Atan2(-velocity.z, velocity.x) + 90;
 				}else if(edgeState >= 2){
@@ -306,7 +306,7 @@ public class PlayerController : PhysicalObject
             // MANAGE EDGE STATE
             // ------------------------------------------------------------------------------------------------------
 				int animEdgeState = anim.GetInteger("EdgeState");
-				if(animEdgeState < 3)
+				if(animEdgeState < 3 || (animEdgeState == 5 && !climbing))	
 					anim.SetInteger("EdgeState", edgeState);
 				else if(animEdgeState == 3){
 						if(Mathf.Abs(velocity.z) < 0.1 && Mathf.Abs(velocity.x) < 0.1)

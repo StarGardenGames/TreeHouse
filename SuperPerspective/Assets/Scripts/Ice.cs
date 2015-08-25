@@ -3,6 +3,8 @@ using System.Collections;
 
 public class Ice : ActiveInteractable {
 
+	#pragma warning disable 219
+
 	private const float gravity = 1.5f;
 	private const float terminalVelocity = 60;
 	private const float decelleration = 15;
