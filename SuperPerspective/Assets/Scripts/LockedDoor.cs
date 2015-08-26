@@ -3,8 +3,8 @@ using System.Collections;
 
 public class LockedDoor : ActiveInteractable {
 
-	public int keysRequired = 1;
-	bool opened;
+	int keysRequired = 1;
+	bool opened = false;
 
 	public override void Triggered() {
 		if (!opened && Key.UseKey(keysRequired)) {

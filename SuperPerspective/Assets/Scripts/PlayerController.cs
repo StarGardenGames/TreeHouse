@@ -72,7 +72,9 @@ public class PlayerController : PhysicalObject
 	public Edge grabbedEdge = null;
 	public byte edgeState = 0;//0: not near an edge, 1: close to an edge, 2:hanging
 	bool climbing = false;
-	
+
+	private float lastUpdate;
+
    #endregion
 	
 	//setup singleton
@@ -111,6 +113,8 @@ public class PlayerController : PhysicalObject
 
 		// Register event handlers
 		GameStateManager.instance.GamePausedEvent += OnPauseGame;
+
+		lastUpdate = Time.fixedTime;
 	}
 
     void Update()
@@ -528,31 +532,33 @@ public class PlayerController : PhysicalObject
 	
 	// LateUpdate is used to actually move the position of the player
 	void LateUpdate () {
-		if (!_paused) {
-			// ------------------------------------------------------------------------------------------------------
-			// VERTICAL MOVEMENT VELOCITY CALCULATIONS
-			// ------------------------------------------------------------------------------------------------------
-			if (edgeState != 2 && !climbing)
-			{
-				// Apply Gravity
-				if (!grounded) {
-					if (velocity.y <= 0)
-						velocity = new Vector3(velocity.x, Mathf.Max(velocity.y - upGravity, -terminalVelocity), velocity.z);
-					else
-						velocity = new Vector3(velocity.x, Mathf.Max(velocity.y - downGravity, -terminalVelocity), velocity.z);
+		float timeDiff = Time.fixedTime - lastUpdate;
+			if (!_paused) {
+				// ------------------------------------------------------------------------------------------------------
+				// VERTICAL MOVEMENT VELOCITY CALCULATIONS
+				// ------------------------------------------------------------------------------------------------------
+				if (edgeState != 2 && !climbing)
+				{
+					// Apply Gravity
+					if (!grounded) {
+						if (velocity.y <= 0)
+							velocity = new Vector3(velocity.x, Mathf.Max(velocity.y - upGravity * Time.deltaTime, -terminalVelocity), velocity.z);
+						else
+							velocity = new Vector3(velocity.x, Mathf.Max(velocity.y - downGravity * Time.deltaTime, -terminalVelocity), velocity.z);
+					}
+					
+					// Determine if the player is falling
+					if (velocity.y < 0f && edgeState == 0)
+						falling = true;
 				}
-				
-				// Determine if the player is falling
-				if (velocity.y < 0f && edgeState == 0)
-					falling = true;
+				else
+				{
+					//if holding on to edge set velocity to 0 and set falling to false
+					velocity.y = 0;
+					falling = false;
+				}
 			}
-			else
-			{
-				//if holding on to edge set velocity to 0 and set falling to false
-				velocity.y = 0;
-				falling = false;
-			}
-		}
+			timeDiff -= 1 / 50f;
 
 		CheckCollisions();
 
@@ -569,6 +575,7 @@ public class PlayerController : PhysicalObject
                 transform.Translate(velocity * Time.deltaTime);
             }
         }
+		lastUpdate = Time.fixedTime;
     }
 
 	public bool Check2DIntersect() {

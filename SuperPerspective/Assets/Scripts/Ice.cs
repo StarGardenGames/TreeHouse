@@ -24,24 +24,25 @@ public class Ice : ActiveInteractable {
 	
 	private bool[] axisBlocked = new bool[4];
 
+	void Awake() {
+		colliderHeight = GetComponent<Collider>().bounds.size.y;
+		colliderWidth = GetComponent<Collider>().bounds.size.x;
+		colliderDepth = GetComponent<Collider>().bounds.size.z;
+	}
+
 	void Start() {
 		base.StartSetup ();
 		grounded = false;
 		velocity = Vector3.zero;
 		nextVelocity = Vector3.zero;
-		colliderHeight = GetComponent<Collider>().bounds.size.y;
-		colliderWidth = GetComponent<Collider>().bounds.size.x;
-		colliderDepth = GetComponent<Collider>().bounds.size.z;
-		
-		//player = GameObject.Find("Player").GetComponent<PlayerController>();
-		
+
 		// Register CheckGrab to grab input event
 		//InputManager.instance.InteractPressed += CheckGrab;
 		GameStateManager.instance.PerspectiveShiftEvent += Shift;
 		CameraController.instance.TransitionStartEvent += checkBreak;
+		range = colliderWidth >= colliderDepth ? colliderWidth * 0.85f : colliderDepth * 0.85f;
 		colCheck = new CollisionChecker (GetComponent<Collider> ());
 		startPos = transform.position;
-		range = colliderWidth >= colliderDepth ? colliderWidth * 0.85f : colliderDepth * 0.85f;
 		
 		for (int i = 0; i < 4; i++)
 			axisBlocked[i] = false;
@@ -104,12 +105,6 @@ public class Ice : ActiveInteractable {
 	
 	void LateUpdate () {
 		base.LateUpdateLogic ();
-		float dist = 0;
-		if (GameStateManager.instance.currentPerspective == PerspectiveType.p2D)
-			Vector3.Distance(transform.position, player.transform.position);
-		else
-			dist = Vector2.Distance(new Vector2(transform.position.x,transform.position.y),
-			                        new Vector2(player.transform.position.x, player.transform.position.y));
 		transform.Translate(velocity * Time.deltaTime);
 		if (respawnFlag && Vector2.Distance(new Vector2(startPos.x, startPos.y), new Vector2(player.transform.position.x, player.transform.position.y)) > colliderWidth) {
 			Vector3 pos = transform.position;
