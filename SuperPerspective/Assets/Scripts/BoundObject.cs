@@ -94,4 +94,8 @@ public class BoundObject : MonoBehaviour {
 			pos.z = Mathf.Max (myBounds.yMin, Mathf.Min (myBounds.yMax, transform.position.z));
 		transform.position = pos;
 	}
+
+	public Rect GetBounds() {
+		return myBounds;
+	}
 }
