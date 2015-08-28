@@ -3,7 +3,7 @@ using System.Collections;
 
 public class Key : Interactable {
 
-	#pragma warning disable 472s
+	#pragma warning disable 472, 1692
 
 	static int keysHeld = 0;
 	bool active = true;
