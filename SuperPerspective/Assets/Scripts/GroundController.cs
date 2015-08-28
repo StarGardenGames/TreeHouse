@@ -8,11 +8,11 @@ public class GroundController : MonoBehaviour {
 		
 	// Use this for initialization
 	void Start () {
-		Vector3 ls = this.transform.Find("Ground").transform.localScale;
-		tex = this.transform.Find("Ground Texture");
+		//Vector3 ls = this.transform.Find("Ground").transform.localScale;
+		//tex = this.transform.Find("Ground Texture");
 
-		var newScale = new Vector2(ls.x * scaleValue.x, ls.z * scaleValue.y);
-		tex.GetComponent<Renderer>().material.mainTextureScale = new Vector2(newScale.x, newScale.y);
+		//var newScale = new Vector2(ls.x * scaleValue.x, ls.z * scaleValue.y);
+		//tex.GetComponent<Renderer>().material.mainTextureScale = new Vector2(newScale.x, newScale.y);
 
 	}
 	

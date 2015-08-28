@@ -82,7 +82,7 @@ public class ActiveInteractable : PhysicalObject {
 		if(is3D) {
 			if (ignoreYDistance) {
 				dist = Vector2.Distance(new Vector2(transform.position.x,transform.position.z),
-				                        new Vector2(player.transform.position.x, player.transform.position.z));
+			               new Vector2(player.transform.position.x, player.transform.position.z));
 			} else {
 				dist = Vector3.Distance(transform.position, player.transform.position);
 			}
@@ -91,7 +91,7 @@ public class ActiveInteractable : PhysicalObject {
 				dist = Mathf.Abs(transform.position.x - player.transform.position.x);
 			} else {
 				dist = Vector2.Distance(new Vector2(transform.position.x,transform.position.y),
-				                        new Vector2(player.transform.position.x, player.transform.position.y));
+				           new Vector2(player.transform.position.x, player.transform.position.y));
 			}
 		}
 		//update inRange
@@ -116,9 +116,9 @@ public class ActiveInteractable : PhysicalObject {
 		//determine whether player is facing interactable
 		playerFacing = angleDiff < angleBuffer;
 		//update canTrigger
-		canTrigger = inRange && (playerFacing || !is3D);
+		canTrigger = inRange && (playerFacing || !is3D) && (GetComponent<Collider>().bounds.max.y - 0.05f > player.GetComponent<Collider>().bounds.min.y || !ignoreYDistance);
 		//update notiShown
-		if(canTrigger && (!notiShown || dist < notiDist) && ((this.gameObject.GetComponent<LockedDoor>() == null || Key.GetKeysHeld() > 0)) ){
+		if(canTrigger && (!notiShown || dist < notiDist) && ((this.gameObject.GetComponent<LockedDoor>() == null || Key.GetKeysHeld() > 0))){
 			selected = this;
 			notiShown = true;
 			notiMarker.updateVisible(true);

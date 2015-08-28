@@ -5,7 +5,7 @@ public class PushSwitch : MonoBehaviour {
 
 	#pragma warning disable 114, 414
 
-	public GameObject parentPlatform;
+	public Rect parentPlatform;
 
 	public Activatable[] triggers;//Activatable objects which this switch triggers
 
@@ -16,14 +16,6 @@ public class PushSwitch : MonoBehaviour {
 	Renderer rune;
 
 	Vector3 baseScale;
-
-	void Awake()
-	{
-		if (parentPlatform == null) {
-			parentPlatform = GameObject.Find("Ground");
-		}
-		
-	}
 
 	void Start() {
 		rune = GetComponentInChildren<Renderer>();
@@ -37,6 +29,7 @@ public class PushSwitch : MonoBehaviour {
 			rune.transform.localScale = baseScale;
 		}
 		RaycastHit hit;
+		parentPlatform = PlayerController.instance.GetComponent<BoundObject>().GetBounds();
 		if (GameStateManager.instance.currentPerspective == PerspectiveType.p3D) {
 			if (Physics.Raycast(transform.position + Vector3.forward * 2f, -Vector3.forward, out hit, 4f, LayerMask.NameToLayer("RaycastIgnore"))) {
 				if (!pushed)
@@ -45,8 +38,8 @@ public class PushSwitch : MonoBehaviour {
 				ExitCollisionWithGeneral(null);
 			}
 		} else {
-			if (Physics.Raycast(transform.position + (Vector3.forward * (parentPlatform.GetComponent<Collider>().bounds.extents.z + 1f)), -Vector3.forward, out hit,
-			                    parentPlatform.GetComponent<Collider>().bounds.extents.z * 2 + 2f, LayerMask.NameToLayer("RaycastIgnore"))) {
+			if (Physics.Raycast(new Vector3(transform.position.x, transform.position.y, parentPlatform.max.y + 1f), -Vector3.forward, out hit,
+			                    parentPlatform.height + 2f, LayerMask.NameToLayer("RaycastIgnore"))) {
 				if (!pushed)
 					EnterCollisionWithGeneral(hit.collider.gameObject);
 			} else if (pushed) {
