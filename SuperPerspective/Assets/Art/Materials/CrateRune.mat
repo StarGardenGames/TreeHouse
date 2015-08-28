@@ -2,15 +2,16 @@
 %TAG !u! tag:unity3d.com,2011:
 --- !u!21 &2100000
 Material:
-  serializedVersion: 5
+  serializedVersion: 6
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_Name: CrateRune
-  m_Shader: {fileID: 10751, guid: 0000000000000000f000000000000000, type: 0}
+  m_Shader: {fileID: 10753, guid: 0000000000000000e000000000000000, type: 0}
   m_ShaderKeywords: 
   m_LightmapFlags: 5
   m_CustomRenderQueue: -1
+  stringTagMap: {}
   m_SavedProperties:
     serializedVersion: 2
     m_TexEnvs:
@@ -80,15 +81,19 @@ Material:
     m_Floats:
       data:
         first:
-          name: _Cutoff
-        second: .5
-      data:
-        first:
           name: _SrcBlend
         second: 1
       data:
         first:
           name: _DstBlend
+        second: 0
+      data:
+        first:
+          name: _Cutoff
+        second: .5
+      data:
+        first:
+          name: PixelSnap
         second: 0
       data:
         first:
@@ -138,7 +143,7 @@ Material:
       data:
         first:
           name: _Color
-        second: {r: 1, g: 1, b: 1, a: 1}
+        second: {r: .142733559, g: .560762227, b: .808823526, a: 1}
       data:
         first:
           name: _EmissionColorUI

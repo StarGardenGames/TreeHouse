@@ -10,7 +10,7 @@ public class Mover : Activatable {
 
 	void Start(){
 		//make startPositon to be current position
-		Vector3 pos = transform.position;
+		Vector3 pos = transform.localPosition;
 		startPosition = new Vector3(pos.x,pos.y,pos.z);
 	}
 
@@ -20,6 +20,6 @@ public class Mover : Activatable {
 		prog = Mathf.Clamp01(prog); //clamp between 0 and 1
 
 		//set position
-		transform.position = Vector3.Lerp(startPosition, startPosition + movement, prog);
+		transform.localPosition = Vector3.Lerp(startPosition, startPosition + movement, prog);
 	}
 }
