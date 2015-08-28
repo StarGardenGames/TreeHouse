@@ -3,6 +3,8 @@ using System.Collections;
 
 public class EdgeManager : MonoBehaviour {
 
+	#pragma warning disable 219
+
 	public static EdgeManager instance;
 
 	public GameObject edgePrefab;
@@ -53,7 +55,7 @@ public class EdgeManager : MonoBehaviour {
 		Vector3 centerOffset = findTrueTerrainCenter(terrain);
 		Vector3 edgeScale = findTrueEdgeScale(terrain);
 		return
-			terrain.transform.position - centerOffset + (terrainScale.y-edgeScale.y) * Vector3.up * .5f;
+			terrain.transform.position + centerOffset + (terrainScale.y-edgeScale.y) * Vector3.up * .5f;
 	}
 	
 	private Vector3 findTrueEdgeScale(GameObject terrain){
@@ -82,19 +84,26 @@ public class EdgeManager : MonoBehaviour {
 		Vector3 boxCenter = terrain.GetComponent<LevelGeometry>().getTrueBoxColliderCenter();
 		Vector3 transformScale = terrain.transform.lossyScale;	
 		
-		
 		Vector3 center = 	(Vector3.right * boxCenter.x * transformScale.x) +
-							(Vector3.up * boxCenter.y * transformScale.y) +
+							(Vector3.up * boxCenter.y * transformScale.y)+
 							(Vector3.forward * boxCenter.z * transformScale.z);
-		if(isTerrainOnRotatedQuadrant(terrain))
-			return flipXZ(center);
-		else
-			return flipXZ(center);
+		
+		switch(getTerrainRotationQuadrant(terrain)){
+			case 0:	return new Vector3( center.x, center.y,  center.z);
+			case 1: return new Vector3( center.z, center.y, -center.x);
+			case 2:	return new Vector3(-center.x, center.y, -center.z);
+			case 3: return new Vector3(-center.z, center.y,  center.x);
+			default:
+				throw new System.ArgumentException("Invalid rotation value, must be (0-3)");
+		}
 	}
 	
 	private bool isTerrainOnRotatedQuadrant(GameObject terrain){
-		int quad = (int)Mathf.Round((float)(terrain.transform.rotation.eulerAngles.y / 90.0));
-		return quad % 2 == 1;
+		return getTerrainRotationQuadrant(terrain) % 2 == 1;
+	}
+	
+	private int getTerrainRotationQuadrant(GameObject terrain){
+		return (int)Mathf.Round((float)(terrain.transform.rotation.eulerAngles.y / 90.0));
 	}
 	
 	private void CreateEdge(GameObject terrain, Vector3 top, Vector3 offsetDir, float offsetMag, Vector3 terrainScale){

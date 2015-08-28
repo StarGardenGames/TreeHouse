@@ -51,89 +51,95 @@ public class Ice : ActiveInteractable {
 	}
 
 	void Update() {
-		if (!nextVelocity.Equals(Vector3.zero)) {
-			velocity = nextVelocity;
-			nextVelocity = Vector3.zero;
-			startPush = true;
-			BoundObject binder = gameObject.GetComponent<BoundObject>();
-			if(binder!=null)
-				binder.bind();
+		if(!PlayerController.instance.isPaused()){
+			if (!nextVelocity.Equals(Vector3.zero)) {
+				velocity = nextVelocity;
+				nextVelocity = Vector3.zero;
+				startPush = true;
+				BoundObject binder = gameObject.GetComponent<BoundObject>();
+				if(binder!=null)
+					binder.bind();
+			}
+			CheckCollisions();
 		}
-		CheckCollisions();
 	}
 
 	void FixedUpdate() {
-		base.FixedUpdateLogic ();
-		if (!grounded)
-			velocity = new Vector3(velocity.x, Mathf.Max(velocity.y - gravity, -terminalVelocity), velocity.z);
-		
-		/*if (grabbed) {
-			float vy = velocity.y;
-			velocity = player.GetComponent<PlayerController>().GetVelocity();
-			velocity.y = vy;
-		}*/
-		
-		//CheckCollisions();
-		
-		/*float newVelocityX = velocity.x, newVelocityZ = velocity.z;
-		if (velocity.x != 0)
-		{
-			int modifier = velocity.x > 0 ? -1 : 1;
-			newVelocityX += Mathf.Min(decelleration, Mathf.Abs(velocity.x)) * modifier;
+		if(!PlayerController.instance.isPaused()){
+			base.FixedUpdateLogic ();
+			if (!grounded)
+				velocity = new Vector3(velocity.x, Mathf.Max(velocity.y - gravity, -terminalVelocity), velocity.z);
+			
+			/*if (grabbed) {
+				float vy = velocity.y;
+				velocity = player.GetComponent<PlayerController>().GetVelocity();
+				velocity.y = vy;
+			}*/
+			
+			//CheckCollisions();
+			
+			/*float newVelocityX = velocity.x, newVelocityZ = velocity.z;
+			if (velocity.x != 0)
+			{
+				int modifier = velocity.x > 0 ? -1 : 1;
+				newVelocityX += Mathf.Min(decelleration, Mathf.Abs(velocity.x)) * modifier;
+			}
+			velocity.x = newVelocityX;
+			
+			if (velocity.z != 0)
+			{
+				int modifier = velocity.z > 0 ? -1 : 1;
+				newVelocityZ += Mathf.Min(decelleration, Mathf.Abs(velocity.z)) * modifier;
+			}
+			velocity.z = newVelocityZ;*/
+			
+			if (GetComponent<Collider> ().enabled) {
+				colliderHeight = GetComponent<Collider>().bounds.size.y;
+				colliderWidth = GetComponent<Collider>().bounds.size.x;
+				colliderDepth = GetComponent<Collider>().bounds.size.z;
+			}
+			
+			if (svFlag) {
+				velocity.x = newVelocity.x;
+				velocity.z = newVelocity.z;
+				svFlag = false;
+			}
+			
+			//CheckCollisions();
 		}
-		velocity.x = newVelocityX;
-		
-		if (velocity.z != 0)
-		{
-			int modifier = velocity.z > 0 ? -1 : 1;
-			newVelocityZ += Mathf.Min(decelleration, Mathf.Abs(velocity.z)) * modifier;
-		}
-		velocity.z = newVelocityZ;*/
-		
-		if (GetComponent<Collider> ().enabled) {
-			colliderHeight = GetComponent<Collider>().bounds.size.y;
-			colliderWidth = GetComponent<Collider>().bounds.size.x;
-			colliderDepth = GetComponent<Collider>().bounds.size.z;
-		}
-		
-		if (svFlag) {
-			velocity.x = newVelocity.x;
-			velocity.z = newVelocity.z;
-			svFlag = false;
-		}
-		
-		//CheckCollisions();
 	}
 	
 	void LateUpdate () {
-		base.LateUpdateLogic ();
-		transform.Translate(velocity * Time.deltaTime);
-		if (respawnFlag && Vector2.Distance(new Vector2(startPos.x, startPos.y), new Vector2(player.transform.position.x, player.transform.position.y)) > colliderWidth) {
-			Vector3 pos = transform.position;
-			pos = startPos + Vector3.up;
-			transform.position = pos;
-			GetComponent<Collider>().enabled = true;
-			GetComponentInChildren<Renderer>().enabled = true;
-			velocity = Vector3.zero;
-			respawnFlag = false;
-		}
-		
-		BoundObject binder = gameObject.GetComponent<BoundObject>();
-		if(binder != null)
-			binder.bind();
-		
-		//call custom bind
-
-		if (startPush) {
-			if (velocity.Equals(Vector3.zero)){
-				respawnFlag = true;
-				GetComponent<Collider>().enabled = false;
-				GetComponentInChildren<Renderer>().enabled = false;
+		if(!PlayerController.instance.isPaused()){
+			base.LateUpdateLogic ();
+			transform.Translate(velocity * Time.deltaTime);
+			if (respawnFlag && Vector2.Distance(new Vector2(startPos.x, startPos.y), new Vector2(player.transform.position.x, player.transform.position.y)) > colliderWidth) {
+				Vector3 pos = transform.position;
+				pos = startPos + Vector3.up;
+				transform.position = pos;
+				GetComponent<Collider>().enabled = true;
+				GetComponentInChildren<Renderer>().enabled = true;
+				velocity = Vector3.zero;
+				respawnFlag = false;
 			}
-			startPush = false;
+			
+			BoundObject binder = gameObject.GetComponent<BoundObject>();
+			if(binder != null)
+				binder.bind();
+			
+			//call custom bind
+	
+			if (startPush) {
+				if (velocity.Equals(Vector3.zero)){
+					respawnFlag = true;
+					GetComponent<Collider>().enabled = false;
+					GetComponentInChildren<Renderer>().enabled = false;
+				}
+				startPush = false;
+			}
+	
+			//CheckCollisions();
 		}
-
-		//CheckCollisions();
 	}
 	
 	public void CheckCollisions() {
