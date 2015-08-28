@@ -706,6 +706,10 @@ public class PlayerController : PhysicalObject
 		return velocity;
 	}
 
+	public bool isPaused(){
+		return _paused;
+	}
+
 	#endregion Accessor Methods
 	
 	private void OnPauseGame(bool p)

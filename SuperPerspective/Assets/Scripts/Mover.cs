@@ -15,11 +15,13 @@ public class Mover : Activatable {
 	}
 
 	void Update(){
-		//update prog
-		prog+= (Time.deltaTime/transitionTime) * ((activated)? 1 : -1);//increase or decrease depending on activated
-		prog = Mathf.Clamp01(prog); //clamp between 0 and 1
-
-		//set position
-		transform.position = Vector3.Lerp(startPosition, startPosition + movement, prog);
+		if (!PlayerController.instance.isPaused()){
+			//update prog
+			prog+= (Time.deltaTime/transitionTime) * ((activated)? 1 : -1);//increase or decrease depending on activated
+			prog = Mathf.Clamp01(prog); //clamp between 0 and 1
+	
+			//set position
+			transform.position = Vector3.Lerp(startPosition, startPosition + movement, prog);
+		}
 	}
 }
