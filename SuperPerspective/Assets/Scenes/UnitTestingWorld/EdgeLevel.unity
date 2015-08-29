@@ -750,7 +750,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   activated: 0
-  movement: {x: 0, y: 2, z: -8}
+  movement: {x: 10, y: 2, z: -8}
   transitionTime: 1
 --- !u!4 &782997234 stripped
 Transform:
