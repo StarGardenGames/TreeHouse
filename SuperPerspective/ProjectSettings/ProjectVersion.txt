@@ -1,2 +1,6 @@
+<<<<<<< HEAD
 m_EditorVersion: 5.1.2f1
+=======
+m_EditorVersion: 5.1.0f3
+>>>>>>> high gates.scene ice level is super cool yo
 m_StandardAssetsVersion: 0
