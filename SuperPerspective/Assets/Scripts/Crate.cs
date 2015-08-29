@@ -293,8 +293,9 @@ public class Crate : ActiveInteractable {
 			gameObject.GetComponent<AudioSource>().clip = Resources.Load ("Sound/SFX/Objects/Box/CrateBreak")  as AudioClip;
 			gameObject.GetComponent<AudioSource>().volume = 1;
 			gameObject.GetComponent<AudioSource>().Play();
-
+			
 			//End Nick stuff
+
 		}
 	}
 

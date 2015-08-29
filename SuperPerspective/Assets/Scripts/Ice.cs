@@ -119,6 +119,30 @@ public class Ice : ActiveInteractable {
 			}
 			
 			//CheckCollisions();
+
+			//Adding in pushing sound, initialize after break sound -Nick
+			
+			//Init
+			/*if (gameObject.GetComponent<AudioSource> () != null && gameObject.GetComponent<AudioSource> ().clip != null &&
+			    gameObject.GetComponent<AudioSource> ().clip.name != "IceMove" && !respawnFlag && grounded) {
+				gameObject.GetComponent<AudioSource> ().clip =  Resources.Load ("Sound/SFX/Objects/Ice/IceMove")  as AudioClip;
+				gameObject.GetComponent<AudioSource> ().loop = true;
+				gameObject.GetComponent<AudioSource>().volume = 0;
+				gameObject.GetComponent<AudioSource>().Play ();
+				
+			}
+			
+			//Check
+			if (velocity.magnitude > 0.1f && grounded){
+				if(gameObject.GetComponent<AudioSource>().volume < 1){
+					gameObject.GetComponent<AudioSource>().volume += 0.5f;
+				}
+			}
+			else{
+				gameObject.GetComponent<AudioSource>().volume = 0;
+			}*/
+			
+			//End Nick stuff
 		}
 	}
 	
@@ -145,6 +169,15 @@ public class Ice : ActiveInteractable {
 			if (startPush) {
 				if (velocity.Equals(Vector3.zero)){
 					respawnFlag = true;
+					//Adding in break sound -Nick
+					gameObject.GetComponent<AudioSource>().loop = false;
+					gameObject.GetComponent<AudioSource>().Stop ();
+					gameObject.GetComponent<AudioSource>().clip = Resources.Load ("Sound/SFX/Objects/Ice/IceBreak")  as AudioClip;
+					gameObject.GetComponent<AudioSource>().volume = 1;
+					gameObject.GetComponent<AudioSource>().Play();
+					Debug.Log("Butt");
+					
+					//End Nick stuff
 					GetComponent<Collider>().enabled = false;
 					GetComponentInChildren<Renderer>().enabled = false;
 				}
@@ -276,7 +309,16 @@ public class Ice : ActiveInteractable {
 	void checkBreak() {
 		if (GameStateManager.instance.currentPerspective == PerspectiveType.p2D && Check2DIntersect ()) {
 			respawnFlag = true;
+			//Adding in break sound -Nick
+			gameObject.GetComponent<AudioSource>().loop = false;
+			gameObject.GetComponent<AudioSource>().Stop ();
+			gameObject.GetComponent<AudioSource>().clip = Resources.Load ("Sound/SFX/Objects/Ice/IceBreak")  as AudioClip;
+			gameObject.GetComponent<AudioSource>().volume = 1;
+			gameObject.GetComponent<AudioSource>().Play();
+			
+			//End Nick stuff
 		}
+	
 	}
 	
 	// Used to check collisions with special objects
