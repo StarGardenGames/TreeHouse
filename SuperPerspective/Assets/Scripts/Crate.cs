@@ -156,7 +156,9 @@ public class Crate : ActiveInteractable {
 				GetComponent<Collider>().enabled = true;
 				GetComponentInChildren<Renderer>().enabled = true;
 				//SPAWN A SPAWN CIRCLE
-				GameObject.Instantiate(spawnCircle, transform.position, Quaternion.identity);
+				if(spawnCircle != null){
+					GameObject.Instantiate(spawnCircle, transform.position, Quaternion.identity);
+				}
 				respawnFlag = false;
 			}
 			//CheckCollisions();

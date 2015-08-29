@@ -160,7 +160,9 @@ public class Ice : ActiveInteractable {
 				transform.position = pos;
 				GetComponent<Collider>().enabled = true;
 				GetComponentInChildren<Renderer>().enabled = true;
-				GameObject.Instantiate(spawnCircle, transform.position, Quaternion.identity);
+				if(spawnCircle != null){
+					GameObject.Instantiate(spawnCircle, transform.position, Quaternion.identity);
+				}
 				velocity = Vector3.zero;
 				respawnFlag = false;
 			}
