@@ -317,12 +317,12 @@ public class Ice : ActiveInteractable {
 	void checkBreak() {
 		if (GameStateManager.instance.currentPerspective == PerspectiveType.p2D && Check2DIntersect ()) {
 			respawnFlag = true;
-<<<<<<< HEAD
+
 			//TODO
 			if(brokenIce != null){
 				GameObject.Instantiate(brokenIce, brokenIceSpawnPoint.transform.position, Quaternion.identity);
 			}
-=======
+
 			//Adding in break sound -Nick
 			gameObject.GetComponent<AudioSource>().loop = false;
 			gameObject.GetComponent<AudioSource>().Stop ();
@@ -331,7 +331,7 @@ public class Ice : ActiveInteractable {
 			gameObject.GetComponent<AudioSource>().Play();
 			
 			//End Nick stuff
->>>>>>> origin/master
+
 		}
 	
 	}
