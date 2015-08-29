@@ -46,7 +46,6 @@ public class Ice : ActiveInteractable {
 		//InputManager.instance.InteractPressed += CheckGrab;
 		GameStateManager.instance.PerspectiveShiftEvent += Shift;
 		CameraController.instance.TransitionStartEvent += checkBreak;
-		range = colliderWidth >= colliderDepth ? colliderWidth * 0.85f : colliderDepth * 0.85f;
 		colCheck = new CollisionChecker (GetComponent<Collider> ());
 		startPos = transform.position;
 		
@@ -55,93 +54,146 @@ public class Ice : ActiveInteractable {
 	}
 
 	void Update() {
-		if (!nextVelocity.Equals(Vector3.zero)) {
-			velocity = nextVelocity;
-			nextVelocity = Vector3.zero;
-			startPush = true;
-			BoundObject binder = gameObject.GetComponent<BoundObject>();
-			if(binder!=null)
-				binder.bind();
+		switch (GetQuadrant()) {
+			case Quadrant.xPlus:
+				range = colliderWidth * 0.85f;
+				break;
+			case Quadrant.xMinus:
+				range = colliderWidth * 0.85f;
+				break;
+			case Quadrant.zPlus:
+				range = colliderDepth * 0.85f;
+				break;
+			case Quadrant.zMinus:
+				range = colliderDepth * 0.85f;
+				break;
 		}
-		CheckCollisions();
+		if(!PlayerController.instance.isPaused()){
+			if (!nextVelocity.Equals(Vector3.zero)) {
+				velocity = nextVelocity;
+				nextVelocity = Vector3.zero;
+				startPush = true;
+				BoundObject binder = gameObject.GetComponent<BoundObject>();
+				if(binder!=null)
+					binder.bind();
+			}
+			CheckCollisions();
+		}
 	}
 
 	void FixedUpdate() {
-		base.FixedUpdateLogic ();
-		if (!grounded)
-			velocity = new Vector3(velocity.x, Mathf.Max(velocity.y - gravity, -terminalVelocity), velocity.z);
-		
-		/*if (grabbed) {
-			float vy = velocity.y;
-			velocity = player.GetComponent<PlayerController>().GetVelocity();
-			velocity.y = vy;
-		}*/
-		
-		//CheckCollisions();
-		
-		/*float newVelocityX = velocity.x, newVelocityZ = velocity.z;
-		if (velocity.x != 0)
-		{
-			int modifier = velocity.x > 0 ? -1 : 1;
-			newVelocityX += Mathf.Min(decelleration, Mathf.Abs(velocity.x)) * modifier;
+		if(!PlayerController.instance.isPaused()){
+			base.FixedUpdateLogic ();
+			if (!grounded)
+				velocity = new Vector3(velocity.x, Mathf.Max(velocity.y - gravity, -terminalVelocity), velocity.z);
+			
+			/*if (grabbed) {
+				float vy = velocity.y;
+				velocity = player.GetComponent<PlayerController>().GetVelocity();
+				velocity.y = vy;
+			}*/
+			
+			//CheckCollisions();
+			
+			/*float newVelocityX = velocity.x, newVelocityZ = velocity.z;
+			if (velocity.x != 0)
+			{
+				int modifier = velocity.x > 0 ? -1 : 1;
+				newVelocityX += Mathf.Min(decelleration, Mathf.Abs(velocity.x)) * modifier;
+			}
+			velocity.x = newVelocityX;
+			
+			if (velocity.z != 0)
+			{
+				int modifier = velocity.z > 0 ? -1 : 1;
+				newVelocityZ += Mathf.Min(decelleration, Mathf.Abs(velocity.z)) * modifier;
+			}
+			velocity.z = newVelocityZ;*/
+			
+			if (GetComponent<Collider> ().enabled) {
+				colliderHeight = GetComponent<Collider>().bounds.size.y;
+				colliderWidth = GetComponent<Collider>().bounds.size.x;
+				colliderDepth = GetComponent<Collider>().bounds.size.z;
+			}
+			
+			if (svFlag) {
+				velocity.x = newVelocity.x;
+				velocity.z = newVelocity.z;
+				svFlag = false;
+			}
+			
+			//CheckCollisions();
+
+			//Adding in pushing sound, initialize after break sound -Nick
+			
+			//Init
+			/*if (gameObject.GetComponent<AudioSource> () != null && gameObject.GetComponent<AudioSource> ().clip != null &&
+			    gameObject.GetComponent<AudioSource> ().clip.name != "IceMove" && !respawnFlag && grounded) {
+				gameObject.GetComponent<AudioSource> ().clip =  Resources.Load ("Sound/SFX/Objects/Ice/IceMove")  as AudioClip;
+				gameObject.GetComponent<AudioSource> ().loop = true;
+				gameObject.GetComponent<AudioSource>().volume = 0;
+				gameObject.GetComponent<AudioSource>().Play ();
+				
+			}
+			
+			//Check
+			if (velocity.magnitude > 0.1f && grounded){
+				if(gameObject.GetComponent<AudioSource>().volume < 1){
+					gameObject.GetComponent<AudioSource>().volume += 0.5f;
+				}
+			}
+			else{
+				gameObject.GetComponent<AudioSource>().volume = 0;
+			}*/
+			
+			//End Nick stuff
 		}
-		velocity.x = newVelocityX;
-		
-		if (velocity.z != 0)
-		{
-			int modifier = velocity.z > 0 ? -1 : 1;
-			newVelocityZ += Mathf.Min(decelleration, Mathf.Abs(velocity.z)) * modifier;
-		}
-		velocity.z = newVelocityZ;*/
-		
-		if (GetComponent<Collider> ().enabled) {
-			colliderHeight = GetComponent<Collider>().bounds.size.y;
-			colliderWidth = GetComponent<Collider>().bounds.size.x;
-			colliderDepth = GetComponent<Collider>().bounds.size.z;
-		}
-		
-		if (svFlag) {
-			velocity.x = newVelocity.x;
-			velocity.z = newVelocity.z;
-			svFlag = false;
-		}
-		
-		//CheckCollisions();
 	}
 	
 	void LateUpdate () {
-		base.LateUpdateLogic ();
-		transform.Translate(velocity * Time.deltaTime);
-		if (respawnFlag && Vector2.Distance(new Vector2(startPos.x, startPos.y), new Vector2(player.transform.position.x, player.transform.position.y)) > colliderWidth) {
-			Vector3 pos = transform.position;
-			pos = startPos + Vector3.up;
-			transform.position = pos;
-			GetComponent<Collider>().enabled = true;
-			GetComponentInChildren<Renderer>().enabled = true;
-			GameObject.Instantiate(spawnCircle, transform.position, Quaternion.identity);
-			velocity = Vector3.zero;
-			respawnFlag = false;
-		}
-		
-		BoundObject binder = gameObject.GetComponent<BoundObject>();
-		if(binder != null)
-			binder.bind();
-		
-		//call custom bind
-
-		if (startPush) {
-			if (velocity.Equals(Vector3.zero)){
-				respawnFlag = true;
-				GetComponent<Collider>().enabled = false;
-				GetComponentInChildren<Renderer>().enabled = false;
-				if(brokenIce != null){
-					GameObject.Instantiate(brokenIce, brokenIceSpawnPoint.transform.position, Quaternion.identity);
-				}
+		if(!PlayerController.instance.isPaused()){
+			base.LateUpdateLogic ();
+			transform.Translate(velocity * Time.deltaTime);
+			if (respawnFlag && Vector2.Distance(new Vector2(startPos.x, startPos.y), new Vector2(player.transform.position.x, player.transform.position.y)) > colliderWidth) {
+				Vector3 pos = transform.position;
+				pos = startPos + Vector3.up;
+				transform.position = pos;
+				GetComponent<Collider>().enabled = true;
+				GetComponentInChildren<Renderer>().enabled = true;
+				GameObject.Instantiate(spawnCircle, transform.position, Quaternion.identity);
+				velocity = Vector3.zero;
+				respawnFlag = false;
 			}
-			startPush = false;
+			
+			BoundObject binder = gameObject.GetComponent<BoundObject>();
+			if(binder != null)
+				binder.bind();
+			
+			//call custom bind
+	
+			if (startPush) {
+				if (velocity.Equals(Vector3.zero)){
+					respawnFlag = true;
+					//Adding in break sound -Nick
+					gameObject.GetComponent<AudioSource>().loop = false;
+					gameObject.GetComponent<AudioSource>().Stop ();
+					gameObject.GetComponent<AudioSource>().clip = Resources.Load ("Sound/SFX/Objects/Ice/IceBreak")  as AudioClip;
+					gameObject.GetComponent<AudioSource>().volume = 1;
+					gameObject.GetComponent<AudioSource>().Play();
+					
+					//End Nick stuff
+					GetComponent<Collider>().enabled = false;
+					GetComponentInChildren<Renderer>().enabled = false;
+					
+					if(brokenIce != null){
+						GameObject.Instantiate(brokenIce, brokenIceSpawnPoint.transform.position, Quaternion.identity);
+					}
+				}
+				startPush = false;
+			}
+	
+			//CheckCollisions();
 		}
-
-		//CheckCollisions();
 	}
 	
 	public void CheckCollisions() {
@@ -265,11 +317,23 @@ public class Ice : ActiveInteractable {
 	void checkBreak() {
 		if (GameStateManager.instance.currentPerspective == PerspectiveType.p2D && Check2DIntersect ()) {
 			respawnFlag = true;
+<<<<<<< HEAD
 			//TODO
 			if(brokenIce != null){
 				GameObject.Instantiate(brokenIce, brokenIceSpawnPoint.transform.position, Quaternion.identity);
 			}
+=======
+			//Adding in break sound -Nick
+			gameObject.GetComponent<AudioSource>().loop = false;
+			gameObject.GetComponent<AudioSource>().Stop ();
+			gameObject.GetComponent<AudioSource>().clip = Resources.Load ("Sound/SFX/Objects/Ice/IceBreak")  as AudioClip;
+			gameObject.GetComponent<AudioSource>().volume = 1;
+			gameObject.GetComponent<AudioSource>().Play();
+			
+			//End Nick stuff
+>>>>>>> origin/master
 		}
+	
 	}
 	
 	// Used to check collisions with special objects
@@ -297,17 +361,20 @@ public class Ice : ActiveInteractable {
 	}
 	//Mathf.Abs(player.transform.position.x - transform.position.x) > colliderWidth / 2
 	public override void Triggered() {
-		if (velocity.Equals(Vector3.zero)) {
-			if (Mathf.Abs(player.transform.position.x - transform.position.x) > colliderWidth / 2 || persp == PerspectiveType.p2D) {
-				if (player.transform.position.x - transform.position.x > 0)
-					nextVelocity = Vector3.left * slideSpeed;
-				else
-					nextVelocity = Vector3.right * slideSpeed;
-			} else {
-				if (player.transform.position.z - transform.position.z > 0)
-					nextVelocity = Vector3.back * slideSpeed;
-				else
-					nextVelocity = Vector3.forward * slideSpeed;
+		if (velocity.Equals (Vector3.zero)) {
+			switch (GetQuadrant()) {
+				case Quadrant.xPlus:
+						nextVelocity = Vector3.left * slideSpeed;
+						break;
+				case Quadrant.xMinus:
+						nextVelocity = Vector3.right * slideSpeed;
+						break;
+				case Quadrant.zPlus:
+						nextVelocity = Vector3.back * slideSpeed;
+						break;
+				case Quadrant.zMinus:
+						nextVelocity = Vector3.forward * slideSpeed;
+						break;
 			}
 		}
 	}

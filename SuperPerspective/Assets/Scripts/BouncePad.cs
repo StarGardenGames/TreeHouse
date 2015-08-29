@@ -38,5 +38,6 @@ public class BouncePad : MonoBehaviour {
 	public void Animate() {
 		damp = 1;
 		animating = true;
+		GetComponent<AudioSource>().Play();
 	}
 }

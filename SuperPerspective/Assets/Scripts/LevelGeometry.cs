@@ -31,8 +31,7 @@ public class LevelGeometry : MonoBehaviour
 	
 	void Start () {
 		parentPlatform = IslandControl.instance.findGround(this.gameObject);
-		if(parentPlatform == null)
-			Debug.Log("Couldn't find ground");
+		
       // Register to perspective shift event
 		boxCollider = GetComponent<BoxCollider>();
 		startCenter = boxCollider.center;

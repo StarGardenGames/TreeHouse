@@ -50,112 +50,117 @@ public class Crate : ActiveInteractable {
 	}
 
 	void Update() {
-		if (grabbed) {
-			if (GameStateManager.instance.currentPerspective == PerspectiveType.p3D) {
-				if (Vector3.Distance(player.transform.position, transform.position) > range * (1 + Margin)) {
-					player.GetComponent<PlayerController>().Grab(null);
-					grabbed = false;
-				}
-			} else {
-				if (Vector2.Distance(new Vector2(player.transform.position.x, player.transform.position.y), new Vector2(transform.position.x, transform.position.y)) > range * (1 + Margin)) {
-					player.GetComponent<PlayerController>().Grab(null);
-					grabbed = false;
+		if(!PlayerController.instance.isPaused()){
+			if (grabbed) {
+				if (GameStateManager.instance.currentPerspective == PerspectiveType.p3D) {
+					if (Vector3.Distance(player.transform.position, transform.position) > range * (1 + Margin)) {
+						player.GetComponent<PlayerController>().Grab(null);
+						grabbed = false;
+					}
+				} else {
+					if (Vector2.Distance(new Vector2(player.transform.position.x, player.transform.position.y), new Vector2(transform.position.x, transform.position.y)) > range * (1 + Margin)) {
+						player.GetComponent<PlayerController>().Grab(null);
+						grabbed = false;
+					}
 				}
 			}
 		}
 	}
 
 	void FixedUpdate() {
-		base.FixedUpdateLogic ();
-		if (!grounded)
-			velocity = new Vector3(velocity.x, Mathf.Max(velocity.y - gravity, -terminalVelocity), velocity.z);
-
-		/*if (grabbed) {
-			float vy = velocity.y;
-			velocity = player.GetComponent<PlayerController>().GetVelocity();
-			velocity.y = vy;
-		}*/
-
-		//CheckCollisions();
-
-		float newVelocityX = velocity.x, newVelocityZ = velocity.z;
-		if (velocity.x != 0)
-		{
-			int modifier = velocity.x > 0 ? -1 : 1;
-			newVelocityX += Mathf.Min(decelleration, Mathf.Abs(velocity.x)) * modifier;
-		}
-		velocity.x = newVelocityX;
+		if(!PlayerController.instance.isPaused()){
+			base.FixedUpdateLogic ();
+			if (!grounded)
+				velocity = new Vector3(velocity.x, Mathf.Max(velocity.y - gravity, -terminalVelocity), velocity.z);
 	
-		if (velocity.z != 0)
-		{
-			int modifier = velocity.z > 0 ? -1 : 1;
-			newVelocityZ += Mathf.Min(decelleration, Mathf.Abs(velocity.z)) * modifier;
-		}
-		velocity.z = newVelocityZ;
-
-		if (GetComponent<Collider> ().enabled) {
-			colliderHeight = GetComponent<Collider>().bounds.size.y;
-			colliderWidth = GetComponent<Collider>().bounds.size.x;
-			colliderDepth = GetComponent<Collider>().bounds.size.z;
-		}
-
-		if (svFlag) {
-			velocity.x = newVelocity.x;
-			velocity.z = newVelocity.z;
-			svFlag = false;
-		}
-
-		CheckCollisions();
-
-		//Adding in pushing sound, initialize after break sound -Nick
-
-		//Init
-		if (gameObject.GetComponent<AudioSource> ().clip.name != "CratePush" && !respawnFlag && grounded) {
-			gameObject.GetComponent<AudioSource> ().clip =  Resources.Load ("Sound/SFX/Objects/Box/CratePush")  as AudioClip;
-			gameObject.GetComponent<AudioSource> ().loop = true;
-			gameObject.GetComponent<AudioSource>().volume = 0;
-			gameObject.GetComponent<AudioSource>().Play ();
-
-		}
-
-		//Check
-		if (velocity.magnitude > 0.1f && grounded){
-			if(gameObject.GetComponent<AudioSource>().volume < 1){
-				gameObject.GetComponent<AudioSource>().volume += 0.5f;
+			/*if (grabbed) {
+				float vy = velocity.y;
+				velocity = player.GetComponent<PlayerController>().GetVelocity();
+				velocity.y = vy;
+			}*/
+	
+			//CheckCollisions();
+	
+			float newVelocityX = velocity.x, newVelocityZ = velocity.z;
+			if (velocity.x != 0)
+			{
+				int modifier = velocity.x > 0 ? -1 : 1;
+				newVelocityX += Mathf.Min(decelleration, Mathf.Abs(velocity.x)) * modifier;
 			}
+			velocity.x = newVelocityX;
+		
+			if (velocity.z != 0)
+			{
+				int modifier = velocity.z > 0 ? -1 : 1;
+				newVelocityZ += Mathf.Min(decelleration, Mathf.Abs(velocity.z)) * modifier;
+			}
+			velocity.z = newVelocityZ;
+	
+			if (GetComponent<Collider> ().enabled) {
+				colliderHeight = GetComponent<Collider>().bounds.size.y;
+				colliderWidth = GetComponent<Collider>().bounds.size.x;
+				colliderDepth = GetComponent<Collider>().bounds.size.z;
+			}
+	
+			if (svFlag) {
+				velocity.x = newVelocity.x;
+				velocity.z = newVelocity.z;
+				svFlag = false;
+			}
+	
+			CheckCollisions();
+	
+			//Adding in pushing sound, initialize after break sound -Nick
+	
+			//Init
+			if (gameObject.GetComponent<AudioSource> ().clip.name != "CratePush" && !respawnFlag && grounded) {
+				gameObject.GetComponent<AudioSource> ().clip =  Resources.Load ("Sound/SFX/Objects/Box/CratePush")  as AudioClip;
+				gameObject.GetComponent<AudioSource> ().loop = true;
+				gameObject.GetComponent<AudioSource>().volume = 0;
+				gameObject.GetComponent<AudioSource>().Play ();
+	
+			}
+	
+			//Check
+			if (velocity.magnitude > 0.1f && grounded){
+				if(gameObject.GetComponent<AudioSource>().volume < 1){
+					gameObject.GetComponent<AudioSource>().volume += 0.5f;
+				}
+			}
+			else{
+				gameObject.GetComponent<AudioSource>().volume = 0;
+			}
+	
+			//End Nick stuff
 		}
-		else{
-			gameObject.GetComponent<AudioSource>().volume = 0;
-		}
-
-		//End Nick stuff
 	}
 
 	void LateUpdate () {
-		base.LateUpdateLogic ();
-		float dist = 0;
-		if (GameStateManager.instance.currentPerspective == PerspectiveType.p2D)
-			Vector3.Distance(transform.position, player.transform.position);
-		else
-			dist = Vector2.Distance(new Vector2(transform.position.x,transform.position.y),
-			                        new Vector2(player.transform.position.x, player.transform.position.y));
-		if (grabbed && dist > range) {
-			player.GetComponent<PlayerController>().Grab(null);
-			grabbed = false;
+		if(!PlayerController.instance.isPaused()){
+			base.LateUpdateLogic ();
+			float dist = 0;
+			if (GameStateManager.instance.currentPerspective == PerspectiveType.p2D)
+				Vector3.Distance(transform.position, player.transform.position);
+			else
+				dist = Vector2.Distance(new Vector2(transform.position.x,transform.position.y),
+										new Vector2(player.transform.position.x, player.transform.position.y));
+			if (grabbed && dist > range) {
+				player.GetComponent<PlayerController>().Grab(null);
+				grabbed = false;
+			}
+			transform.Translate(velocity * Time.deltaTime);
+			if (respawnFlag && Vector2.Distance(new Vector2(startPos.x, startPos.y), new Vector2(player.transform.position.x, player.transform.position.y)) > colliderWidth) {
+				Vector3 pos = transform.position;
+				pos = startPos + Vector3.up;
+				transform.position = pos;
+				GetComponent<Collider>().enabled = true;
+				GetComponentInChildren<Renderer>().enabled = true;
+				//SPAWN A SPAWN CIRCLE
+				GameObject.Instantiate(spawnCircle, transform.position, Quaternion.identity);
+				respawnFlag = false;
+			}
+			//CheckCollisions();
 		}
-		transform.Translate(velocity * Time.deltaTime);
-		if (respawnFlag && Vector2.Distance(new Vector2(startPos.x, startPos.y), new Vector2(player.transform.position.x, player.transform.position.y)) > colliderWidth) {
-			Vector3 pos = transform.position;
-			pos = startPos + Vector3.up;
-			transform.position = pos;
-			GetComponent<Collider>().enabled = true;
-			GetComponentInChildren<Renderer>().enabled = true;
-
-			//SPAWN A SPAWN CIRCLE
-			GameObject.Instantiate(spawnCircle, transform.position, Quaternion.identity);
-			respawnFlag = false;
-		}
-		//CheckCollisions();
 	}
 
 	public void CheckCollisions() {
@@ -294,8 +299,9 @@ public class Crate : ActiveInteractable {
 			gameObject.GetComponent<AudioSource>().clip = Resources.Load ("Sound/SFX/Objects/Box/CrateBreak")  as AudioClip;
 			gameObject.GetComponent<AudioSource>().volume = 1;
 			gameObject.GetComponent<AudioSource>().Play();
-
+			
 			//End Nick stuff
+
 		}
 	}
 

@@ -55,7 +55,7 @@ public class EdgeManager : MonoBehaviour {
 		Vector3 centerOffset = findTrueTerrainCenter(terrain);
 		Vector3 edgeScale = findTrueEdgeScale(terrain);
 		return
-			terrain.transform.position - centerOffset + (terrainScale.y-edgeScale.y) * Vector3.up * .5f;
+			terrain.transform.position + centerOffset + (terrainScale.y-edgeScale.y) * Vector3.up * .5f;
 	}
 	
 	private Vector3 findTrueEdgeScale(GameObject terrain){
@@ -84,9 +84,9 @@ public class EdgeManager : MonoBehaviour {
 		Vector3 boxCenter = terrain.GetComponent<LevelGeometry>().getTrueBoxColliderCenter();
 		Vector3 transformScale = terrain.transform.lossyScale;	
 		
-		Vector3 center = 	-(Vector3.right * boxCenter.x * transformScale.x) +
-							-(Vector3.up * boxCenter.y * transformScale.y)+
-							-(Vector3.forward * boxCenter.z * transformScale.z);
+		Vector3 center = 	(Vector3.right * boxCenter.x * transformScale.x) +
+							(Vector3.up * boxCenter.y * transformScale.y)+
+							(Vector3.forward * boxCenter.z * transformScale.z);
 		
 		switch(getTerrainRotationQuadrant(terrain)){
 			case 0:	return new Vector3( center.x, center.y,  center.z);

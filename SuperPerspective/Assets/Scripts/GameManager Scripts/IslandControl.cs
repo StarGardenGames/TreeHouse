@@ -34,14 +34,10 @@ public class IslandControl : MonoBehaviour {
 	void generateBounds(){
 		grounds = GameObject.FindGameObjectsWithTag("Ground");
 		islandBounds = new Rect[grounds.Length];
-		float gX, gZ, gW, gD;
 		for (int i = 0; i < grounds.Length; i++) {
-			gX = grounds[i].transform.position.x;
-			gZ = grounds[i].transform.position.z;
-			gW = grounds[i].GetComponent<Collider>().bounds.size.x;
-			gD = grounds[i].GetComponent<Collider>().bounds.size.z;
+			Bounds bounds = grounds[i].GetComponent<Collider>().bounds;
 			islandBounds[i] = new Rect(
-				gX - gW/2f, gZ - gD/2f, gW, gD);
+				bounds.min.x, bounds.min.z, bounds.size.x, bounds.size.z);
 		}
 	}
 
@@ -89,9 +85,9 @@ public class IslandControl : MonoBehaviour {
 		Vector3 pos = obj.transform.position;
 		int boundIndex = getBound (pos.x, pos.y, pos.z, !PlayerController.instance.is3D());
 		if(boundIndex == -1){
-			Debug.Log("There is no valid bound for "+obj);
-			//Destroy(this);
-			return null;
+			throw new System.ArgumentException(
+				"(IslandControl) There is no valid bound for "+obj +
+				"\nMake sure all objects are placed within the bounds of a ground");
 		}
 		return grounds[boundIndex];
 	}

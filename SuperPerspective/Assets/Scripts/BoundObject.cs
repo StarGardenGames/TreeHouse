@@ -21,7 +21,6 @@ public class BoundObject : MonoBehaviour {
 		Vector3 pos = transform.position;
 		int boundIndex = IslandControl.instance.getBound (pos.x, pos.y, pos.z, !PlayerController.instance.is3D());
 		if(boundIndex == -1){
-			Debug.Log("There is no valid bound for player");
 			Destroy(this);
 			return;
 		}
@@ -71,26 +70,10 @@ public class BoundObject : MonoBehaviour {
 	}
 	
 	void bindAlternate(){
-		bool pMode = PlayerController.instance.is3D();
 		Vector3 pos = transform.position;
-		//left
-		/*if (altLeftBound == -1 || pMode)
-			pos.x = Mathf.Max (myBounds.xMin, pos.x);
-		else
-			pos.x = Mathf.Max (altLeftBound, pos.x);
-		if (pos.y < groundY && pos.x < myBounds.xMin)
-			updateBounds ();*/
 		pos.x = Mathf.Max (myBounds.xMin, pos.x);
-		//right
-		/*if (altRightBound == -1 || pMode)
-			pos.x = Mathf.Min (myBounds.xMax, pos.x);
-		else
-			pos.x = Mathf.Min (altRightBound, pos.x);
-		if (pos.y < groundY && pos.x > myBounds.xMax)
-			updateBounds ();*/
 		pos.x = Mathf.Min (myBounds.xMax, pos.x);
-		//bind z 
-		if(pMode /*|| PlayerMovement.instance.flipping*/)
+		if(GameStateManager.instance.currentPerspective == PerspectiveType.p3D)
 			pos.z = Mathf.Max (myBounds.yMin, Mathf.Min (myBounds.yMax, transform.position.z));
 		transform.position = pos;
 	}
