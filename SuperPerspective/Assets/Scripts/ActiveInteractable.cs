@@ -33,7 +33,7 @@ public class ActiveInteractable : PhysicalObject {
 	bool fixedCalled = false;
 	
 	//distance for inRange
-	protected float range = 3.0f;
+	protected float range = 3f;
 	
 	//how much error there can be in the angle for it to be valid
 	float angleBuffer = 80;
@@ -75,6 +75,39 @@ public class ActiveInteractable : PhysicalObject {
 		InputManager.instance.InteractPressedEvent += InteractPressed;
 	}
 
+	protected Quadrant GetQuadrant() {
+		float colliderHeight = GetComponent<Collider>().bounds.size.y;
+		float colliderWidth = GetComponent<Collider>().bounds.size.x;
+		float colliderDepth = GetComponent<Collider> ().bounds.size.z;
+		PerspectiveType persp = GameStateManager.instance.currentPerspective;
+		if (Mathf.Abs(player.transform.position.x - transform.position.x) > colliderWidth / 2 || persp == PerspectiveType.p2D) {
+			if (player.transform.position.x - transform.position.x > 0)
+				return Quadrant.xPlus;
+			else
+				return Quadrant.xMinus;
+		} else {
+			if (player.transform.position.z - transform.position.z > 0)
+				return Quadrant.zPlus;
+			else
+				return Quadrant.zMinus;
+		}
+	}
+
+	protected float GetDistance() {
+		bool is3D = player.GetComponent<PlayerController>().is3D();
+		switch (GetQuadrant ()) {
+			case Quadrant.xPlus:
+					return player.transform.position.x - transform.position.x;
+			case Quadrant.xMinus:
+					return transform.position.x - player.transform.position.x;
+			case Quadrant.zPlus:
+					return player.transform.position.z - transform.position.z;
+			case Quadrant.zMinus:
+					return transform.position.z - player.transform.position.z;
+		}
+		return 0;
+	}
+
 	protected void FixedUpdateLogic() {
 		//check distance and determine if range methods need to be called
 		float dist = 0;
@@ -95,7 +128,7 @@ public class ActiveInteractable : PhysicalObject {
 			}
 		}
 		//update inRange
-		inRange = dist < range;
+		inRange = GetDistance() < range;
 		//update player facing
 		//get orientation from player
 		float playerOrientation = player.GetComponent<PlayerController>().getOrientation();
@@ -142,5 +175,9 @@ public class ActiveInteractable : PhysicalObject {
 			
 			fixedCalled = false;
 		}
+	}
+
+	public enum Quadrant {
+		zPlus, zMinus, xPlus, xMinus
 	}
 }

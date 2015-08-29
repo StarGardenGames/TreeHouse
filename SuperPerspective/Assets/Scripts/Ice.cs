@@ -42,7 +42,6 @@ public class Ice : ActiveInteractable {
 		//InputManager.instance.InteractPressed += CheckGrab;
 		GameStateManager.instance.PerspectiveShiftEvent += Shift;
 		CameraController.instance.TransitionStartEvent += checkBreak;
-		range = colliderWidth >= colliderDepth ? colliderWidth * 0.85f : colliderDepth * 0.85f;
 		colCheck = new CollisionChecker (GetComponent<Collider> ());
 		startPos = transform.position;
 		
@@ -51,6 +50,20 @@ public class Ice : ActiveInteractable {
 	}
 
 	void Update() {
+		switch (GetQuadrant()) {
+			case Quadrant.xPlus:
+				range = colliderWidth * 0.85f;
+				break;
+			case Quadrant.xMinus:
+				range = colliderWidth * 0.85f;
+				break;
+			case Quadrant.zPlus:
+				range = colliderDepth * 0.85f;
+				break;
+			case Quadrant.zMinus:
+				range = colliderDepth * 0.85f;
+				break;
+		}
 		if (!nextVelocity.Equals(Vector3.zero)) {
 			velocity = nextVelocity;
 			nextVelocity = Vector3.zero;
@@ -285,17 +298,20 @@ public class Ice : ActiveInteractable {
 	}
 	//Mathf.Abs(player.transform.position.x - transform.position.x) > colliderWidth / 2
 	public override void Triggered() {
-		if (velocity.Equals(Vector3.zero)) {
-			if (Mathf.Abs(player.transform.position.x - transform.position.x) > colliderWidth / 2 || persp == PerspectiveType.p2D) {
-				if (player.transform.position.x - transform.position.x > 0)
-					nextVelocity = Vector3.left * slideSpeed;
-				else
-					nextVelocity = Vector3.right * slideSpeed;
-			} else {
-				if (player.transform.position.z - transform.position.z > 0)
-					nextVelocity = Vector3.back * slideSpeed;
-				else
-					nextVelocity = Vector3.forward * slideSpeed;
+		if (velocity.Equals (Vector3.zero)) {
+			switch (GetQuadrant()) {
+				case Quadrant.xPlus:
+						nextVelocity = Vector3.left * slideSpeed;
+						break;
+				case Quadrant.xMinus:
+						nextVelocity = Vector3.right * slideSpeed;
+						break;
+				case Quadrant.zPlus:
+						nextVelocity = Vector3.back * slideSpeed;
+						break;
+				case Quadrant.zMinus:
+						nextVelocity = Vector3.forward * slideSpeed;
+						break;
 			}
 		}
 	}
