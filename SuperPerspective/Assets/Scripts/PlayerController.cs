@@ -361,7 +361,8 @@ public class PlayerController : PhysicalObject
 							falling = false;
 							canJump = true;
 							launched = 0;
-							if (GameStateManager.instance.currentPerspective == PerspectiveType.p2D) {
+							// New Z-lock
+							if (hitInfo.collider.gameObject.tag != "Ground" && GameStateManager.instance.currentPerspective == PerspectiveType.p2D) {
 								Vector3 pos = transform.position;
 								pos.z = hitInfo.collider.gameObject.transform.position.z;
 								transform.position = pos;
@@ -582,9 +583,6 @@ public class PlayerController : PhysicalObject
 		// True if any ray hits a collider
 		bool connected = false;
 
-		// TODO: Fix this to use the appropriate ground in case of multiple grounds
-		GameObject grnd = GameObject.Find("Ground");
-
 		//reference variables
 		float minX 		= GetComponent<Collider>().bounds.min.x + Margin;
 		float centerX 	= GetComponent<Collider>().bounds.center.x;
@@ -592,7 +590,7 @@ public class PlayerController : PhysicalObject
 		float minY 		= GetComponent<Collider>().bounds.min.y + Margin;
 		float centerY 	= GetComponent<Collider>().bounds.center.y;
 		float maxY 		= GetComponent<Collider>().bounds.max.y - Margin;
-		float centerZ	= grnd.GetComponent<Collider>().bounds.min.z - 1;
+		float centerZ	= GetComponent<Collider>().bounds.center.z;
 
 		//array of startpoints
 		Vector3[] startPoints = {
