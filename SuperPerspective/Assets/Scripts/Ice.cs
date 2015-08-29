@@ -26,6 +26,10 @@ public class Ice : ActiveInteractable {
 	
 	private bool[] axisBlocked = new bool[4];
 
+	public GameObject brokenIceSpawnPoint;
+	public GameObject brokenIce;
+	public GameObject spawnCircle;
+
 	void Awake() {
 		colliderHeight = GetComponent<Collider>().bounds.size.y;
 		colliderWidth = GetComponent<Collider>().bounds.size.x;
@@ -114,6 +118,7 @@ public class Ice : ActiveInteractable {
 			transform.position = pos;
 			GetComponent<Collider>().enabled = true;
 			GetComponentInChildren<Renderer>().enabled = true;
+			GameObject.Instantiate(spawnCircle, transform.position, Quaternion.identity);
 			velocity = Vector3.zero;
 			respawnFlag = false;
 		}
@@ -129,6 +134,9 @@ public class Ice : ActiveInteractable {
 				respawnFlag = true;
 				GetComponent<Collider>().enabled = false;
 				GetComponentInChildren<Renderer>().enabled = false;
+				if(brokenIce != null){
+					GameObject.Instantiate(brokenIce, brokenIceSpawnPoint.transform.position, Quaternion.identity);
+				}
 			}
 			startPush = false;
 		}
@@ -257,6 +265,10 @@ public class Ice : ActiveInteractable {
 	void checkBreak() {
 		if (GameStateManager.instance.currentPerspective == PerspectiveType.p2D && Check2DIntersect ()) {
 			respawnFlag = true;
+			//TODO
+			if(brokenIce != null){
+				GameObject.Instantiate(brokenIce, brokenIceSpawnPoint.transform.position, Quaternion.identity);
+			}
 		}
 	}
 	

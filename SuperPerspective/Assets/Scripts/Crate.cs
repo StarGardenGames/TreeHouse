@@ -24,6 +24,10 @@ public class Crate : ActiveInteractable {
 
 	private bool[] axisBlocked = new bool[4];
 
+	public GameObject brokenCrateSpawnPoint;
+	public GameObject brokenCrate;
+	public GameObject spawnCircle;
+
 	void Start() {
 		base.StartSetup ();
 		grounded = false;
@@ -146,6 +150,9 @@ public class Crate : ActiveInteractable {
 			transform.position = pos;
 			GetComponent<Collider>().enabled = true;
 			GetComponentInChildren<Renderer>().enabled = true;
+
+			//SPAWN A SPAWN CIRCLE
+			GameObject.Instantiate(spawnCircle, transform.position, Quaternion.identity);
 			respawnFlag = false;
 		}
 		//CheckCollisions();
@@ -358,6 +365,9 @@ public class Crate : ActiveInteractable {
 		if (respawnFlag) {
 			GetComponent<Collider>().enabled = false;
 			GetComponentInChildren<Renderer>().enabled = false;
+			if(brokenCrate != null){
+				GameObject.Instantiate(brokenCrate, brokenCrateSpawnPoint.transform.position, Quaternion.identity);
+			}
 		}
 	}
 
