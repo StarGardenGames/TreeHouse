@@ -22,6 +22,12 @@ public class LightingManager : MonoBehaviour {
 		initStartingIntensities();
 		disableIrrelevantLights();
 		linkFunctions();
+
+		//
+		Light pl = GameObject.Find("Primary Light").GetComponent("Light") as Light;
+		pl.enabled = true;
+		GameObject bl = GameObject.Find("Build Light") as GameObject;
+		Destroy(bl.gameObject);
 	}
 	
 	private void loadLightsFromScene(){
