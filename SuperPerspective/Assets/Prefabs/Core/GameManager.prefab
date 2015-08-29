@@ -52,6 +52,8 @@ GameObject:
   - 114: {fileID: 11429108}
   - 114: {fileID: 11449784}
   - 114: {fileID: 11491856}
+  - 82: {fileID: 8286760}
+  - 114: {fileID: 11488326}
   m_Layer: 8
   m_Name: GameManager
   m_TagString: Untagged
@@ -153,6 +155,76 @@ Transform:
   - {fileID: 22498700}
   m_Father: {fileID: 0}
   m_RootOrder: 0
+--- !u!82 &8286760
+AudioSource:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 146284}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 24373944, guid: 5d8306bb8dc8a1341944b70fa7ae3875,
+    type: 2}
+  m_audioClip: {fileID: 0}
+  m_PlayOnAwake: 1
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    - time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
 --- !u!114 &11405564
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -383,6 +455,17 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
+--- !u!114 &11488326
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 146284}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a6657e4ab9e34e343994ca95dd1b23fd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &11489312
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -431,6 +514,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8ea7992ba12689e4488390773917d492, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  lightTransitionTime: 2
 --- !u!114 &11494188
 MonoBehaviour:
   m_ObjectHideFlags: 1
