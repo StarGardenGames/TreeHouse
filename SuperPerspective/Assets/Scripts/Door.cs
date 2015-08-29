@@ -17,6 +17,14 @@ public class Door : ActiveInteractable {
 		p.Play();
 	}
 
+	public override float GetDistance() {
+		if (GameStateManager.instance.currentPerspective == PerspectiveType.p3D)
+			return Vector3.Distance(transform.position, player.transform.position);
+		else
+			return Vector2.Distance(new Vector2(player.transform.position.x, player.transform.position.y),
+			                        new Vector2(transform.position.x, transform.position.y));
+	}
+
 	public override void Triggered(){
 		if(destDoor!=null)
 			player.GetComponent<PlayerController>().Teleport(

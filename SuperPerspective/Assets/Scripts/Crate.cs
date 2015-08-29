@@ -359,7 +359,9 @@ public class Crate : ActiveInteractable {
 	}
 
 	public bool IsAxisBlocked(Vector3 axis) {
-		return axisBlocked[HashAxis(axis)];
+		if (HashAxis(axis) != -1)
+			return axisBlocked[HashAxis(axis)];
+		return true;
 	}
 
 	public int HashAxis(Vector3 axis) {

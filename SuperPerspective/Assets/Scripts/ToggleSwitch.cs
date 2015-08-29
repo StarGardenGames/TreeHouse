@@ -11,7 +11,20 @@ public class ToggleSwitch : ActiveInteractable {
 	bool toggleEnabled = false; //whether switch is currently toggleEnabled
 
 	float distThresh = 1.5f; //distance threshhold where it will become unpressed
-	
+
+	void Start() {
+		base.StartSetup ();
+		range = 2f;
+	}
+
+	public override float GetDistance() {
+		if (GameStateManager.instance.currentPerspective == PerspectiveType.p3D)
+			return Vector3.Distance(transform.position, player.transform.position);
+		else
+			return Vector2.Distance(new Vector2(player.transform.position.x, player.transform.position.y),
+			                        new Vector2(transform.position.x, transform.position.y));
+	}
+
 	public override void Triggered(){
 		Toggle();//toggle switch
 	}
