@@ -11,7 +11,6 @@ public class JumpSound : StateMachineBehaviour {
 		if(voice == null)
 			return;
 		voice.Jump ();
-		Debug.Log ("Jump");
 	}
 
 	// OnStateUpdate is called on each Update frame between OnStateEnter and OnStateExit callbacks

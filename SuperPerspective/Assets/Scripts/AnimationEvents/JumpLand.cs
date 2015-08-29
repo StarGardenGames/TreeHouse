@@ -17,7 +17,6 @@ public class JumpLand : StateMachineBehaviour {
 			return;
 		step.GrassStep ();
 		currentState = animator.GetCurrentAnimatorStateInfo(0);
-		Debug.Log ("Land1");
 	}
 
 	// OnStateUpdate is called on each Update frame between OnStateEnter and OnStateExit callbacks

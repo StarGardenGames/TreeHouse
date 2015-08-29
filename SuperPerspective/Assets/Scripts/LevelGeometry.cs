@@ -51,7 +51,7 @@ public class LevelGeometry : MonoBehaviour
 
     
     // Adjusts the collider to the appropriate shape when the perspective shift event occurs.
-	private void AdjustPosition(PerspectiveType p)
+	public void AdjustPosition(PerspectiveType p)
     {
 		float rot = Mathf.Rad2Deg * Mathf.Acos(Vector3.Dot(Vector3.forward, transform.forward));
 		if (Mathf.Round(rot) == 90 && Mathf.Round(Vector3.Angle(transform.right, Vector3.forward)) == 0)

@@ -7,7 +7,7 @@ public class Crate : ActiveInteractable {
 
 	private const float gravity = 1.5f;
 	private const float terminalVelocity = 60;
-	private const float decelleration = 15;
+	private const float decelleration = 1;
 
 	private Vector3 trajectory, newVelocity;
 	private bool grounded, svFlag;
@@ -18,7 +18,7 @@ public class Crate : ActiveInteractable {
 
 	private CollisionChecker colCheck;
 
-	private bool grabbed, respawnFlag = false;
+	private bool grabbed, fpFlag, respawnFlag = false;
 
 	private PerspectiveType persp = PerspectiveType.p3D;
 
@@ -81,31 +81,32 @@ public class Crate : ActiveInteractable {
 	
 			//CheckCollisions();
 	
-			float newVelocityX = velocity.x, newVelocityZ = velocity.z;
-			if (velocity.x != 0)
-			{
-				int modifier = velocity.x > 0 ? -1 : 1;
-				newVelocityX += Mathf.Min(decelleration, Mathf.Abs(velocity.x)) * modifier;
-			}
-			velocity.x = newVelocityX;
+			if (!svFlag && !fpFlag && !grabbed) {
+				float newVelocityX = velocity.x, newVelocityZ = velocity.z;
+				if (velocity.x != 0)
+				{
+					int modifier = velocity.x > 0 ? -1 : 1;
+					newVelocityX += Mathf.Min(decelleration, Mathf.Abs(velocity.x)) * modifier;
+				}
+				velocity.x = newVelocityX;
+			
+				if (velocity.z != 0)
+				{
+					int modifier = velocity.z > 0 ? -1 : 1;
+					newVelocityZ += Mathf.Min(decelleration, Mathf.Abs(velocity.z)) * modifier;
+				}
+				velocity.z = newVelocityZ;
 		
-			if (velocity.z != 0)
-			{
-				int modifier = velocity.z > 0 ? -1 : 1;
-				newVelocityZ += Mathf.Min(decelleration, Mathf.Abs(velocity.z)) * modifier;
-			}
-			velocity.z = newVelocityZ;
-	
-			if (GetComponent<Collider> ().enabled) {
-				colliderHeight = GetComponent<Collider>().bounds.size.y;
-				colliderWidth = GetComponent<Collider>().bounds.size.x;
-				colliderDepth = GetComponent<Collider>().bounds.size.z;
-			}
-	
-			if (svFlag) {
+				if (GetComponent<Collider> ().enabled) {
+					colliderHeight = GetComponent<Collider>().bounds.size.y;
+					colliderWidth = GetComponent<Collider>().bounds.size.x;
+					colliderDepth = GetComponent<Collider>().bounds.size.z;
+				}
+			} else {
 				velocity.x = newVelocity.x;
 				velocity.z = newVelocity.z;
 				svFlag = false;
+				fpFlag = false;
 			}
 	
 			CheckCollisions();
@@ -144,7 +145,7 @@ public class Crate : ActiveInteractable {
 			else
 				dist = Vector2.Distance(new Vector2(transform.position.x,transform.position.y),
 										new Vector2(player.transform.position.x, player.transform.position.y));
-			if (grabbed && dist > range) {
+			if (grabbed && dist > range * 1.1f) {
 				player.GetComponent<PlayerController>().Grab(null);
 				grabbed = false;
 			}
@@ -159,6 +160,7 @@ public class Crate : ActiveInteractable {
 				if(spawnCircle != null){
 					GameObject.Instantiate(spawnCircle, transform.position, Quaternion.identity);
 				}
+				GetComponent<LevelGeometry>().AdjustPosition(GameStateManager.instance.currentPerspective);
 				respawnFlag = false;
 			}
 			//CheckCollisions();
@@ -341,6 +343,11 @@ public class Crate : ActiveInteractable {
 		newVelocity.x = x;
 		newVelocity.z = z;
 		svFlag = true;
+	}
+
+	public void FreePush(float x, float z) {
+		SetVelocity (x, z);
+		fpFlag = true;
 	}
 
 	public Vector3 GetVelocity() {

@@ -149,7 +149,7 @@ public class ActiveInteractable : PhysicalObject {
 		//determine whether player is facing interactable
 		playerFacing = angleDiff < angleBuffer;
 		//update canTrigger
-		canTrigger = inRange && (playerFacing || !is3D) && (GetComponent<Collider>().bounds.max.y - 0.05f > player.GetComponent<Collider>().bounds.min.y || !ignoreYDistance);
+		canTrigger = GetComponentInChildren<Renderer>().enabled && inRange && (playerFacing || !is3D) && (GetComponent<Collider>().bounds.max.y - 0.05f > player.GetComponent<Collider>().bounds.min.y || !ignoreYDistance);
 		//update notiShown
 		if(canTrigger && (!notiShown || dist < notiDist) && ((this.gameObject.GetComponent<LockedDoor>() == null || Key.GetKeysHeld() > 0))){
 			selected = this;

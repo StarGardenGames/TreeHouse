@@ -226,8 +226,8 @@ public class PlayerController : PhysicalObject
 
             velocity.x = newVelocityX;
 
-			if (launched > 0)
-				launched--;
+			//if (launched > 0)
+				//launched--;
 
             // ------------------------------------------------------------------------------------------------------
             // Z-AXIS MOVEMENT VELOCITY CALCULATIONS
@@ -289,7 +289,8 @@ public class PlayerController : PhysicalObject
             anim.SetBool("Running", running && crate == null);
 					
 				if (crate == null) {
-					anim.SetBool("Pushing", false);
+					if (!pushFlag)
+						anim.SetBool("Pushing", false);
 					anim.SetBool("Pulling", false);
 				} else {
 					anim.SetBool("Pushing", Vector3.Dot(velocity, grabAxis) > 0);
@@ -512,11 +513,11 @@ public class PlayerController : PhysicalObject
 		}
 		// Crate
 		if (trajectory.normalized != Vector3.down && trajectory.normalized != Vector3.zero && other.GetComponent<Crate>() && !other.GetComponent<Crate>().IsAxisBlocked(trajectory)) {
-			other.GetComponent<Crate>().SetVelocity((trajectory*0.75f).x, (trajectory*0.75f).z);
+			other.GetComponent<Crate>().FreePush((trajectory*0.75f).x, (trajectory*0.75f).z);
 			pushFlag = true;
 			if (crate == null && velocity != Vector3.zero)
 				anim.SetBool("Pushing", true);
-		} else if (crate == null) {
+		} else if (crate == null && !pushFlag) {
 			anim.SetBool("Pushing", false);
 		}
 		// PushSwitchOld

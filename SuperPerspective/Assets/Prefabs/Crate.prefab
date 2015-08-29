@@ -13,7 +13,7 @@ GameObject:
   - 114: {fileID: 11411318}
   - 114: {fileID: 11495498}
   - 82: {fileID: 8205446}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: Crate
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -31,8 +31,23 @@ GameObject:
   - 33: {fileID: 3320478}
   - 23: {fileID: 2328870}
   - 95: {fileID: 9560384}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: Crate
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!1 &171504
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 418530}
+  m_Layer: 0
+  m_Name: CrateSpawnPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -49,8 +64,21 @@ Transform:
   m_LocalScale: {x: 2, y: 2, z: 2}
   m_Children:
   - {fileID: 439428}
+  - {fileID: 418530}
   m_Father: {fileID: 0}
   m_RootOrder: 0
+--- !u!4 &418530
+Transform:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 171504}
+  m_LocalRotation: {x: -.707106829, y: 0, z: 0, w: .707106829}
+  m_LocalPosition: {x: .524164796, y: -.526666641, z: .532699585}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 403512}
+  m_RootOrder: 1
 --- !u!4 &439428
 Transform:
   m_ObjectHideFlags: 1
@@ -216,7 +244,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd00909b74cfb3a44a145ff65e6230e7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ignoreYDistance: 0
+  ignoreYDistance: 1
+  brokenCrateSpawnPoint: {fileID: 171504}
+  brokenCrate: {fileID: 108994, guid: bf8271f8c1d36f146b7531b99c96d1ad, type: 2}
+  spawnCircle: {fileID: 192810, guid: 56bd08185db206041a18788a73dc5111, type: 2}
 --- !u!114 &11495498
 MonoBehaviour:
   m_ObjectHideFlags: 1
