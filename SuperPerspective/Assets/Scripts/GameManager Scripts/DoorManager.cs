@@ -24,6 +24,12 @@ public class DoorManager : MonoBehaviour {
 			door.setDoor(destDoor);
 		}
 	}
+
+	public Door getDoor(string doorName){
+		Door returnDoor = null;
+		doors.TryGetValue(doorName, out returnDoor);
+		return returnDoor;
+	}
 	
 	// Update is called once per frame
 	void Update () {

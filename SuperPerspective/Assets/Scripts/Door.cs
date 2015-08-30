@@ -32,6 +32,10 @@ public class Door : ActiveInteractable {
 		else
 			Debug.Log("Door not linked");
 	}
+
+	public string getName(){
+		return myName;
+	}
 	
 	public void setDoor(Door destDoor){
 		this.destDoor = destDoor;
