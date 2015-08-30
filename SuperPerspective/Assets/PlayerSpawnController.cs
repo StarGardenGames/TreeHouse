@@ -20,7 +20,7 @@ public class PlayerSpawnController : MonoBehaviour {
 	}
 
 	//find door with name
-	public void findDoor(string doorName){
+	public Door findDoor(string doorName){
 		Door[] doorList = Object.FindObjectsOfType(
 			typeof(Door)) as Door[];
 
@@ -29,10 +29,16 @@ public class PlayerSpawnController : MonoBehaviour {
 				return door;
 			}
 		}
+
+		return null;
 	}
 
 	public void setDoor(Door destDoor){
 		this.destDoor = destDoor;
+	}
+
+	public Door getDefaultDest(){
+		return destDoor;
 	}
 	
 	// Update is called once per frame

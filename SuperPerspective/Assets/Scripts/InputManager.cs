@@ -25,6 +25,7 @@ public class InputManager : Singleton<InputManager>{
 	public event System.Action LeanRightReleasedEvent;
 	public event System.Action BackwardMovementEvent;
 	public event System.Action ForwardMovementEvent;
+	public event System.Action DevConsoleEvent;
 	
 	// Game's pause state
 	private bool continuePressed = false;//used as an alternate way to unpause
@@ -76,6 +77,9 @@ public class InputManager : Singleton<InputManager>{
 		
 		if(previousForwardMovement != 1 && GetForwardMovement() == 1)
 			RaiseEvent(ForwardMovementEvent);
+
+		if(Input.GetButtonUp("DevConsoleToggle"))
+			RaiseEvent(DevConsoleEvent);
 		
 		previousForwardMovement = GetForwardMovement();
 	}
