@@ -35,7 +35,6 @@ public class ConsoleActionsManager : MonoBehaviour {
 		player = GameObject.FindWithTag("Player");
 		psc = player.GetComponent<PlayerSpawnController>();
 		dcl = GameObject.Find("DevCommandLine").GetComponent<InputField>();
-		Debug.Log(dcl);
 	}
 	
 	// Update is called once per frame
