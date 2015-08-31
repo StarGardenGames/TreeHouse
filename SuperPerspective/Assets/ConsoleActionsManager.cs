@@ -71,6 +71,9 @@ public class ConsoleActionsManager : MonoBehaviour {
 						movePlayer(val);
 						Debug.Log("... moving player to door " + val);
 						break;
+					case "credits":
+						dcl.text = "Nick Shooter, Peter Aquila, Larry Smith, Arend Peter Castelein, Daniel Xiao";
+						break;
 					default:
 						Debug.Log("...command " + command + " not found ");
 						break;
