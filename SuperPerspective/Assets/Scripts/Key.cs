@@ -25,6 +25,10 @@ public class Key : Interactable {
 		keysHeld++;
 	}
 
+	public static void GiveKeys(int amt) {
+		keysHeld = keysHeld + amt;
+	}
+
 	public static void ClearKeys() {
 		keysHeld = 0;
 	}

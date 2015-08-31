@@ -63,9 +63,13 @@ public class ConsoleActionsManager : MonoBehaviour {
 
 			if(command != null && val != null){
 				switch(command){
+					case "givekey":
+						Key.GiveKeys(int.Parse(val));
+						Debug.Log("... giving player " + val + " keys");
+						break;
 					case "tp":
-						Debug.Log("... moving player to door " + val);
 						movePlayer(val);
+						Debug.Log("... moving player to door " + val);
 						break;
 					default:
 						Debug.Log("...command " + command + " not found ");
