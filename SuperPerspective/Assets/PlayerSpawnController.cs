@@ -25,11 +25,11 @@ public class PlayerSpawnController : MonoBehaviour {
 			typeof(Door)) as Door[];
 
 		foreach(Door door in doorList){
-			if(door.getName() == startDoorName){
+			if(door.getName() == doorName){
 				return door;
 			}
 		}
-
+		print("could not find door " + doorName);
 		return null;
 	}
 

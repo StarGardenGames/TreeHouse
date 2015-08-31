@@ -7,6 +7,8 @@ public class DevConsoleController : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+		this.gameObject.transform.position = new Vector3(0, 0, 0);
+
 		devConsole = GameObject.Find("Console Menu");
 		InputManager.instance.DevConsoleEvent += ToggleDevConsole;
 		devConsole.SetActive(false);
