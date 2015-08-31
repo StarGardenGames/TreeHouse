@@ -130,7 +130,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 794a8017e52e91a40968f56b428b8e8c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  parentPlatform: {fileID: 0}
+  parentPlatform:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 0
+    height: 0
   triggers:
   - {fileID: 0}
 --- !u!198 &19845362
