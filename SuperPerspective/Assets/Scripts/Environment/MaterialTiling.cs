@@ -5,13 +5,14 @@ using System.Collections;
  * Works with six sided cubes that have a gameobject to have individual textures for each side. 
  * */
 public class MaterialTiling : MonoBehaviour {
+	public float scale;
 	// Use this for initialization
 	void Start () {
 		findFaces ();
 		//scale texture to the following size
-		float scaleX = (gameObject.transform.localScale.x)/2;//x scale
-		float scaleY = (gameObject.transform.localScale.y)/2;//y scale
-		float scaleZ = (gameObject.transform.localScale.z)/2;//y scale
+		float scaleX = (gameObject.transform.localScale.x)/scale;//x scale
+		float scaleY = (gameObject.transform.localScale.y)/scale;//y scale
+		float scaleZ = (gameObject.transform.localScale.z)/scale;//y scale
 		//apply to each face
 		GameObject backFace = getChildGameObject (gameObject, "Back");
 		backFace.GetComponent<Renderer>().material.mainTextureScale = new Vector2 (scaleX, scaleY);
