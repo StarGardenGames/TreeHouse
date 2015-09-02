@@ -266,7 +266,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ignoreYDistance: 0
-  myName: 
+  myName: d1
   destName: 
   particleColor: {r: 0, g: 0, b: 1, a: 1}
 --- !u!198 &19806364
@@ -1401,6 +1401,10 @@ Prefab:
     - target: {fileID: 0}
       propertyPath: MaxDistance
       value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: myName
+      value: d1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
