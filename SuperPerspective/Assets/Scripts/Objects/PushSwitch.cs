@@ -5,12 +5,11 @@ public class PushSwitch : MonoBehaviour {
 
 	#pragma warning disable 114, 414
 
+	public bool pushed = false; //whether switch is currently pushed
 	public Rect parentPlatform;
+	public bool rotate;
 
 	public Activatable[] triggers;//Activatable objects which this switch triggers
-
-	bool pushed = false; //whether switch is currently pushed
-
 	private ArrayList pushers = new ArrayList();
 
 	Renderer rune;
@@ -46,6 +45,7 @@ public class PushSwitch : MonoBehaviour {
 				ExitCollisionWithGeneral(null);
 			}
 		}
+
 		/*if (pushers.Count > 0) {
 			foreach (Collider pusher in pushers) {
 				check = pusher.bounds;
@@ -57,10 +57,12 @@ public class PushSwitch : MonoBehaviour {
 	}
 
 	void FixedUpdate() {
-		if (!pushed)
-			rune.transform.RotateAround (transform.position, Vector3.up, 1);
-		else
-			rune.transform.RotateAround (transform.position, Vector3.up, 2);
+		if(rotate){
+			if (!pushed)
+				rune.transform.RotateAround (transform.position, Vector3.up, 1);
+			else
+				rune.transform.RotateAround (transform.position, Vector3.up, 2);	
+		}
 	}
 
 	public void EnterCollisionWithPlayer() {
