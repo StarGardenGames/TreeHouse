@@ -16,7 +16,7 @@ public class PlayerSpawnController : MonoBehaviour {
 	public void moveToDoor(Door doorObject){
 		if(doorObject != null && startAtDoor)
 			this.gameObject.GetComponent<PlayerController>().Teleport(
-				doorObject.transform.position + new Vector3(0,0,-2));
+				doorObject.transform.position + new Vector3(0,2,-2));
 	}
 
 	//find door with name

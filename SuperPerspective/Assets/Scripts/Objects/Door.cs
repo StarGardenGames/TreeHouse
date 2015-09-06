@@ -11,7 +11,7 @@ public class Door : ActiveInteractable {
 	
 	public void Awake(){
 		//update particle color
-		ParticleSystem p = transform.GetChild(1).GetComponent<ParticleSystem>();
+		ParticleSystem p = this.transform.FindChild("Particles").GetComponent<ParticleSystem>();
 		p.startColor = particleColor;
 		p.Simulate(2f);
 		p.Play();

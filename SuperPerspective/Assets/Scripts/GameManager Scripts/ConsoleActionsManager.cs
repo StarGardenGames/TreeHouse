@@ -18,8 +18,8 @@ public class ConsoleActionsManager : MonoBehaviour {
 	}
 
 	void buildDoorButtons(){
-		Door[] doorList = Object.FindObjectsOfType(
-			typeof(Door)) as Door[];
+		//Door[] doorList = Object.FindObjectsOfType(
+		//	typeof(Door)) as Door[];
 
 		//generates a teleport button for each door
 		// foreach(Door door in doorList){
@@ -31,7 +31,7 @@ public class ConsoleActionsManager : MonoBehaviour {
 	}
 
 	void init(){
-		canvas = GameObject.Find("Console Menu") as GameObject;
+		//canvas = GameObject.Find("Console Menu") as GameObject;
 		player = GameObject.FindWithTag("Player");
 		psc = player.GetComponent<PlayerSpawnController>();
 		dcl = GameObject.Find("DevCommandLine").GetComponent<InputField>();
