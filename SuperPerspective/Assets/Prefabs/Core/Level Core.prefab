@@ -42,9 +42,8 @@ MonoBehaviour:
   prefabList:
   - {fileID: 112760, guid: 3853afeab822f4bf9855287a0257d810, type: 2}
   - {fileID: 146284, guid: 460dc94b41849c4459973ec740ce5a13, type: 2}
-  - {fileID: 156140, guid: ffefa83fc6317be469504b01c2b5f554, type: 2}
-  - {fileID: 106910, guid: 53f8b1826de3d374f8355fae10d2e3a1, type: 2}
   - {fileID: 152018, guid: 76050249cd01e42aab10f75054f65734, type: 2}
+  - {fileID: 106910, guid: 53f8b1826de3d374f8355fae10d2e3a1, type: 2}
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
