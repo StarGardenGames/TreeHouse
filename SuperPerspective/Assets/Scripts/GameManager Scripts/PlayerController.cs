@@ -681,7 +681,10 @@ public class PlayerController : PhysicalObject
 
 	#region Accessor Methods
 	public bool is3D(){
-		return GameStateManager.instance.currentPerspective== PerspectiveType.p3D;
+		return GameStateManager.instance.currentPerspective == PerspectiveType.p3D;
+	}
+	public bool is2D(){
+		return GameStateManager.instance.currentPerspective == PerspectiveType.p2D;
 	}
 
 	public bool GrabbedCrate() {
