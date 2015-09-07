@@ -8,6 +8,8 @@ public class Door : ActiveInteractable {
 	public string destName;
 	Door destDoor;
 	public Color particleColor;
+
+	public bool isSceneLoad;
 	
 	public void Awake(){
 		//update particle color
@@ -26,7 +28,10 @@ public class Door : ActiveInteractable {
 	}
 
 	public override void Triggered(){
-		if(destDoor!=null)
+		if(isSceneLoad && destName != null)
+			Application.LoadLevel(destName);
+
+		else if(destDoor!=null)
 			player.GetComponent<PlayerController>().Teleport(
 				destDoor.transform.position + new Vector3(0,0,-2));
 		else
