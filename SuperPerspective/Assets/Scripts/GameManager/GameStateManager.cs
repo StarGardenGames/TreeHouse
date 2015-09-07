@@ -211,9 +211,21 @@ public class GameStateManager : MonoBehaviour
 		previousState = currentState;
 		this.targetState = targetState;
 		currentPerspective = view_perspectives[(int)targetState];
-		if(targetState == ViewType.PAUSED)
-			view_mounts[(int)ViewType.PAUSED] = IslandControl.instance.findCurrentPauseMount();
+		if(targetState == ViewType.PAUSED){
+			
+			
+		}
 		CameraController.instance.SetMount(view_mounts[(int)targetState],currentPerspective);
+	}
+	
+	private void UpdatePauseMount(){
+		Transform newMount = IslandControl.instance.findCurrentPauseMount();
+		if(newMount == null){
+			view_mounts[(int)ViewType.PAUSED] = view_mounts[(int)ViewType.STANDARD_3D];
+		}else{
+			view_mounts[(int)ViewType.PAUSED] = newMount;
+		}
+		
 	}
 	
    #endregion State Change Functions

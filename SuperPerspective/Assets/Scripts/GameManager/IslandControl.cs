@@ -11,8 +11,11 @@
 
 using UnityEngine;
 using System.Collections;
+using System;
 
 public class IslandControl : MonoBehaviour {
+
+	#pragma warning disable 414, 649, 472
 
 	public static IslandControl instance;
 	
@@ -36,7 +39,11 @@ public class IslandControl : MonoBehaviour {
 	void findPauseMounts(){
 		pauseMounts = new Transform[grounds.Length];
 		for(int i = 0; i < pauseMounts.Length; i++){
-			pauseMounts[i] = grounds[i].transform.parent.Find("PauseMount");
+			try{
+				pauseMounts[i] = grounds[i].transform.parent.Find("PauseMount");
+			}catch(Exception e){
+				print("IslandControl: Could not find PauseMount for island "+i);
+			}
 		}
 	}
 
