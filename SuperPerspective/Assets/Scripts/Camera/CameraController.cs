@@ -1,16 +1,16 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-using SuperPerspective.Singleton;
-
 /// <summary>
 ///     TODO: Summarize this prolly?
 /// </summary>
 [RequireComponent(typeof(MatrixBlender))]   // Required to blend the camera's view settings between states
 [RequireComponent(typeof(Camera))]          // The camera needs to actually be, you know, a camera
-public class CameraController : PersistentSingleton<CameraController	>
+public class CameraController : MonoBehaviour
 {
 	
+    public static CameraController instance;
+    
 	//suppress warnings
 	#pragma warning disable 472, 414
 	
@@ -47,8 +47,14 @@ public class CameraController : PersistentSingleton<CameraController	>
 
     #region Monobehavior Implementation
 	
-    public override void Awake()
+    public void Awake()
     {
+        //singleton
+		if (instance == null)
+			instance = this;
+		else
+			Destroy (this);
+        
         // Get the MatrixBlender script
         blender = gameObject.GetComponent<MatrixBlender>();
     }

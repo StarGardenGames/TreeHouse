@@ -1,15 +1,15 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-using SuperPerspective.Singleton;
-
 /// <summary>
 ///     This class is in charge of controlling the game state transitions. 
 ///     It receives input from InputManager, and tells the camera, player, and any other necessary objects of behavior changes.
 ///     This keeps all transitions logic in one location and allows the player, camera, and menu scripts to have simple behavior and remain modular.
 /// </summary>
-public class GameStateManager : PersistentSingleton<GameStateManager>
+public class GameStateManager : MonoBehaviour
 {
+	public static GameStateManager instance;
+	
 	//suppress warnings
 	#pragma warning disable 414, 649, 472
 	
@@ -44,9 +44,16 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
 	
 	#region Monobehavior Implementation
 
-	public override void Awake () {
-		base.Awake();
-		
+	public void Awake () {
+		//singleton
+		if (instance == null)
+			instance = this;
+		else
+			Destroy (this);		
+	}
+	
+	void Start(){
+		//init variables
 		InitViewPerspectives();
 		InitViewMounts();
 		InitViewPauseStates();
@@ -57,7 +64,7 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
 		}else{
 			EnterState(ViewType.MENU);
 		}
-
+		
 		// Register event handlers to InputManagers
 		InputManager.instance.ShiftPressedEvent += HandleShiftPressed;
 		InputManager.instance.PausePressedEvent += HandlePausePressed;
@@ -70,6 +77,7 @@ public class GameStateManager : PersistentSingleton<GameStateManager>
 
 		// Register to switch state to proper gameplay when shift is complete
 		CameraController.instance.TransitionCompleteEvent += HandleTransitionComplete;
+		
 	}
 	
 	void InitViewPerspectives(){

@@ -36,7 +36,6 @@ public class IslandControl : MonoBehaviour {
 		islandBounds = new Rect[grounds.Length];
 		for (int i = 0; i < grounds.Length; i++) {
 			Bounds bounds = grounds[i].GetComponent<Collider>().bounds;
-			Debug.Log(bounds);
 			islandBounds[i] = new Rect(
 				bounds.min.x, bounds.min.z, bounds.size.x, bounds.size.z);
 		}

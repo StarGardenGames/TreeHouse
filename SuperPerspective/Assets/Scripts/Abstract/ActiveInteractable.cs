@@ -76,9 +76,7 @@ public class ActiveInteractable : PhysicalObject {
 	}
 
 	protected Quadrant GetQuadrant() {
-		float colliderHeight = GetComponent<Collider>().bounds.size.y;
 		float colliderWidth = GetComponent<Collider>().bounds.size.x;
-		float colliderDepth = GetComponent<Collider> ().bounds.size.z;
 		PerspectiveType persp = GameStateManager.instance.currentPerspective;
 		if (Mathf.Abs(player.transform.position.x - transform.position.x) > colliderWidth / 2 || persp == PerspectiveType.p2D) {
 			if (player.transform.position.x - transform.position.x > 0)
@@ -93,8 +91,7 @@ public class ActiveInteractable : PhysicalObject {
 		}
 	}
 
-	public virtual float GetDistance() {
-		bool is3D = player.GetComponent<PlayerController>().is3D();
+	public virtual float GetDistance() {	
 		switch (GetQuadrant ()) {
 			case Quadrant.xPlus:
 					return player.transform.position.x - transform.position.x;

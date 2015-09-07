@@ -22,8 +22,6 @@ public class Ice : ActiveInteractable {
 	
 	private bool respawnFlag, startPush;
 	
-	private PerspectiveType persp = PerspectiveType.p3D;
-	
 	private bool[] axisBlocked = new bool[4];
 
 	public GameObject brokenIceSpawnPoint;
@@ -44,7 +42,6 @@ public class Ice : ActiveInteractable {
 
 		// Register CheckGrab to grab input event
 		//InputManager.instance.InteractPressed += CheckGrab;
-		GameStateManager.instance.PerspectiveShiftEvent += Shift;
 		CameraController.instance.TransitionStartEvent += checkBreak;
 		colCheck = new CollisionChecker (GetComponent<Collider> ());
 		startPos = transform.position;
@@ -379,9 +376,5 @@ public class Ice : ActiveInteractable {
 						break;
 			}
 		}
-	}
-
-	private void Shift(PerspectiveType p) {
-		persp = p;
 	}
 }

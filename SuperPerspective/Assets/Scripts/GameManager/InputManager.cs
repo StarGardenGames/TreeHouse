@@ -1,13 +1,14 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-using SuperPerspective.Singleton;
-
 /// <summary>
 ///     Sends notifications on user input and allows polling for current input state of buttons and axes.
 ///     Also notifies listeners when the game's perspective changes.
 /// </summary>
-public class InputManager : Singleton<InputManager>{
+public class InputManager : MonoBehaviour{
+	
+	public static InputManager instance;
+	
 	//suppress warnings
 	#pragma warning disable 414
 
@@ -41,6 +42,14 @@ public class InputManager : Singleton<InputManager>{
 	#endregion Properties & Variables
 
 	#region Monobehavior Implementation
+
+	void Awake(){
+		//singleton
+		if (instance == null)
+			instance = this;
+		else
+			Destroy (this);
+	}
 
 	// listens to player input and raises events for listeners.
 	void Update () {

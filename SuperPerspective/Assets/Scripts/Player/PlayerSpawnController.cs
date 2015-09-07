@@ -29,7 +29,7 @@ public class PlayerSpawnController : MonoBehaviour {
 				return door;
 			}
 		}
-		print("could not find door " + doorName);
+		print("PlayerSpawnController: Door ("+doorName+") does not exist");
 		return null;
 	}
 
