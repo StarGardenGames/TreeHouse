@@ -260,7 +260,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 11492578, guid: 0e36522322f5f634b82ede298fb391da, type: 2}
       propertyPath: isSceneLoad
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 11492578, guid: 0e36522322f5f634b82ede298fb391da, type: 2}
       propertyPath: destName

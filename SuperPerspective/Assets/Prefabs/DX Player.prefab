@@ -2120,7 +2120,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 180044}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -6.35018969, y: -3.43000007, z: 3.37981176}
+  m_LocalPosition: {x: -6.45137215, y: -.430000007, z: 2.6105392}
   m_LocalScale: {x: 1, y: 2, z: 1}
   m_Children:
   - {fileID: 448266}
@@ -4389,7 +4389,7 @@ MonoBehaviour:
   hangMaxSpeed: 3
   upGravity: 70
   downGravity: 60
-  terminalVelocity: 60
+  terminalVelocity: 30
   jump: 19
   jumpMargin: .200000003
   falling: 0
