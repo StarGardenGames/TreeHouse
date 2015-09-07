@@ -93,13 +93,12 @@ public class GameStateManager : MonoBehaviour
 	void InitViewMounts(){
 		// Gather mount gameobjects
 		GameObject[] mounts = new GameObject[NUM_VIEW_TYPES];
-		mounts[0] = GameObject.Find("3DCameraMount");
-		mounts[1] = GameObject.Find("2DCameraMount");
-		mounts[2] = GameObject.Find("MenuMount");
-		mounts[3] = GameObject.Find("PauseMount");
-		mounts[4] = GameObject.Find("LeanLeftCameraMount");
-		mounts[5] = GameObject.Find("LeanRightCameraMount");
-		mounts[6] = GameObject.Find("BackwardCameraMount");
+		mounts[(int)ViewType.STANDARD_3D] = GameObject.Find("3DCameraMount");
+		mounts[(int)ViewType.STANDARD_2D] = GameObject.Find("2DCameraMount");
+		mounts[(int)ViewType.MENU] = GameObject.Find("MenuMount");
+		mounts[(int)ViewType.LEAN_LEFT] = GameObject.Find("LeanLeftCameraMount");
+		mounts[(int)ViewType.LEAN_RIGHT] = GameObject.Find("LeanRightCameraMount");
+		mounts[(int)ViewType.BACKWARD] = GameObject.Find("BackwardCameraMount");
 		
 		//find transforms
 		for(int i = 0; i < mounts.Length; i++){
@@ -212,6 +211,8 @@ public class GameStateManager : MonoBehaviour
 		previousState = currentState;
 		this.targetState = targetState;
 		currentPerspective = view_perspectives[(int)targetState];
+		if(targetState == ViewType.PAUSED)
+			view_mounts[(int)ViewType.PAUSED] = IslandControl.instance.findCurrentPauseMount();
 		CameraController.instance.SetMount(view_mounts[(int)targetState],currentPerspective);
 	}
 	
@@ -278,6 +279,11 @@ public class GameStateManager : MonoBehaviour
 		// Register to switch state to proper gameplay when shift is complete
 		CameraController.instance.TransitionCompleteEvent += HandleTransitionComplete;
 	}
+	
+	public void UpdatePauseMount(Transform newMount){
+		view_mounts[(int)ViewType.PAUSED] = newMount;
+	}
+	
 	#endregion Public Interface
 
 	#region Helper Functions

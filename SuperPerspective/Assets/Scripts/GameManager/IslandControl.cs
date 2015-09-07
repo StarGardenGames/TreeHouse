@@ -17,6 +17,7 @@ public class IslandControl : MonoBehaviour {
 	public static IslandControl instance;
 	
 	GameObject[] grounds;
+	Transform[] pauseMounts;
 	public Rect[] islandBounds;
 	//public float[,] altBounds;
 
@@ -28,7 +29,15 @@ public class IslandControl : MonoBehaviour {
 		else
 			Destroy (this);
 		//init islandBounds
-		generateBounds ();
+		generateBounds();
+		findPauseMounts();
+	}
+
+	void findPauseMounts(){
+		pauseMounts = new Transform[grounds.Length];
+		for(int i = 0; i < pauseMounts.Length; i++){
+			pauseMounts[i] = grounds[i].transform.parent.Find("PauseMount");
+		}
 	}
 
 	void generateBounds(){
@@ -76,9 +85,7 @@ public class IslandControl : MonoBehaviour {
 				}
 			}
 		}
-
 		return curValid;
-		
 	}
 	
 	public GameObject findGround(GameObject obj){
@@ -90,5 +97,11 @@ public class IslandControl : MonoBehaviour {
 				"\nMake sure all objects are placed within the bounds of a ground");
 		}
 		return grounds[boundIndex];
+	}
+	
+	public Transform findCurrentPauseMount(){
+		Vector3 playerPos = PlayerController.instance.transform.position;
+		int boundIndex = getBound(playerPos.x, playerPos.y, playerPos.z, false);
+		return pauseMounts[boundIndex];
 	}
 }

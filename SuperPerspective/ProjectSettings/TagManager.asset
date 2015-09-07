@@ -12,6 +12,7 @@ TagManager:
   - BackgroundObject
   - Light_2D
   - Light_3D
+  - Pause_Mount
   layers:
   - Default
   - TransparentFX
