@@ -15,14 +15,13 @@ using System;
 
 public class IslandControl : MonoBehaviour {
 
-	#pragma warning disable 414, 649, 472
+	#pragma warning disable 414, 649, 472, 168
 
 	public static IslandControl instance;
 	
 	GameObject[] grounds;
 	Transform[] pauseMounts;
 	public Rect[] islandBounds;
-	//public float[,] altBounds;
 
 	// Use this for initialization
 	void Awake () {

@@ -3,17 +3,24 @@ using System.Collections;
 
 public class PauseMenu : MonoBehaviour {
 
+	public static PauseMenu instance;
+
 	bool menuVisible = false;
 	float menuAlpha = 0f;
 	Canvas menu;
 	float fadeTime = .3f;
 	
+	void Awake(){
+		if(instance == null)
+			instance = this;
+		else if(instance != this)
+			Destroy(instance);
+	}
+	
 	//init settings
 	void Start () {
 		//Find menu
 		menu = transform.GetChild(0).GetComponent<Canvas>();
-		//link toggle pause to pause button
-		InputManager.instance.PausePressedEvent += TogglePauseMenu;
 	}
 	
 	//called every frame
@@ -26,11 +33,7 @@ public class PauseMenu : MonoBehaviour {
 		menu.GetComponent<CanvasGroup>().alpha = menuAlpha;
 	}
 	
-	public void TogglePauseMenu(){
-		menuVisible = !menuVisible;
-	}
-	
-	public void RaisePauseEvent(){
-		InputManager.instance.ContinuePressed();
+	public void UpdateMenuVisible(bool visible){
+		menuVisible = visible;
 	}
 }

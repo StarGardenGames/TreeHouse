@@ -42,7 +42,7 @@ public class GameStateManager : MonoBehaviour
 	
 	#endregion Properties & Variables
 	
-	#region Monobehavior Implementation
+	#region Initialization
 
 	public void Awake () {
 		//singleton
@@ -53,37 +53,19 @@ public class GameStateManager : MonoBehaviour
 	}
 	
 	void Start(){
-		//init variables
 		InitViewPerspectives();
 		InitViewMounts();
 		InitViewPauseStates();
 		
-		//determine wheather or not to start on menu
-		if(view_mounts[(int)ViewType.MENU] == null){
-			StartGame();
-		}else{
-			EnterState(ViewType.MENU);
-		}
-		
-		// Register event handlers to InputManagers
-		InputManager.instance.ShiftPressedEvent += HandleShiftPressed;
-		InputManager.instance.PausePressedEvent += HandlePausePressed;
-		InputManager.instance.LeanLeftPressedEvent += HandleLeanLeftPressed;
-		InputManager.instance.LeanRightPressedEvent += HandleLeanRightPressed;
-		InputManager.instance.LeanLeftReleasedEvent += HandleLeanLeftReleased;
-		InputManager.instance.LeanRightReleasedEvent += HandleLeanRightReleased;
-		InputManager.instance.BackwardMovementEvent += HandleBackwardMovement;
-		InputManager.instance.ForwardMovementEvent += HandleForwardMovement;
+		RegisterEventHandlers();
 
-		// Register to switch state to proper gameplay when shift is complete
-		CameraController.instance.TransitionCompleteEvent += HandleTransitionComplete;
-		
+		GoToStartState();	
 	}
 	
 	void InitViewPerspectives(){
 		view_perspectives[(int)ViewType.STANDARD_3D] =   PerspectiveType.p3D;
 		view_perspectives[(int)ViewType.STANDARD_2D] =   PerspectiveType.p2D;
-		view_perspectives[(int)ViewType.PAUSED] =        PerspectiveType.p3D;  
+		view_perspectives[(int)ViewType.PAUSE_MENU] =        PerspectiveType.p3D;  
 		view_perspectives[(int)ViewType.MENU] =          PerspectiveType.p2D; 
 		view_perspectives[(int)ViewType.LEAN_LEFT] =		 PerspectiveType.p3D; 
 		view_perspectives[(int)ViewType.LEAN_RIGHT] =	 PerspectiveType.p3D; 
@@ -110,29 +92,48 @@ public class GameStateManager : MonoBehaviour
 	void InitViewPauseStates(){
 		view_pause[(int)ViewType.STANDARD_3D] =   false;
 		view_pause[(int)ViewType.STANDARD_2D] =   false;
-		view_pause[(int)ViewType.PAUSED] =        true; 
+		view_pause[(int)ViewType.PAUSE_MENU] =        true; 
 		view_pause[(int)ViewType.MENU] =          true; 
 		view_pause[(int)ViewType.LEAN_LEFT] =		 false; 
 		view_pause[(int)ViewType.LEAN_RIGHT] =	 false; 
 		view_pause[(int)ViewType.BACKWARD] =		 false;
 	}
 	
+	void RegisterEventHandlers(){
+		InputManager.instance.ShiftPressedEvent += HandleShiftPressed;
+		InputManager.instance.PausePressedEvent += HandlePausePressed;
+		InputManager.instance.LeanLeftPressedEvent += HandleLeanLeftPressed;
+		InputManager.instance.LeanRightPressedEvent += HandleLeanRightPressed;
+		InputManager.instance.LeanLeftReleasedEvent += HandleLeanLeftReleased;
+		InputManager.instance.LeanRightReleasedEvent += HandleLeanRightReleased;
+		InputManager.instance.BackwardMovementEvent += HandleBackwardMovement;
+		InputManager.instance.ForwardMovementEvent += HandleForwardMovement;
+		
+		CameraController.instance.TransitionCompleteEvent += HandleTransitionComplete;
+	}
+	
+	void GoToStartState(){
+		if(view_mounts[(int)ViewType.MENU] == null)
+			StartGame();
+		else
+			EnterState(ViewType.MENU);
+	}
+	
 	#endregion Monobehavior Implementation
 	
 	#region Event Handlers
 
-	//TODO review
 	private void HandlePausePressed(){   
 		switch(currentState){
 			case ViewType.MENU:
 				if(previousState != null)
 					EnterState(previousState);
 				break;
-			case ViewType.PAUSED:
+			case ViewType.PAUSE_MENU:
 				EnterState(previousState);
 				break;
 			default:
-				EnterState(ViewType.PAUSED);
+				EnterState(ViewType.PAUSE_MENU);
 				break;
 		}
 	}
@@ -153,7 +154,6 @@ public class GameStateManager : MonoBehaviour
 		}
 	}
 
-	// TODO Review (handle pause and handle menu are pretty much the same)
 	private void HandleMenuEnterPressed(){
 		if (currentState == ViewType.MENU){
 			EnterState(previousState);
@@ -206,26 +206,40 @@ public class GameStateManager : MonoBehaviour
 	
 	#region State Change Functions
 	
-	private void EnterState(ViewType targetState){
-		RaisePauseEvent(IsPauseState(targetState));
+	private void EnterState(ViewType newState){
+		bool goingToNewState = (newState == targetState);
+		bool onNewState = (newState == currentState);
+		bool transitioning = (targetState != currentState);
+		if((onNewState && !transitioning) || goingToNewState) return;		
+		
+		CheckForPauseMenu(newState);
+		
+		RaisePauseEvent(IsPauseState(newState));
 		previousState = currentState;
-		this.targetState = targetState;
-		currentPerspective = view_perspectives[(int)targetState];
-		if(targetState == ViewType.PAUSED){
-			
-			
-		}
-		CameraController.instance.SetMount(view_mounts[(int)targetState],currentPerspective);
+		targetState = newState;
+		currentPerspective = view_perspectives[(int)newState];
+		CameraController.instance.SetMount(view_mounts[(int)newState],currentPerspective);
+	}
+	
+	private void CheckForPauseMenu(ViewType targetState){
+		if(targetState != ViewType.PAUSE_MENU && currentState != ViewType.PAUSE_MENU)
+			return;
+		
+		bool goingToPauseMenu = (targetState == ViewType.PAUSE_MENU);
+		
+		if(goingToPauseMenu)
+			UpdatePauseMount();
+		
+		PauseMenu.instance.UpdateMenuVisible(goingToPauseMenu);
 	}
 	
 	private void UpdatePauseMount(){
 		Transform newMount = IslandControl.instance.findCurrentPauseMount();
 		if(newMount == null){
-			view_mounts[(int)ViewType.PAUSED] = view_mounts[(int)ViewType.STANDARD_3D];
+			view_mounts[(int)ViewType.PAUSE_MENU] = view_mounts[(int)ViewType.STANDARD_3D];
 		}else{
-			view_mounts[(int)ViewType.PAUSED] = newMount;
+			view_mounts[(int)ViewType.PAUSE_MENU] = newMount;
 		}
-		
 	}
 	
    #endregion State Change Functions
@@ -292,10 +306,6 @@ public class GameStateManager : MonoBehaviour
 		CameraController.instance.TransitionCompleteEvent += HandleTransitionComplete;
 	}
 	
-	public void UpdatePauseMount(Transform newMount){
-		view_mounts[(int)ViewType.PAUSED] = newMount;
-	}
-	
 	#endregion Public Interface
 
 	#region Helper Functions
@@ -332,5 +342,5 @@ public enum PerspectiveType{
 }
 
 public enum ViewType{
-	STANDARD_3D, STANDARD_2D, MENU, PAUSED, LEAN_LEFT, LEAN_RIGHT, BACKWARD
+	NULL_VIEW, STANDARD_3D, STANDARD_2D, MENU, PAUSE_MENU, LEAN_LEFT, LEAN_RIGHT, BACKWARD
 }
