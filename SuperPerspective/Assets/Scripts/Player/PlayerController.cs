@@ -502,13 +502,18 @@ public class PlayerController : PhysicalObject
 		if (trajectory.normalized == Vector3.forward || trajectory.normalized == Vector3.back)
 			colliderDim = colliderDepth;
 		// Bounce Pad
-		if (trajectory.normalized == Vector3.down && other.GetComponent<BouncePad>()) {
-			velocity = other.transform.up * other.GetComponent<BouncePad>().GetBouncePower();
-			if (!other.transform.up.Equals(Vector3.up))
-				launched = 50;
-			other.GetComponent<BouncePad>().Animate();
-			anim.SetTrigger("Jump");
-			bounced = true;
+		if (trajectory.normalized == Vector3.down) {
+			if (other.GetComponent<BouncePad>()) {
+				velocity = other.transform.up * other.GetComponent<BouncePad>().GetBouncePower();
+				if (!other.transform.up.Equals(Vector3.up))
+					launched = 50;
+				other.GetComponent<BouncePad>().Animate();
+				anim.SetTrigger("Jump");
+				bounced = true;
+			}
+			foreach (LandOnObject c in other.GetComponents<LandOnObject>()) {
+				c.LandedOn ();
+			}
 		}
 		// Crate
 		if (trajectory.normalized != Vector3.down && trajectory.normalized != Vector3.zero && other.GetComponent<Crate>() && !other.GetComponent<Crate>().IsAxisBlocked(trajectory)) {
