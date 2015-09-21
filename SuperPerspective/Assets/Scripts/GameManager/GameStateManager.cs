@@ -207,15 +207,13 @@ public class GameStateManager : MonoBehaviour
 	#region State Change Functions
 	
 	private void EnterState(ViewType newState){
-		bool goingToNewState = (newState == targetState);
-		bool onNewState = (newState == currentState);
-		bool transitioning = (targetState != currentState);
-		if((onNewState && !transitioning) || goingToNewState) return;		
+		bool targetOnNewState = (newState == targetState);
+		if(targetOnNewState) return;		
 		
 		CheckForPauseMenu(newState);
 		
 		RaisePauseEvent(IsPauseState(newState));
-		previousState = currentState;
+		previousState = targetState;
 		targetState = newState;
 		currentPerspective = view_perspectives[(int)newState];
 		CameraController.instance.SetMount(view_mounts[(int)newState],currentPerspective);
