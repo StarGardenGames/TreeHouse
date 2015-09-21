@@ -3,13 +3,11 @@ using System.Collections;
 
 [RequireComponent(typeof(LineRenderer))]
 public class PlayerController : PhysicalObject
-{
-	public bool testClimbing;
-	
+{	
 	//suppress warnings
 	#pragma warning disable 1691,168,219,414
 
-   	#region Properties & Variables
+   #region Properties & Variables
 
 	//singleton
 	public static PlayerController instance;
@@ -58,7 +56,8 @@ public class PlayerController : PhysicalObject
 
 	private Animator anim;
 	private GameObject model;
-
+	private float prePauseAnimSpeed = 0;
+	
 	private Crate crate = null;
 	private bool pushFlag = false;
 	private Vector3 grabAxis = Vector3.zero;
@@ -117,46 +116,46 @@ public class PlayerController : PhysicalObject
 		lastUpdate = Time.fixedTime;
 	}
 
-    void Update()
-    {
-		 testClimbing = climbing;
-		 
-        if (!_paused)
-        {
-            // See if the player is pressing the jump button this frame
-            bool input = InputManager.instance.JumpStatus();
+	void Update(){
 
-            // If this is the first frame the button was pressed then store the current time
-            if (input && !lastInput)
-            {
-                jumpPressedTime = Time.time;
-            }
-            // If the player didn't press the jump key this frame store time as 0
-            else if (!input)
-            {
-                jumpPressedTime = 0;
-            }
+		if (!_paused){
+			// See if the player is pressing the jump button this frame
+			bool input = InputManager.instance.JumpStatus();
 
-            // This only runs while the player is grounded, it allows the player to jump as soon as they land 
-            //      even if they pressed the jump button while in midair if they were close enough to the ground
-            if ((grounded || edgeState == 2) && Time.time - jumpPressedTime < jumpMargin && crate == null)
-            {
-				anim.SetTrigger("Jump");
-				grounded = false;
-				velocity = new Vector3(velocity.x, jump, velocity.z);
-				jumpPressedTime = 0;
-				ReleaseEdge();
-				//update edgeState for animation
-				anim.SetInteger("EdgeState", 6);
-            }
+			// If this is the first frame the button was pressed then store the current time
+			if (input && !lastInput)
+			{
+			jumpPressedTime = Time.time;
+			}
+			// If the player didn't press the jump key this frame store time as 0
+			else if (!input)
+			{
+			jumpPressedTime = 0;
+			}
 
-            lastInput = input;
+			// This only runs while the player is grounded, it allows the player to jump as soon as they land 
+			//      even if they pressed the jump button while in midair if they were close enough to the ground
+			if ((grounded || edgeState == 2) && Time.time - jumpPressedTime < jumpMargin && crate == null)
+			{
+			anim.SetTrigger("Jump");
+			grounded = false;
+			velocity = new Vector3(velocity.x, jump, velocity.z);
+			jumpPressedTime = 0;
+			ReleaseEdge();
+			//update edgeState for animation
+			anim.SetInteger("EdgeState", 6);
+			}
 
-            anim.SetBool("Falling", falling);
-            anim.SetBool("Grounded", grounded);
+			lastInput = input;
+
+			anim.SetBool("Falling", falling);
+			anim.SetBool("Grounded", grounded);
+		}else{
+			if(anim.speed != 0){
 				
-        }
-    }
+			}
+		}
+   }
 
     // Collision detection and velocity calculations are done in the fixed update step
     void FixedUpdate()
@@ -714,8 +713,15 @@ public class PlayerController : PhysicalObject
 
 	#endregion Accessor Methods
 	
-	private void OnPauseGame(bool p)
-	{
-	  _paused = p;
+	private void OnPauseGame(bool p){
+		if(_paused != p){
+			if(p){
+				prePauseAnimSpeed = anim.speed;
+				anim.speed = 0;
+			}else{
+				anim.speed = prePauseAnimSpeed;
+			}
+		}		
+		_paused = p;
 	}
 }
