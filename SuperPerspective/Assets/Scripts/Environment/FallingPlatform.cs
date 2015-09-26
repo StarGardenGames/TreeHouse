@@ -6,6 +6,7 @@ public class FallingPlatform : LandOnObject {
 	bool falling, respawning;
 	int shake, respawn;
 	Vector3 origScale, origPos;
+	public bool shouldRespawn;
 
 	// Use this for initialization
 	void Start () {
@@ -23,7 +24,7 @@ public class FallingPlatform : LandOnObject {
 				GetComponent<Collider>().enabled = false;
 			}
 		}
-		if (respawn > 0) {
+		if (respawn > 0 && shouldRespawn) {
 			respawn--;
 			if (respawn == 0) {
 				transform.localScale = origScale;
@@ -36,9 +37,13 @@ public class FallingPlatform : LandOnObject {
 			transform.Translate(Vector3.down * (1 / 25f));
 			transform.localScale *= 0.9f;
 			if (transform.localScale.magnitude < 0.1) {
-				GetComponent<Renderer>().enabled = false;
-				respawn = 50;
-				falling = false;
+				if(shouldRespawn){
+					GetComponent<Renderer>().enabled = false;
+					respawn = 50;
+					falling = false;
+				}else{
+					gameObject.SetActive(false);
+				}
 			}
 		}
 	}
