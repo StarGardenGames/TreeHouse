@@ -13,15 +13,19 @@ public class Edge : MonoBehaviour {
 
 	byte status = 0; //0: no overlap, 1: lined up, 2: latched, 3: rested latch
 
+	bool playerAboveEdge = false;
+	
 	PlayerController player;
 	
 	bool init = false;//indicates whether Edge has been initiated
 	
-	bool playerAboveEdge = false;
-	
 	bool rotatedTerrain = false;
 	
 	public int edgeIndex = 0;
+	
+	float edgeFactor = .5f;
+	
+	public bool validIn2D = true;
 
 	float hangThresh = 35;//time to wait till player can climb
 	float hangCounter = 0.0f;
@@ -31,7 +35,8 @@ public class Edge : MonoBehaviour {
 			return;
 		updateCuboid();
 		
-		bool playerCanGrab = player.isFalling();
+		bool is3D = GameStateManager.instance.currentPerspective == PerspectiveType.p3D;
+		bool playerCanGrab = player.isFalling() && (is3D || validIn2D);
 		//if locked on
 		if(status >= 2){
 			//check if rested latch can be entered
@@ -82,6 +87,12 @@ public class Edge : MonoBehaviour {
 			status = 0;
 			player.UpdateEdgeState(this, status);
 		}
+		
+		//check for making the player let go
+		if(status != 0 && !is3D && !validIn2D){
+			status = 0;
+			player.UpdateEdgeState(this, status);
+		}
 	}
 
 	public bool GrabButtonDown(){
@@ -123,15 +134,18 @@ public class Edge : MonoBehaviour {
 	public void Init(int or, float width, float depth, int overlapIndex, int edgeIndex, Transform parent, 
 		bool rotatedTerrain){
 		this.edgeIndex = edgeIndex;
-		transform.parent = parent;
 		player = PlayerController.instance;
 		this.or = or; //orientation
 		this.overlapIndex = overlapIndex;
 		this.rotatedTerrain = rotatedTerrain;
+	
+		checkOverlaps();
 		
-		updateDimensions(or,width,depth);
+		transform.parent = parent;
 		
 		shortenSides();
+		
+		updateDimensions(or,width,depth);
 		
 		cuboid = new Vector3[2];
 		updateCuboid();
@@ -211,6 +225,136 @@ public class Edge : MonoBehaviour {
 		gameObject.transform.localScale = scale;
 	}
 	
+	public void checkOverlaps(){
+		//reference to terrain in edgemanager
+		GameObject[] t = EdgeManager.instance.getTerrain();
+		//create corners
+		Vector3[] cubBot = new Vector3[2];
+		Vector3 halfScale = gameObject.transform.localScale * .5f;
+		cubBot[0] = gameObject.transform.position - halfScale;
+		cubBot[1] = gameObject.transform.position + halfScale;
+		Vector3[] cubTop = new Vector3[2];
+		float edgeSize = gameObject.transform.localScale.y;
+		float smallEdge = edgeSize * edgeFactor;
+		switch(or){
+		case 0:
+			cubTop[0] = cubBot[0] + new Vector3(-smallEdge,edgeSize,0);
+			cubTop[1] = cubBot[1] + new Vector3(0,smallEdge,0);
+			break;
+		case 1:
+			cubTop[0] = cubBot[0] + new Vector3(0,edgeSize,-smallEdge);
+			cubTop[1] = cubBot[1] + new Vector3(0,smallEdge,0);
+			break;
+		case 2:
+			cubTop[0] = cubBot[0] + new Vector3(0,edgeSize,0);
+			cubTop[1] = cubBot[1] + new Vector3(smallEdge,smallEdge,0);
+			break;
+		case 3:
+			cubTop[0] = cubBot[0] + new Vector3(0,edgeSize,0);
+			cubTop[1] = cubBot[1] + new Vector3(0,smallEdge,smallEdge);
+			break;
+		}
+		
+		//find overlaps
+		/*for(int i = overlapIndex; i < t.Length; i++){
+			Vector3[] overBot = EdgeManager.instance.GetOverlap(i,cubBot);
+			Vector3[] overTop = EdgeManager.instance.GetOverlap(i,cubTop);
+			if(overBot == null && overTop == null){
+				continue;
+			}
+			//find range of overlap
+			float min = 0;
+			float max = 0;
+			if(overBot != null){
+				if(or%2==0){
+					min = overBot[0][2];
+					max = overBot[1][2];
+				}else{
+					min = overBot[0][0];
+					max = overBot[1][0];
+				}
+			}
+			if(overTop != null){
+				if(or%2==0){
+					min = ((overBot == null)? overTop[0][2] : Mathf.Min(overTop[0][2],overBot[0][2]));
+					max = ((overBot == null)? overTop[1][2] : Mathf.Max(overTop[1][2],overBot[1][2]));
+				}else{
+					min = ((overBot == null)? overTop[0][0] : Mathf.Min(overTop[0][0],overBot[0][0]));
+					max = ((overBot == null)? overTop[1][0] : Mathf.Max(overTop[1][0],overBot[1][0]));
+				}
+			}
+			//shorter current edge and create a new edge
+			if(or%2 == 0){//left/right
+				//reference variables
+				float posZ = gameObject.transform.position.z;
+				float halfScaleZ = gameObject.transform.localScale.z *.5f;
+				//create new edge
+				float newZ = (max + posZ + halfScaleZ) * .5f;
+				Vector3 newPos = new Vector3(gameObject.transform.position.x,gameObject.transform.position.y,newZ);
+				GameObject newEdge = Instantiate(EdgeManager.instance.edgePrefab, newPos, Quaternion.identity) as GameObject;
+				float newDepth = posZ + halfScaleZ - max;
+				if(newDepth <=0)
+					Destroy(newEdge);
+				else
+					newEdge.GetComponent<Edge>().Init(or, 0, newDepth, overlapIndex, 
+						EdgeManager.instance.getGlobalIndex(),transform.parent,rotatedTerrain);
+				//shorten current edge
+				float myZ = (min + posZ - halfScaleZ) * .5f;
+				Vector3 myPos = gameObject.transform.position;
+				myPos.z = myZ;
+				gameObject.transform.position = myPos;
+				float myDepth = min - (posZ - halfScaleZ);
+				if(myDepth <= 0){
+					Destroy(this.gameObject);
+					break;
+				}else{
+					Vector3 myScale = gameObject.transform.localScale;
+					myScale.z = myDepth;
+					gameObject.transform.localScale = myScale;
+				}
+			}else{//front/back
+				//reference variables
+				float posX = gameObject.transform.position.x;
+				float halfScaleX = gameObject.transform.localScale.x *.5f;
+				//create new edge
+				float newX = (max + posX + halfScaleX) * .5f;
+				Vector3 newPos = new Vector3(newX,gameObject.transform.position.y,gameObject.transform.position.z);
+				GameObject newEdge = Instantiate(EdgeManager.instance.edgePrefab, newPos, Quaternion.identity) as GameObject;
+				float newWidth = posX + halfScaleX - max;
+				if(newWidth <= 0)
+					Destroy(newEdge);
+				else
+					newEdge.GetComponent<Edge>().Init(or, newWidth, 0, overlapIndex,
+						EdgeManager.instance.getGlobalIndex(),transform.parent,rotatedTerrain);
+				//shorten current edge
+				float myX = (min + posX - halfScaleX) * .5f;
+				Vector3 myPos = gameObject.transform.position;
+				myPos.x = myX;
+				gameObject.transform.position = myPos;
+				float myWidth = min - (posX - halfScaleX);
+				if(myWidth <= 0){
+					Destroy(this.gameObject);
+					break;
+				}else{
+					Vector3 myScale = gameObject.transform.localScale;
+					myScale.x = myWidth;
+					gameObject.transform.localScale = myScale;
+				}
+			}
+		}*/
+
+		//determine valid in 2D
+		if(or%2 == 1)
+			validIn2D = false;
+		else{
+			for(int i = overlapIndex; i < t.Length; i++){
+				bool overBot = EdgeManager.instance.CheckOverlap2D(i,cubBot);
+				bool overTop = EdgeManager.instance.CheckOverlap2D(i,cubTop);
+				validIn2D = validIn2D && !overBot && !overTop;
+			}
+		}
+	}
+	
 	private void shortenSides(){
 		Vector3 lossyScale = gameObject.transform.lossyScale;
 		Vector3 localScale = gameObject.transform.localScale;
@@ -228,7 +372,7 @@ public class Edge : MonoBehaviour {
 		}
 		gameObject.transform.localScale = localScale;
 	}
-
+	
 	private Vector3 findAdjustedParentScale(){
 		Vector3 parScale = gameObject.transform.parent.lossyScale;
 		if(rotatedTerrain){
@@ -238,7 +382,6 @@ public class Edge : MonoBehaviour {
 		}
 		return parScale;
 	}
-	
 	
 	public void resetStatus(){
 		status = 0;

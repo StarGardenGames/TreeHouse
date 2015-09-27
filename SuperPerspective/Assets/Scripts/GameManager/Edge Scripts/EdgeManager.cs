@@ -145,10 +145,13 @@ public class EdgeManager : MonoBehaviour {
 			region[0][k] = Mathf.Max(p0[k],c[0][k]);
 			region[1][k] = Mathf.Min(p1[k],c[1][k]);
 		}
-		if(!overlap)
+		if(!overlap){
+			print("returning nothing");
 			return null;
-		else
+		}else{
+			print("returning something");
 			return region;
+		}
 	}
 
 	public int getGlobalIndex(){

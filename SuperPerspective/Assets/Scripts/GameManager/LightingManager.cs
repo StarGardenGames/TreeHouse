@@ -22,12 +22,7 @@ public class LightingManager : MonoBehaviour {
 		initStartingIntensities();
 		disableIrrelevantLights();
 		linkFunctions();
-
-		//
-		Light pl = GameObject.Find("Primary Light").GetComponent("Light") as Light;
-		pl.enabled = true;
-		GameObject bl = GameObject.Find("Build Light") as GameObject;
-		Destroy(bl.gameObject);
+		enablePrimaryLight();
 	}
 	
 	private void loadLightsFromScene(){
@@ -61,6 +56,17 @@ public class LightingManager : MonoBehaviour {
 	private void linkFunctions(){
 		GameStateManager.instance.PerspectiveShiftSuccessEvent += startLightTransition;
 	}	
+	
+	private void enablePrimaryLight(){
+		GameObject lightObj = GameObject.Find("Primary Light");
+		if(lightObj != null){
+			Light pl = lightObj.GetComponent("Light") as Light;
+			pl.enabled = true;
+		}
+		lightObj = GameObject.Find("Build Light");
+		if(lightObj != null)
+			Destroy(lightObj.gameObject);
+	}
 	
 	#endregion Initialization
 	
