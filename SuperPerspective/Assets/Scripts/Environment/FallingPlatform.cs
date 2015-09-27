@@ -6,6 +6,8 @@ public class FallingPlatform : LandOnObject {
 	bool falling, respawning;
 	int shake, respawn;
 	Vector3 origScale, origPos;
+
+	public int timeTilFall;
 	public bool shouldRespawn;
 
 	// Use this for initialization
@@ -50,6 +52,6 @@ public class FallingPlatform : LandOnObject {
 
 	public override void LandedOn() {
 		if (shake == 0)
-			shake = 50;
+			shake = timeTilFall;
 	}
 }

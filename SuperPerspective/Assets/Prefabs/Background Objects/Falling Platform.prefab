@@ -484,6 +484,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0fa4f4497f9f634f891d7731994fc41, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  timeTilFall: 50
   shouldRespawn: 0
 --- !u!1001 &100100000
 Prefab:
