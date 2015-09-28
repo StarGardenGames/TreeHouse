@@ -72,6 +72,9 @@ public class PlayerController : PhysicalObject
 	public byte edgeState = 0;//0: not near an edge, 1: close to an edge, 2:hanging
 	bool climbing = false;
 
+    private int kicking;
+    private const int KICK_TIME = 30;
+
 	private float lastUpdate;
 
    #endregion
@@ -160,7 +163,9 @@ public class PlayerController : PhysicalObject
     // Collision detection and velocity calculations are done in the fixed update step
     void FixedUpdate()
     {
-        if (!_paused)
+        if (kicking > 0)
+            kicking--;
+        if (!_paused && kicking == 0)
         {
 				//update climbing variable
 				climbing = anim.GetCurrentAnimatorStateInfo(0).IsName("HangUp");
@@ -682,6 +687,14 @@ public class PlayerController : PhysicalObject
 	}
 	
 	#endregion EdgeGrabbing
+
+    public void StartKick()
+    {
+        anim.SetTrigger("Kick");
+        kicking = KICK_TIME;
+        velocity.x = 0;
+        velocity.z = 0;
+    }
 
 	#region Accessor Methods
 	public bool is3D(){

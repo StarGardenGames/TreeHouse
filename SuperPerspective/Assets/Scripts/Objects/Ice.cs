@@ -24,6 +24,10 @@ public class Ice : ActiveInteractable {
 	
 	private bool[] axisBlocked = new bool[4];
 
+    private const int DELAY = 25;
+
+    private int kickDelay;
+
 	public GameObject brokenIceSpawnPoint;
 	public GameObject brokenIce;
 	public GameObject spawnCircle;
@@ -66,7 +70,7 @@ public class Ice : ActiveInteractable {
 				break;
 		}
 		if(!PlayerController.instance.isPaused()){
-			if (!nextVelocity.Equals(Vector3.zero)) {
+			if (!nextVelocity.Equals(Vector3.zero) && kickDelay == 0) {
 				velocity = nextVelocity;
 				nextVelocity = Vector3.zero;
 				startPush = true;
@@ -83,6 +87,8 @@ public class Ice : ActiveInteractable {
 			base.FixedUpdateLogic ();
 			if (!grounded)
 				velocity = new Vector3(velocity.x, Mathf.Max(velocity.y - gravity, -terminalVelocity), velocity.z);
+            if (kickDelay > 0)
+                kickDelay--;
 			
 			/*if (grabbed) {
 				float vy = velocity.y;
@@ -346,11 +352,8 @@ public class Ice : ActiveInteractable {
 			colliderDim = colliderWidth;
 		if (trajectory.normalized == Vector3.forward || trajectory.normalized == Vector3.back)
 			colliderDim = colliderDepth;
-		if (other.GetComponent<PushSwitchOld>() && colliderDim == colliderWidth) {
-			transform.Translate(0, 0.1f, 0);
-		}
-		// Rune Switch
-		if (other.GetComponent<PushSwitch>()) {
+        // Rune Switch
+        if (other.GetComponent<PushSwitch>()) {
 			other.GetComponent<PushSwitch>().EnterCollisionWithGeneral(gameObject);
 		}
 		//Collision w/ PlayerInteractable
@@ -376,5 +379,7 @@ public class Ice : ActiveInteractable {
 						break;
 			}
 		}
-	}
+        kickDelay = DELAY;
+        PlayerController.instance.StartKick();
+    }
 }
