@@ -77,18 +77,26 @@ public class ActiveInteractable : PhysicalObject {
 
 	protected Quadrant GetQuadrant() {
 		float colliderWidth = GetComponent<Collider>().bounds.size.x;
-		PerspectiveType persp = GameStateManager.instance.currentPerspective;
+        float colliderDepth = GetComponent<Collider>().bounds.size.z;
+        PerspectiveType persp = GameStateManager.instance.currentPerspective;
 		if (Mathf.Abs(player.transform.position.x - transform.position.x) > colliderWidth / 2 || persp == PerspectiveType.p2D) {
-			if (player.transform.position.x - transform.position.x > 0)
-				return Quadrant.xPlus;
-			else
-				return Quadrant.xMinus;
-		} else {
-			if (player.transform.position.z - transform.position.z > 0)
-				return Quadrant.zPlus;
-			else
-				return Quadrant.zMinus;
+            if (Mathf.Abs(player.transform.position.z - transform.position.z) <= colliderDepth)
+            {
+                if (player.transform.position.x - transform.position.x > 0)
+                    return Quadrant.xPlus;
+                else
+                    return Quadrant.xMinus;
+            }
+		} else if (Mathf.Abs(player.transform.position.z - transform.position.z) > colliderDepth / 2) {
+            if (Mathf.Abs(player.transform.position.x - transform.position.x) <= colliderWidth)
+            {
+                if (player.transform.position.z - transform.position.z > 0)
+                    return Quadrant.zPlus;
+                else
+                    return Quadrant.zMinus;
+            }
 		}
+        return Quadrant.none;
 	}
 
 	public virtual float GetDistance() {	
@@ -101,8 +109,9 @@ public class ActiveInteractable : PhysicalObject {
 					return player.transform.position.z - transform.position.z;
 			case Quadrant.zMinus:
 					return transform.position.z - player.transform.position.z;
+            default:
+                    return float.MaxValue;
 		}
-		return 0;
 	}
 
 	protected void FixedUpdateLogic() {
@@ -176,6 +185,6 @@ public class ActiveInteractable : PhysicalObject {
 	}
 
 	public enum Quadrant {
-		zPlus, zMinus, xPlus, xMinus
+		zPlus, zMinus, xPlus, xMinus, none
 	}
 }

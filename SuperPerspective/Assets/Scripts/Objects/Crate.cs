@@ -320,6 +320,7 @@ public class Crate : ActiveInteractable {
 			colliderDim = colliderWidth;
 		if (trajectory.normalized == Vector3.forward || trajectory.normalized == Vector3.back)
 			colliderDim = colliderDepth;
+        // Pressure Plate
 		if (other.GetComponent<PushSwitchOld>() && colliderDim == colliderWidth) {
 			transform.Translate(0, 0.1f, 0);
 		}
