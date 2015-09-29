@@ -76,6 +76,8 @@ public class PlayerController : PhysicalObject
     private const int KICK_TIME = 30;
 
 	private float lastUpdate;
+	
+	bool cutsceneMode = false;
 
    #endregion
 	
@@ -121,7 +123,7 @@ public class PlayerController : PhysicalObject
 
 	void Update(){
 
-		if (!_paused){
+		if (canMove()){
 			// See if the player is pressing the jump button this frame
 			bool input = InputManager.instance.JumpStatus();
 
@@ -158,14 +160,14 @@ public class PlayerController : PhysicalObject
 				
 			}
 		}
-   }
+	}
 
     // Collision detection and velocity calculations are done in the fixed update step
     void FixedUpdate()
     {
         if (kicking > 0)
             kicking--;
-        if (!_paused && kicking == 0)
+        if (canMove() && kicking == 0)
         {
 				//update climbing variable
 				climbing = anim.GetCurrentAnimatorStateInfo(0).IsName("HangUp");
@@ -544,7 +546,7 @@ public class PlayerController : PhysicalObject
 	// LateUpdate is used to actually move the position of the player
 	void LateUpdate () {
 		float timeDiff = Time.fixedTime - lastUpdate;
-			if (!_paused) {
+			if (canMove()) {
 				// ------------------------------------------------------------------------------------------------------
 				// VERTICAL MOVEMENT VELOCITY CALCULATIONS
 				// ------------------------------------------------------------------------------------------------------
@@ -573,7 +575,7 @@ public class PlayerController : PhysicalObject
 
 		CheckCollisions();
 
-        if (!_paused)
+        if (canMove())
         {
             if (crate != null)
             {
@@ -627,7 +629,7 @@ public class PlayerController : PhysicalObject
 
 		return connected;
 	}
-
+	
 	#region EdgeGrabbing
 		
 	//This can only be called from self
@@ -697,12 +699,7 @@ public class PlayerController : PhysicalObject
     }
 
 	#region Accessor Methods
-	public bool is3D(){
-		return GameStateManager.instance.currentPerspective == PerspectiveType.p3D;
-	}
-	public bool is2D(){
-		return GameStateManager.instance.currentPerspective == PerspectiveType.p2D;
-	}
+	
 
 	public bool GrabbedCrate() {
 		return crate != null;
@@ -729,6 +726,14 @@ public class PlayerController : PhysicalObject
 		return _paused;
 	}
 
+	public void setCutsceneMode(bool c){
+		cutsceneMode = c;
+	}
+	
+	public bool canMove(){
+		return !_paused && !cutsceneMode;
+	}
+	
 	#endregion Accessor Methods
 	
 	private void OnPauseGame(bool p){

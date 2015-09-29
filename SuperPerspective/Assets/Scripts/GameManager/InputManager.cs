@@ -38,7 +38,7 @@ public class InputManager : MonoBehaviour{
 	private bool flipFailed = false;
 	
 	private float previousForwardMovement = 0;
-
+	
 	#endregion Properties & Variables
 
 	#region Monobehavior Implementation
@@ -53,15 +53,18 @@ public class InputManager : MonoBehaviour{
 
 	// listens to player input and raises events for listeners.
 	void Update () {
+		if(Input.GetButtonUp("DevConsoleToggle"))
+			RaiseEvent(DevConsoleEvent);
+		
+		if(Input.GetButtonDown("Interaction"))			
+			RaiseEvent(InteractPressedEvent);
+		
 		if(Input.GetButtonDown("Pause") || continuePressed){
 			RaiseEvent(PausePressedEvent);
 			continuePressed = false;
 		}
 		if(Input.GetButtonDown("Jump")) 					
 			RaiseEvent(JumpPressedEvent);
-		
-		if(Input.GetButtonDown("Interaction"))			
-			RaiseEvent(InteractPressedEvent);
 		
 		if(Input.GetButtonDown("Grab"))						
 			RaiseEvent(GrabPressedEvent);
@@ -87,9 +90,6 @@ public class InputManager : MonoBehaviour{
 		if(previousForwardMovement != 1 && GetForwardMovement() == 1)
 			RaiseEvent(ForwardMovementEvent);
 
-		if(Input.GetButtonUp("DevConsoleToggle"))
-			RaiseEvent(DevConsoleEvent);
-		
 		previousForwardMovement = GetForwardMovement();
 	}
 
@@ -133,7 +133,7 @@ public class InputManager : MonoBehaviour{
 	public void SetFailFlag(){
 		flipFailed = true;
 	}
-
+	
 	#endregion Public Interface
 
 	#region Event Raising Functions

@@ -96,7 +96,7 @@ public class IslandControl : MonoBehaviour {
 	
 	public GameObject findGround(GameObject obj){
 		Vector3 pos = obj.transform.position;
-		int boundIndex = getBound (pos.x, pos.y, pos.z, !PlayerController.instance.is3D());
+		int boundIndex = getBound (pos.x, pos.y, pos.z, !GameStateManager.is3D());
 		if(boundIndex == -1){
 			throw new System.ArgumentException(
 				"(IslandControl) There is no valid bound for "+obj +

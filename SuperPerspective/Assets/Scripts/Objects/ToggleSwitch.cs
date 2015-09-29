@@ -18,7 +18,7 @@ public class ToggleSwitch : ActiveInteractable {
 	}
 
 	public override float GetDistance() {
-		if (GameStateManager.instance.currentPerspective == PerspectiveType.p3D)
+		if (GameStateManager.is3D())
 			return Vector3.Distance(transform.position, player.transform.position);
 		else
 			return Vector2.Distance(new Vector2(player.transform.position.x, player.transform.position.y),

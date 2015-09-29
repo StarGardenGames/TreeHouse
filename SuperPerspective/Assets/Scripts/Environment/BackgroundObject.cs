@@ -9,7 +9,7 @@ public class BackgroundObject : MonoBehaviour {
 	void Update () {
 		GameObject me = this.gameObject;
 		Color tint = new Color(0, 0.5f, 1f, 0.8f);
-		if(!PlayerController.instance.is3D()){
+		if(!GameStateManager.is3D()){
 			Renderer[] rs = me.GetComponentsInChildren<Renderer>();
 			foreach(Renderer r in rs){
 				Material m = r.material;

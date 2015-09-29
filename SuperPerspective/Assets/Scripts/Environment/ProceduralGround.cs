@@ -60,7 +60,7 @@ public class ProceduralGround : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		if(cleanUpIn2D){
-			if(!PlayerController.instance.is3D()){
+			if(!GameStateManager.is3D()){
 				for(int i=0;i<Mathf.Ceil(renderedObjects.Length/2);i++){
 					MeshRenderer r = renderedObjects[i].GetComponentInChildren<MeshRenderer>();
 					r.enabled = false;

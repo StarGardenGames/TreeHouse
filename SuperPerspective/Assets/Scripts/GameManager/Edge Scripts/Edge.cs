@@ -35,7 +35,7 @@ public class Edge : MonoBehaviour {
 			return;
 		updateCuboid();
 		
-		bool is3D = GameStateManager.instance.currentPerspective == PerspectiveType.p3D;
+		bool is3D = GameStateManager.is3D();
 		bool playerCanGrab = player.isFalling() && (is3D || validIn2D);
 		//if locked on
 		if(status >= 2){
@@ -118,7 +118,7 @@ public class Edge : MonoBehaviour {
 	public bool isOverlaping(Vector3[] c1, Vector3[] c2){
 		bool ans = true;
 		for(int i = 0; i < 3; i++){
-			if(i == 2 && !player.is3D())
+			if(i == 2 && !GameStateManager.is3D())
 				continue;
 			ans = ans && c1[0][i] <= c2[1][i] && c2[0][i] <= c1[1][i];
 		}

@@ -24,11 +24,6 @@ public class ActiveInteractable : PhysicalObject {
 	static ActiveInteractable selected = null;
 	static int frameCount = 0;
 	
-	//variables to determine whether player can trigger
-	bool inRange = false;
-	bool playerFacing = false;
-	bool canTrigger = false;
-	
 	//used to create a fixedlateupdate effect
 	bool fixedCalled = false;
 	
@@ -75,30 +70,35 @@ public class ActiveInteractable : PhysicalObject {
 		InputManager.instance.InteractPressedEvent += InteractPressed;
 	}
 
-	protected Quadrant GetQuadrant() {
-		float colliderWidth = GetComponent<Collider>().bounds.size.x;
-        float colliderDepth = GetComponent<Collider>().bounds.size.z;
-        PerspectiveType persp = GameStateManager.instance.currentPerspective;
-		if (Mathf.Abs(player.transform.position.x - transform.position.x) > colliderWidth / 2 || persp == PerspectiveType.p2D) {
-            if (Mathf.Abs(player.transform.position.z - transform.position.z) <= colliderDepth)
-            {
-                if (player.transform.position.x - transform.position.x > 0)
-                    return Quadrant.xPlus;
-                else
-                    return Quadrant.xMinus;
-            }
-		} else if (Mathf.Abs(player.transform.position.z - transform.position.z) > colliderDepth / 2) {
-            if (Mathf.Abs(player.transform.position.x - transform.position.x) <= colliderWidth)
-            {
-                if (player.transform.position.z - transform.position.z > 0)
-                    return Quadrant.zPlus;
-                else
-                    return Quadrant.zMinus;
-            }
-		}
-        return Quadrant.none;
-	}
+	protected void FixedUpdateLogic() {
+		float dist = GetDistance();
+		
+		bool inRange = dist < range;
 
+		bool playerFacing = isPlayerFacingObject();
+			
+		bool inYRange = yRangeOverlapsWithPlayer();
+	
+		bool aa = (GetComponentInChildren<Renderer>().enabled || GetComponent<Door>());
+		
+		bool unlockable = ((this.gameObject.GetComponent<LockedDoor>() == null || Key.GetKeysHeld() > 0));
+		
+		bool canTrigger = 
+			aa && inRange && (playerFacing || !GameStateManager.is3D()) && inYRange && unlockable;
+		
+		bool notificationCanBeShown = !notiShown || dist < notiDist;
+		
+		//update notiShown
+		if(canTrigger && notificationCanBeShown){
+			selected = this;
+			notiShown = true;
+			notiMarker.updateVisible(true);
+			notiDist = dist;
+		}
+		
+		fixedCalled = true;
+	}
+	
 	public virtual float GetDistance() {	
 		switch (GetQuadrant ()) {
 			case Quadrant.xPlus:
@@ -113,38 +113,40 @@ public class ActiveInteractable : PhysicalObject {
                     return float.MaxValue;
 		}
 	}
-
-	protected void FixedUpdateLogic() {
-		//check distance and determine if range methods need to be called
-		float dist = 0;
-		bool is3D = player.GetComponent<PlayerController>().is3D();
-		if(is3D) {
-			if (ignoreYDistance) {
-				dist = Vector2.Distance(new Vector2(transform.position.x,transform.position.z),
-			               new Vector2(player.transform.position.x, player.transform.position.z));
-			} else {
-				dist = Vector3.Distance(transform.position, player.transform.position);
+	
+	protected Quadrant GetQuadrant() {
+		float colliderWidth = GetComponent<Collider>().bounds.size.x;
+		float colliderDepth = GetComponent<Collider>().bounds.size.z;
+		if (Mathf.Abs(player.transform.position.x - transform.position.x) > colliderWidth / 2 || GameStateManager.is2D()) {
+			if (Mathf.Abs(player.transform.position.z - transform.position.z) <= colliderDepth)
+			{
+				 if (player.transform.position.x - transform.position.x > 0)
+					  return Quadrant.xPlus;
+				 else
+					  return Quadrant.xMinus;
 			}
-		} else {
-			if (ignoreYDistance) {
-				dist = Mathf.Abs(transform.position.x - player.transform.position.x);
-			} else {
-				dist = Vector2.Distance(new Vector2(transform.position.x,transform.position.y),
-				           new Vector2(player.transform.position.x, player.transform.position.y));
+		} else if (Mathf.Abs(player.transform.position.z - transform.position.z) > colliderDepth / 2) {
+			if (Mathf.Abs(player.transform.position.x - transform.position.x) <= colliderWidth)
+			{
+				 if (player.transform.position.z - transform.position.z > 0)
+					  return Quadrant.zPlus;
+				 else
+					  return Quadrant.zMinus;
 			}
 		}
-		//update inRange
-		inRange = GetDistance() < range;
-		//update player facing
-		//get orientation from player
+		return Quadrant.none;
+	}
+	
+	private bool isPlayerFacingObject(){
 		float playerOrientation = player.GetComponent<PlayerController>().getOrientation();
 		//calculate angle between interactable and player
 		float playerAngle = Vector2.Angle(new Vector2(transform.position.x - player.transform.position.x,
 		                                              transform.position.z - player.transform.position.z),Vector2.up);
-		float playerAngle2 = Vector2.Angle(new Vector2(transform.position.x - player.transform.position.x,
+		float playerAngleRelativeToRight = Vector2.Angle(new Vector2(transform.position.x - player.transform.position.x,
 		                                               transform.position.z - player.transform.position.z),Vector2.right);
+																
 		//adjust angle to be between 0 and 360
-		if(90 < playerAngle2 && playerAngle2 < 270)
+		if(90 < playerAngle && playerAngleRelativeToRight < 270)
 			playerAngle = 360 - playerAngle;
 		//calculate difference and modify so that it's in the correct range 
 		float angleDiff = Mathf.Abs(playerOrientation - playerAngle);
@@ -153,21 +155,20 @@ public class ActiveInteractable : PhysicalObject {
 		if(angleDiff > 180)
 			angleDiff = 360 - angleDiff;
 		//determine whether player is facing interactable
-		playerFacing = angleDiff < angleBuffer;
-		//update canTrigger
-		canTrigger = (GetComponentInChildren<Renderer>().enabled || GetComponent<Door>()) && inRange && (playerFacing || !is3D) &&
-			((GetComponent<Collider>().bounds.max.y - 0.05f > player.GetComponent<Collider>().bounds.min.y && GetComponent<Collider>().bounds.min.y + 0.05f < player.GetComponent<Collider>().bounds.max.y) || !ignoreYDistance);
-		//update notiShown
-		if(canTrigger && (!notiShown || dist < notiDist) && ((this.gameObject.GetComponent<LockedDoor>() == null || Key.GetKeysHeld() > 0))){
-			selected = this;
-			notiShown = true;
-			notiMarker.updateVisible(true);
-			notiDist = dist;
-		}
-		
-		fixedCalled = true;
+		return angleDiff < angleBuffer;
 	}
 
+	private bool yRangeOverlapsWithPlayer(){
+		float colliderBot = GetComponent<Collider>().bounds.min.y + 0.05f;
+		float colliderTop = GetComponent<Collider>().bounds.max.y - 0.05f;
+		float playerBot = player.GetComponent<Collider>().bounds.min.y;
+		float playerTop = player.GetComponent<Collider>().bounds.max.y;
+		
+		bool rangesOverlap = (colliderTop > playerBot && colliderBot < playerTop);
+		
+		return rangesOverlap || !ignoreYDistance;
+	}
+	
 	protected void LateUpdateLogic() {
 		//perform static actions
 		if(main == this && fixedCalled){

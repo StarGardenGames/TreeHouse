@@ -146,10 +146,8 @@ public class EdgeManager : MonoBehaviour {
 			region[1][k] = Mathf.Min(p1[k],c[1][k]);
 		}
 		if(!overlap){
-			print("returning nothing");
 			return null;
 		}else{
-			print("returning something");
 			return region;
 		}
 	}

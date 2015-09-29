@@ -28,7 +28,7 @@ public class GameStateManager : MonoBehaviour
 	private float failureTimer = 0f;    // The current timer used in the FailTimer coroutine
 
 	// view mounts & settings
-	private const int NUM_VIEW_TYPES = 8;
+	private const int NUM_VIEW_TYPES = 9;
 	private Transform[] view_mounts = new Transform[NUM_VIEW_TYPES];
 	private PerspectiveType[] view_perspectives = new PerspectiveType[NUM_VIEW_TYPES];
 	private bool[] view_pause = new bool[NUM_VIEW_TYPES];
@@ -65,11 +65,12 @@ public class GameStateManager : MonoBehaviour
 	void InitViewPerspectives(){
 		view_perspectives[(int)ViewType.STANDARD_3D] =   PerspectiveType.p3D;
 		view_perspectives[(int)ViewType.STANDARD_2D] =   PerspectiveType.p2D;
-		view_perspectives[(int)ViewType.PAUSE_MENU] =        PerspectiveType.p3D;  
+		view_perspectives[(int)ViewType.PAUSE_MENU] =    PerspectiveType.p3D;  
 		view_perspectives[(int)ViewType.MENU] =          PerspectiveType.p2D; 
 		view_perspectives[(int)ViewType.LEAN_LEFT] =		 PerspectiveType.p3D; 
 		view_perspectives[(int)ViewType.LEAN_RIGHT] =	 PerspectiveType.p3D; 
 		view_perspectives[(int)ViewType.BACKWARD] =		 PerspectiveType.p3D;
+		view_perspectives[(int)ViewType.DYNAMIC] =		 PerspectiveType.p3D;
 	}
 	
 	void InitViewMounts(){
@@ -97,6 +98,7 @@ public class GameStateManager : MonoBehaviour
 		view_pause[(int)ViewType.LEAN_LEFT] =		 false; 
 		view_pause[(int)ViewType.LEAN_RIGHT] =	 false; 
 		view_pause[(int)ViewType.BACKWARD] =		 false;
+		view_pause[(int)ViewType.DYNAMIC] =		 false;
 	}
 	
 	void RegisterEventHandlers(){
@@ -303,6 +305,40 @@ public class GameStateManager : MonoBehaviour
 		// Register to switch state to proper gameplay when shift is complete
 		CameraController.instance.TransitionCompleteEvent += HandleTransitionComplete;
 	}
+
+	public void EnterDynamicState(Transform t){
+		Camera cam = t.gameObject.GetComponent<Camera>();
+		if(cam == null)
+			throw new System.ArgumentException(
+				"Dynamic Camera scripts must only be attached "+
+				"to game objects which also have Camera components.");
+		bool dyIs2D = cam.orthographic;
+		bool curIs2D = (currentPerspective == PerspectiveType.p2D);
+		if(dyIs2D != curIs2D)
+			return;
+		
+		view_perspectives[(int)ViewType.DYNAMIC] = 
+			cam.orthographic? PerspectiveType.p2D : PerspectiveType.p3D;
+		view_mounts[(int)ViewType.DYNAMIC] = t;
+		EnterState(ViewType.DYNAMIC);
+	}
+	
+	public void ExitDynamicState(PerspectiveType newPerspective){
+		if(targetState != ViewType.DYNAMIC)
+			return;
+		if(newPerspective == PerspectiveType.p3D)
+			EnterState(ViewType.STANDARD_3D);
+		else
+			EnterState(ViewType.STANDARD_2D);
+	}
+	
+	public static bool is3D(){
+		return GameStateManager.instance.currentPerspective == PerspectiveType.p3D;
+	}
+	
+	public static bool is2D(){
+		return GameStateManager.instance.currentPerspective == PerspectiveType.p2D;
+	}
 	
 	#endregion Public Interface
 
@@ -340,5 +376,5 @@ public enum PerspectiveType{
 }
 
 public enum ViewType{
-	NULL_VIEW, STANDARD_3D, STANDARD_2D, MENU, PAUSE_MENU, LEAN_LEFT, LEAN_RIGHT, BACKWARD
+	NULL_VIEW, STANDARD_3D, STANDARD_2D, MENU, PAUSE_MENU, LEAN_LEFT, LEAN_RIGHT, BACKWARD, DYNAMIC
 }

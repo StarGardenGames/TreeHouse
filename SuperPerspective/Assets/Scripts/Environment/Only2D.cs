@@ -15,7 +15,7 @@ public class Only2D : MonoBehaviour {
 		SpriteRenderer sR = this.gameObject.GetComponent<SpriteRenderer>();
 		Renderer r = this.gameObject.GetComponent<Renderer>();
 
-		if(!visibleIn3D && PlayerController.instance.is3D()){
+		if(!visibleIn3D && GameStateManager.is3D()){
 			if(sR != null){
 				sR.enabled = false;			
 			}

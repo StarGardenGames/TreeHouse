@@ -19,7 +19,7 @@ public class BoundObject : MonoBehaviour {
 
 	public void updateBounds(){
 		Vector3 pos = transform.position;
-		int boundIndex = IslandControl.instance.getBound (pos.x, pos.y, pos.z, !PlayerController.instance.is3D());
+		int boundIndex = IslandControl.instance.getBound (pos.x, pos.y, pos.z, !GameStateManager.is3D());
 		if(boundIndex == -1){
 			Destroy(this);
 			return;

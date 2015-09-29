@@ -2,7 +2,7 @@
 using System.Collections;
 using System;
 
-public class LightingManager : MonoBehaviour {
+public class LightSourceManager : MonoBehaviour {
 	
 	#pragma warning disable 168
 
