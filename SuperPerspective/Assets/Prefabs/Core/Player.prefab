@@ -3324,7 +3324,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 152018}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -18.7099991, y: 10.3800001, z: 8.52999973}
+  m_LocalPosition: {x: -20.75, y: 14.3800001, z: 8.52999973}
   m_LocalScale: {x: 1, y: 2, z: 1}
   m_Children:
   - {fileID: 493196}
@@ -4391,7 +4391,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f26504d114486734aa0ac41a20533e26, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  testClimbing: 0
   acceleration: 1.5
   decelleration: 15
   maxSpeed: 7
@@ -4419,7 +4418,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 13a9b15d4186a431cabe109256ad2261, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startAtDoor: 0
+  startAtDoor: 1
   startDoorName: d1
 --- !u!114 &11459124
 MonoBehaviour:
