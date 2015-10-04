@@ -923,6 +923,10 @@ Prefab:
       propertyPath: m_Center.x
       value: -2.04999995
       objectReference: {fileID: 0}
+    - target: {fileID: 417550, guid: 1644debdee08f68419c5d3591a563574, type: 2}
+      propertyPath: m_LocalScale.z
+      value: 5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 1644debdee08f68419c5d3591a563574, type: 2}
   m_IsPrefabParent: 0
@@ -2132,6 +2136,7 @@ MonoBehaviour:
   myName: NICK1_toHUB
   destName: HUB_toNICK1
   particleColor: {r: 0, g: 0, b: 1, a: 1}
+  isSceneLoad: 0
 --- !u!23 &593765256
 MeshRenderer:
   m_ObjectHideFlags: 0
