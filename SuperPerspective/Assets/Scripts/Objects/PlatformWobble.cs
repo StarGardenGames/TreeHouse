@@ -13,10 +13,12 @@ public class PlatformWobble : LandOnObject {
 	public float floatStrength;
 	float currStrength;
 
+	float startTime;
+
 
 	// Use this for initialization
 	void Start () {
-	
+		
 	}
 	
 	// Update is called once per frame
@@ -25,7 +27,7 @@ public class PlatformWobble : LandOnObject {
 		if(isWobbling && wobbleTimer>0){
     		wobbleTimer--;
     		float strengthRemaning = ((float)wobbleTimer / (float)defaultWobbleTime) * floatStrength;//move closer to zero
-    		float x = Mathf.PI * Time.time;
+    		float x = Mathf.PI * (Time.time - startTime);
     		float p = strengthRemaning * Mathf.Sin(x);
     		transform.position = new Vector3(transform.position.x, origin.y - p, transform.position.z);
 
@@ -44,6 +46,7 @@ public class PlatformWobble : LandOnObject {
 
 	public override void LandedOn() {
 		if (!isWobbling){
+			startTime = Time.time;
 			currStrength = floatStrength;
 			isWobbling = true;
 			wobbleTimer = defaultWobbleTime;//TODO: take in force of landing 
