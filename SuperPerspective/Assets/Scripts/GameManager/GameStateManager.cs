@@ -323,10 +323,10 @@ public class GameStateManager : MonoBehaviour
 		EnterState(ViewType.DYNAMIC);
 	}
 	
-	public void ExitDynamicState(PerspectiveType newPerspective){
+	public void ExitDynamicState(){
 		if(targetState != ViewType.DYNAMIC)
 			return;
-		if(newPerspective == PerspectiveType.p3D)
+		if(currentPerspective == PerspectiveType.p3D)
 			EnterState(ViewType.STANDARD_3D);
 		else
 			EnterState(ViewType.STANDARD_2D);

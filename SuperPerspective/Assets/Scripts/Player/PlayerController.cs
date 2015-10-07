@@ -358,7 +358,7 @@ public class PlayerController : PhysicalObject
 		float close = -1;
 		for (int i = 0; i < hits.Length; i++) {
 			RaycastHit hitInfo = hits[i];
-			if (hitInfo.collider != null)
+			if (hitInfo.collider != null && !hitInfo.collider.isTrigger)
 			{
 				float verticalOverlap = getVerticalOverlap(hitInfo);
 				bool significantVerticalOverlap = 

@@ -2,9 +2,7 @@
 using System.Collections;
 
 public class ActiveDynamicCamera : Activatable {
-	
-	private PerspectiveType previousPerspective;
-	
+
 	public float lockDuration = 3;
 	
 	private float activateTime = -1f;
@@ -26,12 +24,11 @@ public class ActiveDynamicCamera : Activatable {
 		if(a == startA)
 			return;
 		if(a){
-			previousPerspective = GameStateManager.instance.currentPerspective;
 			GameStateManager.instance.EnterDynamicState(transform);
 			PlayerController.instance.setCutsceneMode(true);
 			activateTime = Time.time;
 		}else{
-			GameStateManager.instance.ExitDynamicState(previousPerspective);
+			GameStateManager.instance.ExitDynamicState();
 			PlayerController.instance.setCutsceneMode(false);
 			activateTime = -1f;
 		}
