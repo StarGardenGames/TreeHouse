@@ -79,6 +79,12 @@ public class PlayerController : PhysicalObject
 	
 	bool cutsceneMode = false;
 
+	//Emitter
+	public ParticleSystem dustEmitter;
+	//public ParticleSystem landingEmitter;
+	AnimatorStateInfo currentState;
+
+
    #endregion
 	
 	//setup singleton
@@ -98,7 +104,8 @@ public class PlayerController : PhysicalObject
 		falling = true;
 		canJump = false;
 		lastInput = false;
-
+		dustEmitter.enableEmission = false;
+		//landingEmitter.enableEmission = false;
 		// Initialize the layer mask
 		layerMask = LayerMask.NameToLayer("normalCollisions");
 
@@ -155,6 +162,8 @@ public class PlayerController : PhysicalObject
 
 			anim.SetBool("Falling", falling);
 			anim.SetBool("Grounded", grounded);
+
+
 		}else{
 			if(anim.speed != 0){
 				
@@ -293,7 +302,8 @@ public class PlayerController : PhysicalObject
             bool running = (Mathf.Abs(velocity.z) >= maxSpeed / 2 || Mathf.Abs(velocity.x) >= maxSpeed / 2);
             anim.SetBool("Walking", walking && !running && crate == null);
             anim.SetBool("Running", running && crate == null);
-					
+			if((running || walking) && grounded){dustEmitter.enableEmission =true;}
+			else{dustEmitter.enableEmission =false;}
 				if (crate == null) {
 					if (!pushFlag)
 						anim.SetBool("Pushing", false);
@@ -521,6 +531,7 @@ public class PlayerController : PhysicalObject
 			foreach (LandOnObject c in other.GetComponents<LandOnObject>()) {
 				c.LandedOn ();
 			}
+						
 		}
 		// Crate
 		if (trajectory.normalized != Vector3.down && trajectory.normalized != Vector3.zero && other.GetComponent<Crate>() && !other.GetComponent<Crate>().IsAxisBlocked(trajectory)) {
@@ -540,7 +551,7 @@ public class PlayerController : PhysicalObject
 			c.EnterCollisionWithPlayer ();
 		}
 	}
-	
+
 	#endregion Collisions
 	
 	// LateUpdate is used to actually move the position of the player
@@ -629,7 +640,7 @@ public class PlayerController : PhysicalObject
 
 		return connected;
 	}
-	
+
 	#region EdgeGrabbing
 		
 	//This can only be called from self

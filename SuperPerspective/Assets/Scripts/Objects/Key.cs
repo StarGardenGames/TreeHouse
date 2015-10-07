@@ -13,7 +13,8 @@ public class Key : Interactable {
 			GetComponentInChildren<Renderer>().transform.Rotate(Vector3.up, Mathf.PI / 4, Space.World);
 	}
 
-	public static bool UseKey(int keyRequired = 1) {
+	public static bool UseKey(int keyRequired) {
+		keyRequired = 1;
 		if (keysHeld >= keyRequired) {
 			keysHeld--;
 			return true;
