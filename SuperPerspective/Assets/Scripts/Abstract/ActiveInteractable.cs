@@ -46,7 +46,7 @@ public class ActiveInteractable : PhysicalObject {
 	}
 	
 	void InteractPressed(){
-		if(selected == this)
+		if(!GameStateManager.IsGamePaused() && selected == this)
 			Triggered();
 	}
 	

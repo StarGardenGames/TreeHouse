@@ -40,6 +40,8 @@ public class IslandControl : MonoBehaviour {
 		for(int i = 0; i < pauseMounts.Length; i++){
 			try{
 				pauseMounts[i] = grounds[i].transform.parent.Find("PauseMount");
+				if(pauseMounts[i] == null)
+					throw new Exception();
 			}catch(Exception e){
 				print("IslandControl: Could not find PauseMount for island "+i);
 			}

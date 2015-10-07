@@ -7,7 +7,7 @@ using System.Collections;
 ///     This keeps all transitions logic in one location and allows the player, camera, and menu scripts to have simple behavior and remain modular.
 /// </summary>
 public class GameStateManager : MonoBehaviour
-{
+{	
 	public static GameStateManager instance;
 	
 	//suppress warnings
@@ -141,7 +141,7 @@ public class GameStateManager : MonoBehaviour
 	}
 
 	private void HandleShiftPressed(){
-		if (!IsPauseState(currentState) && !PlayerController.instance.GrabbedCrate()){
+		if (!IsPauseState(targetState) && !PlayerController.instance.GrabbedCrate()){
 			ViewType newState = (view_perspectives[(int)currentState] == PerspectiveType.p3D) ?
 				ViewType.STANDARD_2D : ViewType.STANDARD_3D;
 
@@ -340,6 +340,10 @@ public class GameStateManager : MonoBehaviour
 		return GameStateManager.instance.currentPerspective == PerspectiveType.p2D;
 	}
 	
+	public static bool IsGamePaused(){
+		return GameStateManager.instance.IsPauseState(GameStateManager.instance.targetState);
+	}
+	
 	#endregion Public Interface
 
 	#region Helper Functions
@@ -359,7 +363,7 @@ public class GameStateManager : MonoBehaviour
 		EnterState(ViewType.STANDARD_3D);
 	}
 
-	private bool IsPauseState(ViewType targetState){
+	private bool IsPauseState(ViewType targetState){		
 		return view_pause[(int)targetState] || currentPerspective != view_perspectives[(int)targetState];
 	}
 	
