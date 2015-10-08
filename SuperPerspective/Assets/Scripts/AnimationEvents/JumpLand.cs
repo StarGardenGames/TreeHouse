@@ -18,7 +18,7 @@ public class JumpLand : StateMachineBehaviour {
 
 	 // OnStateEnter is called when a transition starts and the state machine starts to evaluate this state
 	override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
-		dustLanding = Object.FindObjectOfType<ParticleSystem>();
+		dustLanding = GameObject.Find ("LandingEmitter").GetComponent<ParticleSystem>();
 		dustLanding.enableEmission = false;
 		dustLanding.Emit(20);
 		step = Object.FindObjectOfType<StepManager> ();

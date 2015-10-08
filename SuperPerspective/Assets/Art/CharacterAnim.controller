@@ -149,6 +149,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   step: {fileID: 0}
+  dustLanding: {fileID: 0}
+  hasPoofed: 0
 --- !u!114 &11497312
 MonoBehaviour:
   m_ObjectHideFlags: 1
