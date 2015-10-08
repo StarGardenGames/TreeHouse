@@ -145,7 +145,7 @@ public class ActiveInteractable : PhysicalObject {
 		float playerAngle = Vector2.Angle(new Vector2(transform.position.x - player.transform.position.x,
 		                                              transform.position.z - player.transform.position.z),Vector2.up);
 																	 
-		bool inFrontOfPlayer = transform.position.x < player.transform.position.x
+		bool inFrontOfPlayer = transform.position.x < player.transform.position.x;
 		if(inFrontOfPlayer){
 			playerAngle = 360 - playerAngle;
 		}
