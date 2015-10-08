@@ -12,7 +12,7 @@ public class Ice : ActiveInteractable {
 	private Vector3 trajectory, newVelocity;
 	private bool grounded, svFlag;
 	private float colliderHeight, colliderWidth, colliderDepth;
-	private float Margin = 0.05f;
+	private float Margin = 0.1f;
 	private float slideSpeed = 20;
 	
 	private Vector3 startPos;
@@ -46,7 +46,7 @@ public class Ice : ActiveInteractable {
 
 		// Register CheckGrab to grab input event
 		//InputManager.instance.InteractPressed += CheckGrab;
-		CameraController.instance.TransitionStartEvent += checkBreak;
+		CameraController.instance.TransitionCompleteEvent += checkBreak;
 		colCheck = new CollisionChecker (GetComponent<Collider> ());
 		startPos = transform.position;
 		
@@ -338,6 +338,8 @@ public class Ice : ActiveInteractable {
 			
 			//End Nick stuff
 
+			GetComponent<Collider>().enabled = false;
+			GetComponentInChildren<Renderer>().enabled = false;
 		}
 	
 	}
@@ -364,7 +366,7 @@ public class Ice : ActiveInteractable {
 	}
 	//Mathf.Abs(player.transform.position.x - transform.position.x) > colliderWidth / 2
 	public override void Triggered() {
-		if (velocity.Equals (Vector3.zero)) {
+		if (velocity.Equals (Vector3.zero) && !PlayerController.instance.isFalling()) {
 			switch (GetQuadrant()) {
 				case Quadrant.xPlus:
 						nextVelocity = Vector3.left * slideSpeed;
@@ -379,8 +381,8 @@ public class Ice : ActiveInteractable {
 						nextVelocity = Vector3.forward * slideSpeed;
 						break;
 			}
+			kickDelay = DELAY;
+			PlayerController.instance.StartKick();
 		}
-        kickDelay = DELAY;
-        PlayerController.instance.StartKick();
     }
 }
