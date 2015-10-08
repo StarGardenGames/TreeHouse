@@ -9,9 +9,18 @@ public class JumpLand : StateMachineBehaviour {
 	AnimatorStateInfo currentState;
 	float playbackTime;
 	bool play;
+	public ParticleSystem dustLanding;
+	public bool hasPoofed = false;
+
+	public void Start(){
+
+	}
 
 	 // OnStateEnter is called when a transition starts and the state machine starts to evaluate this state
 	override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
+		dustLanding = Object.FindObjectOfType<ParticleSystem>();
+		dustLanding.enableEmission = false;
+		dustLanding.Emit(20);
 		step = Object.FindObjectOfType<StepManager> ();
 		if(step == null)
 			return;
