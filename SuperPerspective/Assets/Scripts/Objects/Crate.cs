@@ -43,7 +43,6 @@ public class Crate : ActiveInteractable {
 		CameraController.instance.TransitionStartEvent += checkBreak;
 		colCheck = new CollisionChecker (GetComponent<Collider> ());
 		startPos = transform.position;
-		range = colliderWidth * 0.9f;
 
 		for (int i = 0; i < 4; i++)
 			axisBlocked[i] = false;
@@ -52,16 +51,9 @@ public class Crate : ActiveInteractable {
 	void Update() {
 		if(!PlayerController.instance.isPaused()){
 			if (grabbed) {
-				if (GameStateManager.instance.currentPerspective == PerspectiveType.p3D) {
-					if (Vector3.Distance(player.transform.position, transform.position) > range * (1 + Margin)) {
-						player.GetComponent<PlayerController>().Grab(null);
-						grabbed = false;
-					}
-				} else {
-					if (Vector2.Distance(new Vector2(player.transform.position.x, player.transform.position.y), new Vector2(transform.position.x, transform.position.y)) > range * (1 + Margin)) {
-						player.GetComponent<PlayerController>().Grab(null);
-						grabbed = false;
-					}
+				if (GetDistance() > range * (1 + Margin) || PlayerController.instance.isFalling()) {
+					player.GetComponent<PlayerController>().Grab(null);
+					grabbed = false;
 				}
 			}
 		}
@@ -139,16 +131,16 @@ public class Crate : ActiveInteractable {
 	void LateUpdate () {
 		if(!PlayerController.instance.isPaused()){
 			base.LateUpdateLogic ();
-			float dist = 0;
-			if (GameStateManager.instance.currentPerspective == PerspectiveType.p2D)
-				Vector3.Distance(transform.position, player.transform.position);
-			else
-				dist = Vector2.Distance(new Vector2(transform.position.x,transform.position.y),
-										new Vector2(player.transform.position.x, player.transform.position.y));
-			if (grabbed && dist > range * 1.1f) {
-				player.GetComponent<PlayerController>().Grab(null);
-				grabbed = false;
-			}
+//			float dist = 0;
+//			if (GameStateManager.instance.currentPerspective == PerspectiveType.p2D)
+//				Vector3.Distance(transform.position, player.transform.position);
+//			else
+//				dist = Vector2.Distance(new Vector2(transform.position.x,transform.position.y),
+//										new Vector2(player.transform.position.x, player.transform.position.y));
+//			if (grabbed && dist > range * 1.1f) {
+//				player.GetComponent<PlayerController>().Grab(null);
+//				grabbed = false;
+//			}
 			transform.Translate(velocity * Time.deltaTime);
 			if (respawnFlag && Vector2.Distance(new Vector2(startPos.x, startPos.y), new Vector2(player.transform.position.x, player.transform.position.y)) > colliderWidth) {
 				Vector3 pos = transform.position;
@@ -331,7 +323,7 @@ public class Crate : ActiveInteractable {
 	}
 
 	public override void Triggered() {
-		if (!grabbed) {
+		if (!grabbed && !PlayerController.instance.isFalling()) {
 			player.GetComponent<PlayerController> ().Grab (this);
 			grabbed = true;
 		} else {
@@ -387,12 +379,5 @@ public class Crate : ActiveInteractable {
 				GameObject.Instantiate(brokenCrate, brokenCrateSpawnPoint.transform.position, Quaternion.identity);
 			}
 		}
-	}
-
-	private bool PlayerInRange() {
-		if (persp == PerspectiveType.p3D)
-			return Mathf.Abs(player.transform.position.y - transform.position.y) <= colliderHeight / 2 && Mathf.Abs (player.transform.position.x - transform.position.x) <= colliderWidth / 2 + player.GetComponent<Collider>().bounds.size.x / 2 + Margin * 4 && Mathf.Abs (player.transform.position.z - transform.position.z) <= GetComponent<Collider>().bounds.size.z / 2 + player.GetComponent<Collider>().bounds.size.z / 2 + Margin * 4;
-		else
-			return Mathf.Abs(player.transform.position.y - transform.position.y) <= colliderHeight / 2 && Mathf.Abs (player.transform.position.x - transform.position.x) <= colliderWidth / 2 + player.GetComponent<Collider>().bounds.size.x / 2 + Margin * 4;
 	}
 }

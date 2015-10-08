@@ -55,20 +55,21 @@ public class Ice : ActiveInteractable {
 	}
 
 	void Update() {
-		switch (GetQuadrant()) {
-			case Quadrant.xPlus:
-				range = colliderWidth * 0.85f;
-				break;
-			case Quadrant.xMinus:
-				range = colliderWidth * 0.85f;
-				break;
-			case Quadrant.zPlus:
-				range = colliderDepth * 0.85f;
-				break;
-			case Quadrant.zMinus:
-				range = colliderDepth * 0.85f;
-				break;
-		}
+//		switch (GetQuadrant()) {
+//			case Quadrant.xPlus:
+//				range = colliderWidth * 0.85f;
+//				break;
+//			case Quadrant.xMinus:
+//				range = colliderWidth * 0.85f;
+//				break;
+//			case Quadrant.zPlus:
+//				range = colliderDepth * 0.85f;
+//				break;
+//			case Quadrant.zMinus:
+//				range = colliderDepth * 0.85f;
+//				break;
+//		}
+		range = 1f;
 		if(!PlayerController.instance.isPaused()){
 			if (!nextVelocity.Equals(Vector3.zero) && kickDelay == 0) {
 				velocity = nextVelocity;
