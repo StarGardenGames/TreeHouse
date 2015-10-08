@@ -268,7 +268,8 @@ MonoBehaviour:
   ignoreYDistance: 0
   myName: d1
   destName: 
-  particleColor: {r: 0, g: 0, b: 1, a: 1}
+  particleColor: {r: .796999991, g: .799188614, b: 1, a: 1}
+  isSceneLoad: 0
 --- !u!198 &19806364
 ParticleSystem:
   m_ObjectHideFlags: 1
@@ -1405,6 +1406,18 @@ Prefab:
     - target: {fileID: 0}
       propertyPath: myName
       value: d1
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: particleColor.g
+      value: .799188614
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: particleColor.r
+      value: .796999991
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: particleColor.b
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
