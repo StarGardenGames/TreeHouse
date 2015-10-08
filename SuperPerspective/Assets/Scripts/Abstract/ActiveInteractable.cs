@@ -139,15 +139,17 @@ public class ActiveInteractable : PhysicalObject {
 	
 	private bool isPlayerFacingObject(){
 		float playerOrientation = player.GetComponent<PlayerController>().getOrientation();
+		playerOrientation = (playerOrientation + 360) % 360;
+		
 		//calculate angle between interactable and player
 		float playerAngle = Vector2.Angle(new Vector2(transform.position.x - player.transform.position.x,
 		                                              transform.position.z - player.transform.position.z),Vector2.up);
-		float playerAngleRelativeToRight = Vector2.Angle(new Vector2(transform.position.x - player.transform.position.x,
-		                                               transform.position.z - player.transform.position.z),Vector2.right);
-																
-		//adjust angle to be between 0 and 360
-		if(90 < playerAngle && playerAngleRelativeToRight < 270)
+																	 
+		bool inFrontOfPlayer = transform.position.x < player.transform.position.x
+		if(inFrontOfPlayer){
 			playerAngle = 360 - playerAngle;
+		}
+
 		//calculate difference and modify so that it's in the correct range 
 		float angleDiff = Mathf.Abs(playerOrientation - playerAngle);
 		angleDiff += 360;
