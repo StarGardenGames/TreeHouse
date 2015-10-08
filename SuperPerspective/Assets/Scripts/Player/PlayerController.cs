@@ -129,7 +129,6 @@ public class PlayerController : PhysicalObject
 	}
 
 	void Update(){
-
 		if (canMove()){
 			// See if the player is pressing the jump button this frame
 			bool input = InputManager.instance.JumpStatus();
@@ -214,23 +213,30 @@ public class PlayerController : PhysicalObject
 					else
 						newVelocityX = hangMaxSpeed * Mathf.Sign(xAxis);
 					
-					//clamp motion
-					float newX = gameObject.transform.position.x;
-					float edgeX = grabbedEdge.gameObject.transform.position.x;
-					float edgeScale = grabbedEdge.gameObject.transform.lossyScale.x;
-					float minBound = edgeX - edgeScale * .5f;
-					float maxBound = edgeX + edgeScale * .5f;
-					if (!(minBound <= newX && newX <= maxBound))
-					{
-						newX = Mathf.Clamp(newX, minBound, maxBound);
+					//check if edge is still valid
+					Vector3 pos = transform.position;
+					pos.x += newVelocityX/50f;
+					if(grabbedEdge.isPositionValidOnEdge(pos)){					
+						//clamp motion
+						float newX = gameObject.transform.position.x;
+						float edgeX = grabbedEdge.gameObject.transform.position.x;
+						float edgeScale = grabbedEdge.gameObject.transform.lossyScale.x;
+						float minBound = edgeX - edgeScale * .5f + colliderWidth * .5f;
+						float maxBound = edgeX + edgeScale * .5f - colliderWidth * .5f;
+						if (!(minBound <= newX && newX <= maxBound))
+						{
+							newX = Mathf.Clamp(newX, minBound, maxBound);
+							newVelocityX = 0;
+							pos = gameObject.transform.position;
+							pos.x = newX;
+							gameObject.transform.position = pos;
+						}
+						//update edgeState for animation
+						if(newVelocityX!=0 && anim.GetInteger("EdgeState") < 3){
+							anim.SetInteger("EdgeState", 3);
+						}
+					}else{
 						newVelocityX = 0;
-						Vector3 pos = gameObject.transform.position;
-						pos.x = newX;
-						gameObject.transform.position = pos;
-					}
-					//update edgeState for animation
-					if(newVelocityX!=0 && anim.GetInteger("EdgeState") < 3){
-						anim.SetInteger("EdgeState", 3);
 					}
 				}
             else
@@ -269,24 +275,32 @@ public class PlayerController : PhysicalObject
 						newVelocityZ = 0f;
 					else
 						newVelocityZ = hangMaxSpeed * Mathf.Sign(zAxis);
-					//clamp position
-					float newZ = gameObject.transform.position.z + (newVelocityZ/50f);
-					float edgeZ = grabbedEdge.gameObject.transform.position.z;
-					float edgeScale = grabbedEdge.gameObject.transform.lossyScale.z;
-					float minBound = edgeZ - edgeScale * .5f;
-					float maxBound = edgeZ + edgeScale * .5f;
-					if (!(minBound <= newZ && newZ <= maxBound))
-					{
-						newZ = Mathf.Clamp(newZ, minBound, maxBound);
-						newVelocityZ = 0;
-						Vector3 pos = gameObject.transform.position;
-						pos.z = newZ;
-						gameObject.transform.position = pos;
-					}
 					
-					//update edgeState for animation
-					if(newVelocityZ!=0 && anim.GetInteger("EdgeState") < 3){
-						anim.SetInteger("EdgeState", 3);
+					//check if new position is valid
+					Vector3 pos = transform.position;
+					pos.z += newVelocityZ/50f;
+					if(grabbedEdge.isPositionValidOnEdge(pos)){
+						//clamp position
+						float newZ = gameObject.transform.position.z + (newVelocityZ/50f);
+						float edgeZ = grabbedEdge.gameObject.transform.position.z;
+						float edgeScale = grabbedEdge.gameObject.transform.lossyScale.z;
+						float minBound = edgeZ - edgeScale * .5f + colliderDepth * .5f;
+						float maxBound = edgeZ + edgeScale * .5f - colliderDepth * .5f;
+						if (!(minBound <= newZ && newZ <= maxBound))
+						{
+							newZ = Mathf.Clamp(newZ, minBound, maxBound);
+							newVelocityZ = 0;
+							pos = gameObject.transform.position;
+							pos.z = newZ;
+							gameObject.transform.position = pos;
+						}
+						
+						//update edgeState for animation
+						if(newVelocityZ!=0 && anim.GetInteger("EdgeState") < 3){
+							anim.SetInteger("EdgeState", 3);
+						}
+					}else{
+						newVelocityZ = 0;
 					}
 				}
             else
