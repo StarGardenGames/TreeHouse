@@ -28,7 +28,7 @@ public class ActiveInteractable : PhysicalObject {
 	bool fixedCalled = false;
 	
 	//distance for inRange
-	protected float range = 3f;
+	protected float range = 1f;
 	
 	//how much error there can be in the angle for it to be valid
 	float angleBuffer = 80;
@@ -73,7 +73,7 @@ public class ActiveInteractable : PhysicalObject {
 	protected void FixedUpdateLogic() {
 		float dist = GetDistance();
 		
-		bool inRange = dist < range;
+		bool inRange = Mathf.Abs(dist) < range;
 
 		bool playerFacing = isPlayerFacingObject();
 			
@@ -95,22 +95,26 @@ public class ActiveInteractable : PhysicalObject {
 			notiMarker.updateVisible(true);
 			notiDist = dist;
 		}
-		
+
 		fixedCalled = true;
 	}
 	
-	public virtual float GetDistance() {	
+	public virtual float GetDistance() {
+		float colMinX = GetComponent<Collider>().bounds.min.x;
+		float colMaxX = GetComponent<Collider>().bounds.max.x;
+		float colMinZ = GetComponent<Collider>().bounds.min.z;
+		float colMaxZ = GetComponent<Collider>().bounds.max.z;
 		switch (GetQuadrant ()) {
 			case Quadrant.xPlus:
-					return player.transform.position.x - transform.position.x;
+				return player.transform.position.x - colMaxX;
 			case Quadrant.xMinus:
-					return transform.position.x - player.transform.position.x;
+				return colMinX - player.transform.position.x;
 			case Quadrant.zPlus:
-					return player.transform.position.z - transform.position.z;
+				return player.transform.position.z - colMaxZ;
 			case Quadrant.zMinus:
-					return transform.position.z - player.transform.position.z;
+				return colMinZ - player.transform.position.z;
             default:
-                    return float.MaxValue;
+                return float.MaxValue;
 		}
 	}
 	
@@ -118,7 +122,7 @@ public class ActiveInteractable : PhysicalObject {
 		float colliderWidth = GetComponent<Collider>().bounds.size.x;
 		float colliderDepth = GetComponent<Collider>().bounds.size.z;
 		if (Mathf.Abs(player.transform.position.x - transform.position.x) > colliderWidth / 2 || GameStateManager.is2D()) {
-			if (Mathf.Abs(player.transform.position.z - transform.position.z) <= colliderDepth)
+			if (Mathf.Abs(player.transform.position.z - transform.position.z) <= colliderDepth / 2 || GameStateManager.is2D())
 			{
 				 if (player.transform.position.x - transform.position.x > 0)
 					  return Quadrant.xPlus;
@@ -126,7 +130,7 @@ public class ActiveInteractable : PhysicalObject {
 					  return Quadrant.xMinus;
 			}
 		} else if (Mathf.Abs(player.transform.position.z - transform.position.z) > colliderDepth / 2) {
-			if (Mathf.Abs(player.transform.position.x - transform.position.x) <= colliderWidth)
+			if (Mathf.Abs(player.transform.position.x - transform.position.x) <= colliderWidth / 2)
 			{
 				 if (player.transform.position.z - transform.position.z > 0)
 					  return Quadrant.zPlus;

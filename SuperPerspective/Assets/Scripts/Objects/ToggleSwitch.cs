@@ -14,7 +14,7 @@ public class ToggleSwitch : ActiveInteractable {
 
 	void Start() {
 		base.StartSetup ();
-		range = 2f;
+		range = 1.5f;
 	}
 
 	public override float GetDistance() {
