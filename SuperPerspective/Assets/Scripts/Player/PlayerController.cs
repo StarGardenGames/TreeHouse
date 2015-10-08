@@ -303,8 +303,7 @@ public class PlayerController : PhysicalObject
 						newVelocityZ = 0;
 					}
 				}
-            else
-            {
+            else{
                 //if we're latched to a wall which doesn't allow z movement
                 newVelocityZ = 0;
             }
@@ -316,15 +315,20 @@ public class PlayerController : PhysicalObject
             bool running = (Mathf.Abs(velocity.z) >= maxSpeed / 2 || Mathf.Abs(velocity.x) >= maxSpeed / 2);
             anim.SetBool("Walking", walking && !running && crate == null);
             anim.SetBool("Running", running && crate == null);
+				
 			if((running || walking) && grounded){dustEmitter.enableEmission =true;}
 			else{dustEmitter.enableEmission =false;}
 				if (crate == null) {
 					if (!pushFlag)
 						anim.SetBool("Pushing", false);
 					anim.SetBool("Pulling", false);
+					anim.SetBool("CrateIdle", false);
 				} else {
-					anim.SetBool("Pushing", Vector3.Dot(velocity, grabAxis) > 0);
-					anim.SetBool("Pulling", Vector3.Dot(velocity, grabAxis) < 0);
+					float epsilon = .1f;
+					float crateVel = Vector3.Dot(velocity, grabAxis);
+					anim.SetBool("Pushing", crateVel > epsilon);
+					anim.SetBool("Pulling", crateVel < -epsilon);
+					anim.SetBool("CrateIdle", -epsilon <= crateVel && crateVel <= epsilon);
 				}
 				// ------------------------------------------------------------------------------------------------------
             // Update Orientation
