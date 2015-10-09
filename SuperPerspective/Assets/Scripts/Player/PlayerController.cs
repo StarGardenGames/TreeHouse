@@ -73,8 +73,7 @@ public class PlayerController : PhysicalObject
 	bool climbing = false;
 
     private int kicking;
-    private const int KICK_TIME = 30;
-
+	 private const int KICK_TIME = 10;
 	private float lastUpdate;
 	
 	bool cutsceneMode = false;

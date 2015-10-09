@@ -14,8 +14,12 @@ public class DoorManager : MonoBehaviour {
 			typeof(Door)) as Door[];
 		//fill up doors
 		foreach(Door door in doorList){
-			if(door.myName!="")
-				doors.Add(door.myName,door);
+			try{
+				if(door.myName!="")
+					doors.Add(door.myName,door);
+			}catch(System.Exception e){
+				print("DoorManager : There are two doors named "+door.myName+". Please rename one of them");
+			}
 		}
 		//for each door assign destination
 		foreach(Door door in doorList){
