@@ -17,7 +17,7 @@ public class Door : ActiveInteractable {
 		p.startColor = particleColor;
 		p.Simulate(2f);
 		p.Play();
-        range = 2;
+        range = 4;
 	}
 
 	public override float GetDistance() {
