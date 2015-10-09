@@ -34,7 +34,7 @@ public class Door : ActiveInteractable {
 
 		else if(destDoor!=null)
 			player.GetComponent<PlayerController>().Teleport(
-				destDoor.transform.position + new Vector3(0,0,-2));
+				destDoor.GetComponent<Collider>().bounds.center + new Vector3(0,0,-2));
 		else
 			Debug.Log("Door not linked");
 	}
