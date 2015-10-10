@@ -1,15 +1,16 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class PushSwitchOld : Interactable {
+public class PushSwitchOld : MonoBehaviour {
 
 	public Activatable[] triggers;//Activatable objects which this switch triggers
 	
 	bool pushed = false; //whether switch is currently pushed
-	
-	Collider pusher = null;
 
 	Color baseColor = Color.white;
+	
+	public Rect parentPlatform;
+	Collider pusher = null;
 	
 	void Update(){
 		//update color for debugging
@@ -30,17 +31,35 @@ public class PushSwitchOld : Interactable {
 			if (!check.Intersects (GetComponent<Collider> ().bounds))
 				ExitCollisionWithGeneral (pusher.gameObject);
 		}
+		/*RaycastHit hit;
+		parentPlatform = PlayerController.instance.GetComponent<BoundObject>().GetBounds();
+		if (GameStateManager.is3D()) {
+			if (Physics.Raycast(transform.position + Vector3.forward * 2f, -Vector3.forward, out hit, 4f, LayerMask.NameToLayer("RaycastIgnore"))) {
+				if (!pushed)
+					EnterCollisionWithGeneral(hit.collider.gameObject);
+			} else if (pushed) {
+				ExitCollisionWithGeneral(null);
+			}
+		} else {
+			if (Physics.Raycast(new Vector3(transform.position.x, transform.position.y, parentPlatform.max.y + 1f), -Vector3.forward, out hit,
+			                    parentPlatform.height + 2f, LayerMask.NameToLayer("RaycastIgnore"))) {
+				if (!pushed)
+					EnterCollisionWithGeneral(hit.collider.gameObject);
+			} else if (pushed) {
+				ExitCollisionWithGeneral(null);
+			}
+		}*/
 	}
 
-	public override void EnterCollisionWithGeneral(GameObject other){
+	public void EnterCollisionWithGeneral(GameObject other){
 		pushed = true;//becomes pushed when it collides with player
-		pusher = other.GetComponent<Collider> ();
+		//pusher = other.GetComponent<Collider> ();
 		//pushed is also updated for all activatable objects
 		foreach(Activatable o in triggers)
 			o.setActivated(pushed);
 	}
 	
-	public override void ExitCollisionWithGeneral(GameObject other){
+	public void ExitCollisionWithGeneral(GameObject other){
 		pushed = false;//becomes pushed when it collides with player
 		//pushed is also updated for all activatable objects
 		foreach(Activatable o in triggers)

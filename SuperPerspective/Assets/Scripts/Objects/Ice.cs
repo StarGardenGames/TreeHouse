@@ -215,7 +215,7 @@ public class Ice : ActiveInteractable {
 			RaycastHit hitInfo = hits[i];
 			if (hitInfo.collider != null)
 			{
-				if (hitInfo.collider.gameObject.tag == "Intangible") {
+				if (hitInfo.collider.gameObject.tag == "Intangible" || hitInfo.collider.gameObject.GetComponent<PushSwitchOld>()!=null) {
 					trajectory = velocity.y * Vector3.up;
 					CollideWithObject(hitInfo, trajectory);
 				} else if (close == -1 || close > hitInfo.distance) {
@@ -246,7 +246,7 @@ public class Ice : ActiveInteractable {
 			RaycastHit hitInfo = hits[i];
 			if (hitInfo.collider != null)
 			{
-				if (hitInfo.collider.gameObject.tag == "Intangible") {
+				if (hitInfo.collider.gameObject.tag == "Intangible"  || hitInfo.collider.gameObject.GetComponent<PushSwitchOld>()!=null) {
 					trajectory = velocity.x * Vector3.right;
 					CollideWithObject(hitInfo, trajectory);
 				} else if (close == -1 || close > hitInfo.distance) {
@@ -273,7 +273,7 @@ public class Ice : ActiveInteractable {
 			RaycastHit hitInfo = hits[i];
 			if (hitInfo.collider != null)
 			{
-				if (hitInfo.collider.gameObject.tag == "Intangible") {
+				if (hitInfo.collider.gameObject.tag == "Intangible" || hitInfo.collider.gameObject.GetComponent<PushSwitchOld>()!=null) {
 					trajectory = velocity.z * Vector3.forward;
 					CollideWithObject(hitInfo, trajectory);
 				} else if (close == -1 || close > hitInfo.distance) {
