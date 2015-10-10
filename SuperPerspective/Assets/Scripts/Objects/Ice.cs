@@ -20,7 +20,7 @@ public class Ice : ActiveInteractable {
 	
 	private CollisionChecker colCheck;
 	
-	private bool respawnFlag, startPush;
+	private bool respawnFlag, startPush, breakFlag;
 	
 	private bool[] axisBlocked = new bool[4];
 
@@ -44,9 +44,10 @@ public class Ice : ActiveInteractable {
 		velocity = Vector3.zero;
 		nextVelocity = Vector3.zero;
 
-		// Register CheckGrab to grab input event
-		//InputManager.instance.InteractPressed += CheckGrab;
-		CameraController.instance.TransitionCompleteEvent += checkBreak;
+        // Register CheckGrab to grab input event
+        //InputManager.instance.InteractPressed += CheckGrab;
+        CameraController.instance.TransitionStartEvent += checkBreak;
+        CameraController.instance.TransitionCompleteEvent += doBreak;
 		colCheck = new CollisionChecker (GetComponent<Collider> ());
 		startPos = transform.position;
 		
@@ -302,12 +303,21 @@ public class Ice : ActiveInteractable {
 		for (int i = 0; i < startPoints.Length; i++) {
 			connected = connected || Physics.Raycast (startPoints [i], Vector3.forward) || Physics.Raycast (startPoints [i], -Vector3.forward);
 		}
-		
+
 		return connected;
 	}
-	
-	void checkBreak() {
-		if (GameStateManager.instance.currentPerspective == PerspectiveType.p2D && Check2DIntersect ()) {
+
+    void checkBreak()
+    {
+        breakFlag = false;
+        if (GameStateManager.instance.currentPerspective == PerspectiveType.p2D && Check2DIntersect())
+        {
+            breakFlag = true;
+        }
+    }
+
+	void doBreak() {
+		if (breakFlag) {
 			respawnFlag = true;
 
 			//TODO
@@ -327,7 +337,7 @@ public class Ice : ActiveInteractable {
 			GetComponent<Collider>().enabled = false;
 			GetComponentInChildren<Renderer>().enabled = false;
 		}
-	
+        breakFlag = false;
 	}
 	
 	// Used to check collisions with special objects
@@ -352,7 +362,7 @@ public class Ice : ActiveInteractable {
 	}
 	//Mathf.Abs(player.transform.position.x - transform.position.x) > colliderWidth / 2
 	public override void Triggered() {
-		if (velocity.Equals (Vector3.zero) && Mathf.Abs(PlayerController.instance.GetVelocity().y) < 0.2f) {
+		if (velocity.Equals (Vector3.zero)) {
 			switch (GetQuadrant()) {
 				case Quadrant.xPlus:
 						nextVelocity = Vector3.left * slideSpeed;

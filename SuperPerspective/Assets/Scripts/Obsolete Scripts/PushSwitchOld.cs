@@ -13,47 +13,33 @@ public class PushSwitchOld : MonoBehaviour {
 	Collider pusher = null;
 	
 	void Update(){
-		/*//update color for debugging
-		
-		Bounds check;
-		if (pusher != null) {
-			check = pusher.bounds;
-			check.Expand (0.1f);
-			if (!check.Intersects (GetComponent<Collider> ().bounds))
-				ExitCollisionWithGeneral (pusher.gameObject);
-		}*/
-		RaycastHit hit;
+        RaycastHit hit;
 		parentPlatform = PlayerController.instance.GetComponent<BoundObject>().GetBounds();
         float xx = transform.position.x, yy = transform.position.y, zz = transform.position.z;
-		if (GameStateManager.is3D()) {
-			if (Physics.Raycast(new Vector3(xx + 1f, yy + 0.5f, zz + 2f), -Vector3.forward, out hit, 4f, LayerMask.NameToLayer("RaycastIgnore")) ||
-                Physics.Raycast(new Vector3(xx, yy + 0.5f, zz + 2f), -Vector3.forward, out hit, 4f, LayerMask.NameToLayer("RaycastIgnore")) ||
-                Physics.Raycast(new Vector3(xx - 1f, yy + 0.5f, zz + 2f), -Vector3.forward, out hit, 4f, LayerMask.NameToLayer("RaycastIgnore"))) {
-				if (!pushed)
-					EnterCollisionWithGeneral(hit.collider.gameObject);
-			} else if (pushed) {
-				ExitCollisionWithGeneral(null);
-			}
-		} else {
-			if (Physics.Raycast(new Vector3(xx + 1f, yy + 0.5f, parentPlatform.max.y + 1f), -Vector3.forward, out hit, parentPlatform.height + 2f, LayerMask.NameToLayer("RaycastIgnore")) ||
-                Physics.Raycast(new Vector3(xx, yy + 0.5f, parentPlatform.max.y + 1f), -Vector3.forward, out hit, parentPlatform.height + 2f, LayerMask.NameToLayer("RaycastIgnore")) ||
-                Physics.Raycast(new Vector3(xx - 1f, yy + 0.5f, parentPlatform.max.y + 1f), -Vector3.forward, out hit, parentPlatform.height + 2f, LayerMask.NameToLayer("RaycastIgnore"))) {
-				if (!pushed)
-					EnterCollisionWithGeneral(hit.collider.gameObject);
-			} else if (pushed) {
-				ExitCollisionWithGeneral(null);
-			}
+        Bounds check = new Bounds(new Vector3(transform.position.x, transform.position.y, parentPlatform.center.y), new Vector3(2f, 1f, parentPlatform.height));
+		if (GameStateManager.is2D() && check.Intersects(PlayerController.instance.gameObject.GetComponent<Collider>().bounds)) {
+            EnterCollisionWithPlayer();
+        } else if (Physics.Raycast(new Vector3(xx + 1f, yy - 0.5f, zz + 2f), -Vector3.forward + Vector3.up * 0.25f, out hit, 4f, LayerMask.NameToLayer("RaycastIgnore")) ||
+            Physics.Raycast(new Vector3(xx, yy - 0.5f, zz + 2f), -Vector3.forward + Vector3.up * 0.25f, out hit, 4f, LayerMask.NameToLayer("RaycastIgnore")) ||
+            Physics.Raycast(new Vector3(xx - 1f, yy - 0.5f, zz + 2f), -Vector3.forward + Vector3.up * 0.25f, out hit, 4f, LayerMask.NameToLayer("RaycastIgnore"))) {
+		    if (!pushed)
+			    EnterCollisionWithGeneral(hit.collider.gameObject);
+		} else if (pushed) {
+			ExitCollisionWithGeneral(null);
 		}
         if (pushed) {
             if (baseColor == Color.white)
                 baseColor = gameObject.GetComponent<Renderer>().material.color;
             gameObject.GetComponent<Renderer>().material.color = Color.white;
-            //gameObject.tag = "Intangible";
         } else {
             if (baseColor != Color.white)
                 gameObject.GetComponent<Renderer>().material.color = baseColor;
-            //gameObject.tag = "Untagged";
         }
+    }
+
+    public void EnterCollisionWithPlayer()
+    {
+        EnterCollisionWithGeneral(null);
     }
 
     public void EnterCollisionWithGeneral(GameObject other){

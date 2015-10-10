@@ -13,7 +13,7 @@ GameObject:
   - 114: {fileID: 11411318}
   - 114: {fileID: 11495498}
   - 82: {fileID: 8205446}
-  - 114: {fileID: 11445754}
+  - 114: {fileID: 11469730}
   m_Layer: 0
   m_Name: Crate
   m_TagString: Untagged
@@ -235,17 +235,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   parentPlatform: {fileID: 0}
---- !u!114 &11445754
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 132632}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e0f70b97d9dcd442a0cd3e95e6bfc16, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &11459430
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -261,6 +250,17 @@ MonoBehaviour:
   brokenCrateSpawnPoint: {fileID: 171504}
   brokenCrate: {fileID: 108994, guid: bf8271f8c1d36f146b7531b99c96d1ad, type: 2}
   spawnCircle: {fileID: 192810, guid: 56bd08185db206041a18788a73dc5111, type: 2}
+--- !u!114 &11469730
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 132632}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e0f70b97d9dcd442a0cd3e95e6bfc16, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &11495498
 MonoBehaviour:
   m_ObjectHideFlags: 1
