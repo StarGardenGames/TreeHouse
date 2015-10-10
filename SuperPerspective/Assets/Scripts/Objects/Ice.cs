@@ -24,7 +24,7 @@ public class Ice : ActiveInteractable {
 	
 	private bool[] axisBlocked = new bool[4];
 
-    private const int DELAY = 25;
+    private const int DELAY = 10;
 
     private int kickDelay;
 
@@ -55,20 +55,6 @@ public class Ice : ActiveInteractable {
 	}
 
 	void Update() {
-//		switch (GetQuadrant()) {
-//			case Quadrant.xPlus:
-//				range = colliderWidth * 0.85f;
-//				break;
-//			case Quadrant.xMinus:
-//				range = colliderWidth * 0.85f;
-//				break;
-//			case Quadrant.zPlus:
-//				range = colliderDepth * 0.85f;
-//				break;
-//			case Quadrant.zMinus:
-//				range = colliderDepth * 0.85f;
-//				break;
-//		}
 		range = 1f;
 		if(!PlayerController.instance.isPaused()){
 			if (!nextVelocity.Equals(Vector3.zero) && kickDelay == 0) {
@@ -366,7 +352,7 @@ public class Ice : ActiveInteractable {
 	}
 	//Mathf.Abs(player.transform.position.x - transform.position.x) > colliderWidth / 2
 	public override void Triggered() {
-		if (velocity.Equals (Vector3.zero) && !PlayerController.instance.isFalling()) {
+		if (velocity.Equals (Vector3.zero) && Mathf.Abs(PlayerController.instance.GetVelocity().y) < 0.2f) {
 			switch (GetQuadrant()) {
 				case Quadrant.xPlus:
 						nextVelocity = Vector3.left * slideSpeed;
