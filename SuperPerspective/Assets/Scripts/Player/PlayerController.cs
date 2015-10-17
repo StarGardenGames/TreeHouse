@@ -158,7 +158,9 @@ public class PlayerController : PhysicalObject
 
 			lastInput = input;
 
-			anim.SetBool("Falling", falling);
+            if (falling)
+                anim.SetBool("Kick", false);
+            anim.SetBool("Falling", falling);
 			anim.SetBool("Grounded", grounded);
 
 
@@ -176,8 +178,9 @@ public class PlayerController : PhysicalObject
             kicking--;
         if (canMove() && kicking == 0)
         {
-				//update climbing variable
-				climbing = anim.GetCurrentAnimatorStateInfo(0).IsName("HangUp");
+            anim.SetBool("Kick", false);
+            //update climbing variable
+            climbing = anim.GetCurrentAnimatorStateInfo(0).IsName("HangUp");
 			  
             //update cuboid for edges
 				Vector3 halfScale = gameObject.transform.lossyScale * .5f;
@@ -671,8 +674,13 @@ public class PlayerController : PhysicalObject
 	public bool isFalling(){
 		return falling;
 	}
-	//note: this is only called from the Edge.cs
-	public void UpdateEdgeState(Edge e, byte edgeState){
+
+    public bool isGrounded() {
+        return grounded;
+    }
+
+    //note: this is only called from the Edge.cs
+    public void UpdateEdgeState(Edge e, byte edgeState){
 		UpdateEdgeState(e,edgeState,-1);
 	}
 	public void UpdateEdgeState(Edge e, byte edgeState, int animState){
@@ -720,7 +728,7 @@ public class PlayerController : PhysicalObject
 
     public void StartKick()
     {
-        anim.SetTrigger("Kick");
+        anim.SetBool("Kick", true);
         kicking = KICK_TIME;
         velocity.x = 0;
         velocity.z = 0;

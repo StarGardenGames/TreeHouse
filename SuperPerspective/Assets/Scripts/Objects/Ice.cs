@@ -20,11 +20,11 @@ public class Ice : ActiveInteractable {
 	
 	private CollisionChecker colCheck;
 	
-	private bool respawnFlag, startPush;
+	private bool respawnFlag, startPush, breakFlag;
 	
 	private bool[] axisBlocked = new bool[4];
 
-    private const int DELAY = 25;
+    private const int DELAY = 10;
 
     private int kickDelay;
 
@@ -44,9 +44,10 @@ public class Ice : ActiveInteractable {
 		velocity = Vector3.zero;
 		nextVelocity = Vector3.zero;
 
-		// Register CheckGrab to grab input event
-		//InputManager.instance.InteractPressed += CheckGrab;
-		CameraController.instance.TransitionCompleteEvent += checkBreak;
+        // Register CheckGrab to grab input event
+        //InputManager.instance.InteractPressed += CheckGrab;
+        CameraController.instance.TransitionStartEvent += checkBreak;
+        CameraController.instance.TransitionCompleteEvent += doBreak;
 		colCheck = new CollisionChecker (GetComponent<Collider> ());
 		startPos = transform.position;
 		
@@ -55,20 +56,6 @@ public class Ice : ActiveInteractable {
 	}
 
 	void Update() {
-//		switch (GetQuadrant()) {
-//			case Quadrant.xPlus:
-//				range = colliderWidth * 0.85f;
-//				break;
-//			case Quadrant.xMinus:
-//				range = colliderWidth * 0.85f;
-//				break;
-//			case Quadrant.zPlus:
-//				range = colliderDepth * 0.85f;
-//				break;
-//			case Quadrant.zMinus:
-//				range = colliderDepth * 0.85f;
-//				break;
-//		}
 		range = 1f;
 		if(!PlayerController.instance.isPaused()){
 			if (!nextVelocity.Equals(Vector3.zero) && kickDelay == 0) {
@@ -215,7 +202,7 @@ public class Ice : ActiveInteractable {
 			RaycastHit hitInfo = hits[i];
 			if (hitInfo.collider != null)
 			{
-				if (hitInfo.collider.gameObject.tag == "Intangible") {
+				if (hitInfo.collider.gameObject.tag == "Intangible" || hitInfo.collider.gameObject.GetComponent<PushSwitchOld>()!=null) {
 					trajectory = velocity.y * Vector3.up;
 					CollideWithObject(hitInfo, trajectory);
 				} else if (close == -1 || close > hitInfo.distance) {
@@ -246,7 +233,7 @@ public class Ice : ActiveInteractable {
 			RaycastHit hitInfo = hits[i];
 			if (hitInfo.collider != null)
 			{
-				if (hitInfo.collider.gameObject.tag == "Intangible") {
+				if (hitInfo.collider.gameObject.tag == "Intangible"  || hitInfo.collider.gameObject.GetComponent<PushSwitchOld>()!=null) {
 					trajectory = velocity.x * Vector3.right;
 					CollideWithObject(hitInfo, trajectory);
 				} else if (close == -1 || close > hitInfo.distance) {
@@ -273,7 +260,7 @@ public class Ice : ActiveInteractable {
 			RaycastHit hitInfo = hits[i];
 			if (hitInfo.collider != null)
 			{
-				if (hitInfo.collider.gameObject.tag == "Intangible") {
+				if (hitInfo.collider.gameObject.tag == "Intangible" || hitInfo.collider.gameObject.GetComponent<PushSwitchOld>()!=null) {
 					trajectory = velocity.z * Vector3.forward;
 					CollideWithObject(hitInfo, trajectory);
 				} else if (close == -1 || close > hitInfo.distance) {
@@ -316,12 +303,21 @@ public class Ice : ActiveInteractable {
 		for (int i = 0; i < startPoints.Length; i++) {
 			connected = connected || Physics.Raycast (startPoints [i], Vector3.forward) || Physics.Raycast (startPoints [i], -Vector3.forward);
 		}
-		
+
 		return connected;
 	}
-	
-	void checkBreak() {
-		if (GameStateManager.instance.currentPerspective == PerspectiveType.p2D && Check2DIntersect ()) {
+
+    void checkBreak()
+    {
+        breakFlag = false;
+        if (GameStateManager.instance.currentPerspective == PerspectiveType.p2D && Check2DIntersect())
+        {
+            breakFlag = true;
+        }
+    }
+
+	void doBreak() {
+		if (breakFlag) {
 			respawnFlag = true;
 
 			//TODO
@@ -341,7 +337,7 @@ public class Ice : ActiveInteractable {
 			GetComponent<Collider>().enabled = false;
 			GetComponentInChildren<Renderer>().enabled = false;
 		}
-	
+        breakFlag = false;
 	}
 	
 	// Used to check collisions with special objects
@@ -366,7 +362,7 @@ public class Ice : ActiveInteractable {
 	}
 	//Mathf.Abs(player.transform.position.x - transform.position.x) > colliderWidth / 2
 	public override void Triggered() {
-		if (velocity.Equals (Vector3.zero) && !PlayerController.instance.isFalling()) {
+		if (velocity.Equals (Vector3.zero)) {
 			switch (GetQuadrant()) {
 				case Quadrant.xPlus:
 						nextVelocity = Vector3.left * slideSpeed;
