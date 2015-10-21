@@ -8,6 +8,10 @@ public class CollisionChecker {
 	
 	#pragma warning disable 219
 
+	private const int X = 0;
+	private const int Y = 1;
+	private const int Z = 2;
+	
 	public CollisionChecker(Collider col) {
 		this.col = col;
 		colliderWidth = col.bounds.size.x;
@@ -15,11 +19,11 @@ public class CollisionChecker {
 		colliderDepth = col.bounds.size.z;
 	}
 	
-	public RaycastHit[] CheckCollisionOnAxis(char axis, Vector3 velocity, float Margin){
+	public RaycastHit[] CheckCollisionOnAxis(int axis, Vector3 velocity, float Margin){
 		switch(axis){
-			case 'X': return CheckXCollision(velocity, Margin);
-			case 'Y': return CheckYCollision(velocity, Margin);
-			case 'Z': return CheckZCollision(velocity, Margin);
+			case X: return CheckXCollision(velocity, Margin);
+			case Y: return CheckYCollision(velocity, Margin);
+			case Z: return CheckZCollision(velocity, Margin);
 			default:
 				throw new System.ArgumentException("Invalid Axis Character");
 		}
