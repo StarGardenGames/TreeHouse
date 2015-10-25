@@ -57,8 +57,7 @@ public class ActiveInteractable : PhysicalObject {
 		//find player
 		player = PlayerController.instance.gameObject;
 		//become main if no one else has become it yet
-		if(main == null)
-			main = this;
+		if(main == null) main = this;
 		//perform static actions
 		if(main == this){
 			//find notification marker
@@ -142,7 +141,7 @@ public class ActiveInteractable : PhysicalObject {
 	}
 	
 	private bool isPlayerFacingObject(){
-		float playerOrientation = player.GetComponent<PlayerController>().getOrientation();
+		float playerOrientation = PlayerAnimController.instance.getOrientation();
 		playerOrientation = (playerOrientation + 360) % 360;
 		
 		//calculate angle between interactable and player

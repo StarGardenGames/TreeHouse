@@ -3,8 +3,6 @@ using System.Collections;
 
 [RequireComponent(typeof(LineRenderer))]
 public class PlayerController : PhysicalObject{	
-	public bool testFalling;
-
 	//suppress warnings
 	#pragma warning disable 1691,168,219,414
 
@@ -13,6 +11,9 @@ public class PlayerController : PhysicalObject{
 	//singleton
 	public static PlayerController instance;
 
+	//animator
+	private PlayerAnimController animator;
+	
 	// Movement Parameters
 	public float acceleration;
 	public float decelleration;
@@ -26,14 +27,11 @@ public class PlayerController : PhysicalObject{
 	
 
 	// Verticle movement flags
-	private bool grounded;
-	private bool falling;
 	private bool jumpPressedOnPreviousFrame;
 	private bool bounced;
 	private float jumpPressedTime;
-	private bool walking;
-	private bool shimmying;
-	private bool running;
+	private bool jumping;
+	private bool grounded;
 
 	// Raycasting Variables
 	public int verticalRays = 8;
@@ -47,29 +45,20 @@ public class PlayerController : PhysicalObject{
 
 	private CollisionChecker colCheck;
 
-    // Vector used to store new veolicty
-    //private Vector3 velocity; functionality has been moved to PhysicalObject
-
 	// Vars for Z-locking
 	private float zlock = int.MinValue;
 	private bool zlockFlag;
-
-	private Animator anim;
-	private GameObject model;
-	private float prePauseAnimSpeed = 0;
 	
 	private Crate crate = null;
-	private bool pushFlag = false;
+	private bool passivePush = false;
 	private Vector3 grabAxis = Vector3.zero;
 	private bool launched;
-
-	//direction of player
-	private float orientation = 0;
 
 	//Vars for edge grabbing
 	private Vector3[] cuboid;
 	private Edge grabbedEdge = null;
 	private EdgeState edgeState = EdgeState.FAR_FROM_EDGE;
+	
 	private int climbTimer = 0;
 	private const int CLIMB_TIME = 10;
 
@@ -77,18 +66,14 @@ public class PlayerController : PhysicalObject{
 	private const int KICK_TIME = 10;
 	
 	bool cutsceneMode = false;
-
-	//Emitter
-	public ParticleSystem dustEmitter;
-	//public ParticleSystem landingEmitter;
-	AnimatorStateInfo currentState;
+	
 	private bool _paused;
 	
 	private const int X = 0;
 	private const int Y = 1;
 	private const int Z = 2;
-	private float epsilon = .1f;
-
+	private const float epsilon = .1f;
+	
    #endregion
 	
 	#region Init
@@ -99,22 +84,18 @@ public class PlayerController : PhysicalObject{
 	
 	void Start () {
 		base.Init();
-	
+		
+		linkAnimator();
+		
 		initMovementVariables();
 	
 		initCollisionVariables();
-
-		initAnimationVariables();
-
-		initParticleVariables();
 
 		registerEventHandlers();
 	}
 	
 	public void Reset() {		
 		initMovementVariables();
-		
-		initParticleVariables();
 	}
 	
 	private void generateSingleton(){
@@ -124,9 +105,12 @@ public class PlayerController : PhysicalObject{
 			Destroy(this);
 	}
 	
+	private void linkAnimator(){
+		animator = PlayerAnimController.instance;
+	}
+	
 	private void initMovementVariables(){
 		grounded = false;
-		falling = true;
 		jumpPressedOnPreviousFrame = false;
 	}
 
@@ -138,16 +122,6 @@ public class PlayerController : PhysicalObject{
 		colCheck = new CollisionChecker(GetComponent<Collider> ());
 	}
 	
-	private void initAnimationVariables(){
-		anim = GetComponentInChildren<Animator>();
-		model = anim.gameObject;
-	}
-	
-	private void initParticleVariables(){
-		dustEmitter.enableEmission = false;	
-		//landingEmitter.enableEmission = false;
-	}
-	
 	private void registerEventHandlers(){
 		GameStateManager.instance.GamePausedEvent += OnPauseGame;
 	}
@@ -155,18 +129,15 @@ public class PlayerController : PhysicalObject{
 	#endregion Init
 	
 	void Update(){
-		testFalling = falling;
-		if (canMove()){		
-			checkForJump();
-			updateAnimationVariables();
-		}
+		if (canMove())	checkForJump();
 	}
-	
+
+	#region Jump
 	private void checkForJump(){
 		updateJumpPressedTime();
 		
 		bool jumpInputed = (Time.time - jumpPressedTime) < jumpMargin;
-		bool canJump = (grounded || edgeState == EdgeState.HANGING) && !GrabbedCrate();
+		bool canJump = (isGrounded() || edgeState == EdgeState.HANGING) && !GrabbedCrate();
 		if(canJump && jumpInputed)
 			jump();
 	}
@@ -187,18 +158,12 @@ public class PlayerController : PhysicalObject{
 		grounded = false;
 		velocity = new Vector3(velocity.x, jumpVelocity, velocity.z);
 		jumpPressedTime = 0;
+		jumping = true;
 		
 		ReleaseEdge();
-		
-		anim.SetTrigger("Jump");
-		anim.SetInteger("EdgeState", 6);
 	}
 	
-	private void updateAnimationVariables(){
-		if (falling) anim.SetBool("Kick", false);
-		anim.SetBool("Falling", falling);
-		anim.SetBool("Grounded", grounded);
-	}
+	#endregion Jump
 	
 	// Collision detection and velocity calculations are done in the fixed update step
 	void FixedUpdate(){
@@ -207,11 +172,7 @@ public class PlayerController : PhysicalObject{
 		
 		if(canMove()) move();
 		
-		if(!isDisabled()){
-			updateStateVariables();
-			
-			updateOrientation();
-		}
+		if(!isDisabled()) updateStateVariables();
 	}
 	
 	private void updateTimers(){
@@ -228,11 +189,10 @@ public class PlayerController : PhysicalObject{
 	private void move(){
 		if(edgeState == EdgeState.HANGING){
 			bool edgeOnXAxis = grabbedEdge.getOrientation() % 2 == 1;
-			if(edgeOnXAxis){
+			if(edgeOnXAxis)
 				shimmyOnAxis(X);
-			}else{
+			else
 				shimmyOnAxis(Z);
-			}
 		}else{
 			moveOnAxis(X);
 			moveOnAxis(Z);
@@ -261,90 +221,30 @@ public class PlayerController : PhysicalObject{
 	}
 	
 	private void shimmyOnAxis(int axis){
-		float newVelocity = velocity[axis];
-		
 		float axisInput = (axis == X)?
 			InputManager.instance.GetForwardMovement():
-			InputManager.instance.GetSideMovement();
-			
+			-InputManager.instance.GetSideMovement();
+		
+		float newVelocity = hangMaxSpeed * Mathf.Sign(axisInput);
+		
 		Vector3 pos = transform.position;
 		pos[axis] += newVelocity/50f;
 		
-		if(axisInput != 0 && grabbedEdge.isPositionValidOnEdge(pos)){
-			newVelocity = hangMaxSpeed * Mathf.Sign(axisInput);
-			//update edgeState for animation
-			if(newVelocity!=0 && anim.GetInteger("EdgeState") < 3){
-				anim.SetInteger("EdgeState", 3);
-			}
-		}else{
+		if(axisInput == 0 || !grabbedEdge.isPositionValidOnEdge(pos))
 			newVelocity = 0;
-		}
 		
 		velocity[axis] = newVelocity;
 	}
 	
 	private void updateStateVariables(){
-		updateMovementStates();
-		
-		updateCrateStates();
-		
-		updateEdgeStates();
-	}
-	
-	private void updateMovementStates(){
-		bool moving = velocity.magnitude > epsilon;
-		walking = moving && edgeState != EdgeState.HANGING;
-		shimmying = moving && edgeState == EdgeState.HANGING;
-		running = velocity.magnitude > maxSpeed / 2;
-		anim.SetBool("Walking", walking && !running && !GrabbedCrate());
-		anim.SetBool("Running", running && !GrabbedCrate());
-		anim.SetBool("Kick", false);
-		
-		falling = velocity.y < 0f && edgeState != EdgeState.HANGING;
-		
-		dustEmitter.enableEmission =(running || walking) && grounded;
-	}
-	
-	private void updateCrateStates(){
-		if (!GrabbedCrate()){
-			if (!pushFlag) anim.SetBool("Pushing", false);
-			anim.SetBool("Pulling", false);
-			anim.SetBool("CrateIdle", false);
-		} else {
-			float crateVel = Vector3.Dot(velocity, grabAxis);
-			anim.SetBool("Pushing", crateVel > epsilon);
-			anim.SetBool("Pulling", crateVel < -epsilon);
-			anim.SetBool("CrateIdle", -epsilon <= crateVel && crateVel <= epsilon);
-		}
-	}
-	
-	private void updateEdgeStates(){
-		int animEdgeState = anim.GetInteger("EdgeState");
-		if(animEdgeState < 3 || (animEdgeState == 5 && !isClimbing()))	
-			anim.SetInteger("EdgeState", (int)edgeState);
-		else if(animEdgeState == 3){
-			if(Mathf.Abs(velocity.z) < 0.1 && Mathf.Abs(velocity.x) < 0.1)
-				anim.SetInteger("EdgeState", (int)edgeState);
-		}else if(!anim.GetCurrentAnimatorStateInfo(0).IsName("HangBegin") && 
-				!anim.GetCurrentAnimatorStateInfo(0).IsName("HangShimmying")){
-			anim.SetInteger("EdgeState", (int)edgeState);
-		}
-	}
-	
-	private void updateOrientation(){
-		if (!isClimbing() && walking && !GrabbedCrate() && edgeState != EdgeState.HANGING && anim.GetInteger("EdgeState") == 0){
-			orientation = Mathf.Rad2Deg * Mathf.Atan2(-velocity.z, velocity.x) + 90;
-		}else if(edgeState == EdgeState.HANGING){
-			orientation = (-1 - grabbedEdge.getOrientation()) * 90;
-		}
-		model.transform.rotation = Quaternion.AngleAxis(orientation, Vector3.up);
+		if(isFalling()) jumping = false;
 	}
 	
 	#region Collisions
 	 
 	public void CheckCollisions(){
 		CheckCollisionsOnAxis(Y);
-		pushFlag = false;
+		passivePush = false;
 		CheckCollisionsOnAxis(X);
 		CheckCollisionsOnAxis(Z);
 	}
@@ -356,7 +256,7 @@ public class PlayerController : PhysicalObject{
 
 		RaycastHit[] hits = colCheck.CheckCollisionOnAxis(axis,velocity, Margin);
 
-		float close = -1;
+		float distToCollision = -1;
 		for (int i = 0; i < hits.Length; i++) {
 			RaycastHit hitInfo = hits[i];
 			if (hitInfo.collider != null && !hitInfo.collider.isTrigger)
@@ -371,12 +271,11 @@ public class PlayerController : PhysicalObject{
 				if (hitInfo.collider.gameObject.tag == "Intangible") {
 					trajectory = velocity[axis] * axisVector;
 					CollideWithObject(hitInfo, trajectory);
-				} else if (close == -1 || close > hitInfo.distance) {
-					close = hitInfo.distance;
+				} else if (distToCollision == -1 || distToCollision > hitInfo.distance) {
+					distToCollision = hitInfo.distance;
 					if(axis == Y){
 						if (velocity.y < 0) {
 							grounded = true;
-							falling = false;
 							launched = false;
 							// New Z-lock
 							if (hitInfo.collider.gameObject.tag != "Ground" && GameStateManager.instance.currentPerspective == PerspectiveType.p2D) {
@@ -403,22 +302,24 @@ public class PlayerController : PhysicalObject{
 			}
 		}
 		
-		if (close != -1) {
+		
+		bool collisionWithTangibleOccurred = distToCollision!=-1;
+		if (collisionWithTangibleOccurred) {
 			if(axis == Y){
 				if (!bounced) {
 					transform.Translate(
 						axisVector * 
 						Mathf.Sign(velocity[axis]) * 
-						(close - getDimensionAlongAxis(axis) / 2)
+						(distToCollision - getDimensionAlongAxis(axis) / 2)
 					);
 					velocity[axis] = 0f;
 				} else {
 					bounced = false;
 				}
 			}else{
-				if(!pushFlag) velocity[axis] = 0f;
+				if(!passivePush) velocity[axis] = 0f;
 			}
-		} else if(axis == Y){
+		}else if(axis == Y){
 			grounded = false;
 		}
 	}
@@ -468,7 +369,6 @@ public class PlayerController : PhysicalObject{
 				if (!other.transform.up.Equals(Vector3.up))
 					launched = true;
 				other.GetComponent<BouncePad>().Animate();
-				anim.SetTrigger("Jump");
 				bounced = true;
 			}
 			foreach (LandOnObject c in other.GetComponents<LandOnObject>()) {
@@ -477,13 +377,10 @@ public class PlayerController : PhysicalObject{
 						
 		}
 		// Crate
-		if (trajectory.normalized != Vector3.down && trajectory.normalized != Vector3.zero && other.GetComponent<Crate>() && !other.GetComponent<Crate>().IsAxisBlocked(trajectory)) {
+		if (trajectory.normalized != Vector3.down && trajectory.normalized != Vector3.zero && 
+				other.GetComponent<Crate>() && !other.GetComponent<Crate>().IsAxisBlocked(trajectory)) {
 			other.GetComponent<Crate>().FreePush((trajectory*0.75f).x, (trajectory*0.75f).z);
-			pushFlag = true;
-			if (crate == null && velocity != Vector3.zero)
-				anim.SetBool("Pushing", true);
-		} else if (crate == null && !pushFlag) {
-			anim.SetBool("Pushing", false);
+			passivePush = true;
 		}
 		// PushSwitchOld
 		if (other.GetComponent<PushSwitchOld>() && colliderDim == colliderWidth) {
@@ -508,12 +405,10 @@ public class PlayerController : PhysicalObject{
 
 	private void applyGravity(){
 		if (edgeState != EdgeState.HANGING){
-			if (!grounded) {
-				if (velocity.y <= 0)
-					velocity = new Vector3(velocity.x, Mathf.Max(velocity.y - upGravity * Time.deltaTime, -terminalVelocity), velocity.z);
-				else
-					velocity = new Vector3(velocity.x, Mathf.Max(velocity.y - downGravity * Time.deltaTime, -terminalVelocity), velocity.z);
-			}
+			if (velocity.y <= 0)
+				velocity = new Vector3(velocity.x, Mathf.Max(velocity.y - upGravity * Time.deltaTime, -terminalVelocity), velocity.z);
+			else
+				velocity = new Vector3(velocity.x, Mathf.Max(velocity.y - downGravity * Time.deltaTime, -terminalVelocity), velocity.z);
 		}else{
 			velocity.y = 0;
 		}
@@ -569,27 +464,19 @@ public class PlayerController : PhysicalObject{
 	}
 
 	#region EdgeGrabbing
-		
-	//This can only be called from self
-	void ReleaseEdge(){
+	
+	private void ReleaseEdge(){
 		if(grabbedEdge!=null)
 			grabbedEdge.resetStatus();
 		grabbedEdge = null;
 		edgeState = EdgeState.FAR_FROM_EDGE;
 	}
 
-	public bool isFalling(){
-		return falling;
-	}
-
-    public bool isGrounded() {
-        return grounded;
-    }
-
-    //note: this is only called from the Edge.cs
-    public void UpdateEdgeState(Edge e, byte edgeState){
+   //note: this is only called from the Edge.cs
+   public void UpdateEdgeState(Edge e, byte edgeState){
 		UpdateEdgeState(e,edgeState,-1);
 	}
+	
 	public void UpdateEdgeState(Edge e, byte edgeState, int animState){
 		switch(edgeState){
 			case 0:
@@ -599,10 +486,11 @@ public class PlayerController : PhysicalObject{
 						grabbedEdge =null;
 					}
 				}
+				
 				//adjust animation state
-				if(animState!= -1){
-					anim.SetInteger("EdgeState", animState);
-				}
+				if(animState!= -1)
+					animator.updateEdgeState(animState);
+				
 				if(animState == 5)
 					climbTimer = CLIMB_TIME;
 				break;
@@ -626,10 +514,13 @@ public class PlayerController : PhysicalObject{
 		this.crate = crate;
 		if (crate == null)
 			return;
-		if (GameStateManager.instance.currentPerspective == PerspectiveType.p2D || Mathf.Abs (crate.transform.position.x - transform.position.x) > Mathf.Abs (crate.transform.position.z - transform.position.z)) {
-			grabAxis = Vector3.right * Mathf.Sign(crate.transform.position.x - transform.position.x);
+		float xDiff = Mathf.Abs(crate.transform.position.x - transform.position.x);
+		float zDiff = Mathf.Abs (crate.transform.position.z - transform.position.z);
+		bool closerAlongXAxis = xDiff > zDiff;
+		if (!GameStateManager.is3D() || closerAlongXAxis) {
+			grabAxis = Vector3.right * xDiff;
 		} else {
-			grabAxis = Vector3.forward * Mathf.Sign(crate.transform.position.z - transform.position.z);
+			grabAxis = Vector3.forward * zDiff;
 		}
 	}
 	
@@ -637,34 +528,22 @@ public class PlayerController : PhysicalObject{
 
 	#region Accessor Methods
 	
-	public bool GrabbedCrate() {
-		return crate != null;
-	}
+	public bool GrabbedCrate() { return crate != null; }
 	
-	public Vector3[] getCuboid(){
-		return cuboid;
-	}
+	public bool isPassivelyPushing(){ return passivePush; }
 	
-	public float getOrientation(){
-		return orientation;
-	}
+	public Vector3[] getCuboid(){ return cuboid; }
 	
 	public void Teleport(Vector3 newPos){
 		transform.position = newPos;
 		gameObject.GetComponent<BoundObject>().updateBounds();
 	}
 
-	public Vector3 GetVelocity() {
-		return velocity;
-	}
+	public Vector3 GetVelocity(){ return velocity; }
 
-	public bool isPaused(){
-		return _paused;
-	}
+	public bool isPaused(){ return _paused; }
 
-	public void setCutsceneMode(bool c){
-		cutsceneMode = c;
-	}
+	public void setCutsceneMode(bool c){ cutsceneMode = c; }
 	
 	public bool canMove(){
 		return !isDisabled() && !isKicking() && !isClimbing() && !launched;
@@ -684,42 +563,64 @@ public class PlayerController : PhysicalObject{
 		}
 	}
 	
-	public float getColliderWidth(){
-		return colliderWidth;
+	public float getColliderWidth(){ return colliderWidth; }
+	
+	public float getColliderHeight(){ return colliderHeight; }
+	
+	public float getColliderDepth(){ return colliderDepth; }
+	
+	public EdgeState getEdgeState(){ return edgeState; }
+	
+	//TODO store axis info in grabbed edge
+	public int getEdgeOrientation(){ return grabbedEdge.getOrientation(); }
+	
+	public Vector3 getGrabAxis(){ return grabAxis; }
+	
+	public bool isClimbing(){ return climbTimer > 0; }
+	
+	public bool isKicking(){ return kickTimer > 0; }
+	
+	public bool isRunning(){ 
+		bool movingFast = velocity.magnitude > maxSpeed/2;
+		return isGrounded() && movingFast; 
 	}
 	
-	public float getColliderHeight(){
-		return colliderHeight;
+	public bool isWalking(){
+		bool movingSlow = 0 < velocity.magnitude && velocity.magnitude <= maxSpeed/2;
+		return isGrounded() && movingSlow; 
 	}
 	
-	public float getColliderDepth(){
-		return colliderDepth;
+	public bool isFalling(){ 
+		bool onEdge = edgeState == EdgeState.HANGING;
+		return velocity.y < -epsilon && !onEdge;
+	}
+
+   public bool isGrounded(){ 
+		return grounded; 
 	}
 	
-	public bool isClimbing(){
-		return climbTimer > 0;
+	public bool isJumping(){ return jumping; }
+	
+	public bool isShimmying(){ 
+		bool moving = velocity.magnitude > epsilon;
+		bool onEdge = edgeState == EdgeState.HANGING;
+		return moving && onEdge;
 	}
 	
-	public bool isKicking(){
-		return kickTimer > 0;
-	}
+	public bool isLaunched(){ return launched; }
 	
 	#endregion Accessor Methods
 	
 	private void OnPauseGame(bool p){
-		if(_paused != p){
-			if(p){
-				prePauseAnimSpeed = anim.speed;
-				anim.speed = 0;
-			}else{
-				anim.speed = prePauseAnimSpeed;
-			}
-		}		
+		if(p)
+			animator.pauseAnimation();
+		else
+			animator.resumeAnimation();
+		
 		_paused = p;
 	}
 
 	public void StartKick(){
-	  anim.SetBool("Kick", true);
 	  kickTimer = KICK_TIME;
 	  velocity.x = 0;
 	  velocity.z = 0;

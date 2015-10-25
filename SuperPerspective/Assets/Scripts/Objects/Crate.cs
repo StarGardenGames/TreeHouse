@@ -3,7 +3,7 @@ using System.Collections;
 
 public class Crate : ActiveInteractable {
 
-	#pragma warning disable 219
+	#pragma warning disable 219, 414
 
 	private const float gravity = 1.5f;
 	private const float terminalVelocity = 60;
