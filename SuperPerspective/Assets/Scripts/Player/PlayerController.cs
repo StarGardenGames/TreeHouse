@@ -284,11 +284,11 @@ public class PlayerController : PhysicalObject{
 								transform.position = pos;
 							}
 						}
-						// Z-lock
-						if (hitInfo.collider.gameObject.GetComponent<LevelGeometry>())
-							zlock = hitInfo.transform.position.z;
-						else
-							zlock = int.MinValue;
+                        // Z-lock
+                        if (hitInfo.collider.gameObject.GetComponent<LevelGeometry>())
+                            zlock = hitInfo.transform.position.z;
+                        else
+                            zlock = int.MinValue;
 					}else{
 						transform.Translate(
 							axisVector * 
