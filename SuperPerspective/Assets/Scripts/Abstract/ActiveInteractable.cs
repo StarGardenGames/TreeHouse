@@ -72,7 +72,7 @@ public class ActiveInteractable : PhysicalObject {
 	protected void FixedUpdateLogic() {
 		float dist = GetDistance();
 		
-		bool inRange = Mathf.Abs(dist) < range;
+		bool inRange = dist < range;
 
 		bool playerFacing = isPlayerFacingObject();
 			
@@ -81,7 +81,7 @@ public class ActiveInteractable : PhysicalObject {
 		bool aa = (GetComponentInChildren<Renderer>().enabled || GetComponent<Door>());
 		
 		bool unlockable = ((this.gameObject.GetComponent<LockedDoor>() == null || Key.GetKeysHeld() > 0));
-		
+
 		bool canTrigger = 
 			aa && inRange && (playerFacing || !GameStateManager.is3D()) && inYRange && unlockable;
 		
@@ -140,7 +140,7 @@ public class ActiveInteractable : PhysicalObject {
 		return Quadrant.none;
 	}
 	
-	private bool isPlayerFacingObject(){
+	protected virtual bool isPlayerFacingObject(){
 		float playerOrientation = PlayerAnimController.instance.getOrientation();
 		playerOrientation = (playerOrientation + 360) % 360;
 		
