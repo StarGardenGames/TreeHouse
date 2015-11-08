@@ -503,9 +503,13 @@ public class PlayerController : PhysicalObject{
 				//stop moving
 				velocity = Vector3.zero;
 				//lock y
-				Vector3 pos = gameObject.transform.position;
+				Vector3 pos = transform.position;
 				pos.y = e.gameObject.transform.position.y + (e.gameObject.transform.lossyScale.y * .5f) - (colliderHeight * .5f);
-				gameObject.transform.position = pos;
+				//z-lock to edge
+				if(!GameStateManager.is3D())
+					pos.z = grabbedEdge.transform.position.z;
+				//update transform
+				transform.position = pos;
 				break;
 		}
 	}
