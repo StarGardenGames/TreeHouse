@@ -53,6 +53,7 @@ public class PlayerController : PhysicalObject{
 	private bool passivePush = false;
 	private Vector3 grabAxis = Vector3.zero;
 	private bool launched;
+	private GameObject ridingPlatform = null;
 
 	//Vars for edge grabbing
 	private Vector3[] cuboid;
@@ -550,7 +551,7 @@ public class PlayerController : PhysicalObject{
 	public void setCutsceneMode(bool c){ cutsceneMode = c; }
 	
 	public bool canMove(){
-		return !isDisabled() && !isKicking() && !isClimbing() && !launched;
+		return !isDisabled() && !isKicking() && !isClimbing() && !launched && !isRiding();
 	}
 	
 	public bool isDisabled(){
@@ -599,10 +600,18 @@ public class PlayerController : PhysicalObject{
 		return velocity.y < -epsilon && !onEdge;
 	}
 
-   public bool isGrounded(){ 
+    public bool isGrounded(){ 
 		return grounded; 
 	}
-	
+
+	public bool isRiding() {
+		return ridingPlatform != null;
+	}
+
+	public void setRiding(GameObject platform) {
+		ridingPlatform = platform;
+	}
+
 	public bool isJumping(){ return jumping; }
 	
 	public bool isShimmying(){ 
