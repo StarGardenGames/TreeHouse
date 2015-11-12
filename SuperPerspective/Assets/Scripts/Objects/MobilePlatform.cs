@@ -17,12 +17,16 @@ public class MobilePlatform : ActiveInteractable {
 	private CollisionChecker colCheck;
 	private float Margin = 0.05f;
 
+	private Rect rect;
+
 	void Start() {
 		StartSetup();
 		colCheck = new CollisionChecker (GetComponent<Collider> ());
+		colCheck.precision = 3;
 		colliderHeight = GetComponent<Collider>().bounds.size.y;
 		colliderWidth = GetComponent<Collider>().bounds.size.x;
 		colliderDepth = GetComponent<Collider>().bounds.size.z;
+		rect = GetComponent<BoundObject>().GetBounds();
 	}
 
 	void FixedUpdate () {
@@ -57,15 +61,12 @@ public class MobilePlatform : ActiveInteractable {
 
 		if (axisInput != 0){
 			newVelocity += acceleration * Mathf.Sign(axisInput);
-			newVelocity = Mathf.Clamp(newVelocity, 
-			                          -maxSpeed * Mathf.Abs(axisInput), 
-			                          maxSpeed * Mathf.Abs(axisInput)
-			                          );
-		}else if (velocity[axis] != 0){
+			newVelocity = Mathf.Clamp(newVelocity,  -maxSpeed * Mathf.Abs(axisInput), maxSpeed * Mathf.Abs(axisInput));
+		} else if (velocity[axis] != 0) {
 			newVelocity -= decelleration * Mathf.Sign(newVelocity);
 			if(Mathf.Sign(newVelocity) != Mathf.Sign(velocity[axis])) newVelocity = 0;
 		}
-		
+
 		velocity[axis] = newVelocity;
 	}
 
@@ -75,43 +76,49 @@ public class MobilePlatform : ActiveInteractable {
 		RaycastHit[] hits = colCheck.CheckYCollision (velocity, Margin);
 
 		// If any rays connected move the player and set grounded to true since we're now on the ground
-		
-		hits = colCheck.CheckXCollision (velocity, Margin);
-		
-		float close = -1;
-		for (int i = 0; i < hits.Length; i++) {
-			RaycastHit hitInfo = hits[i];
-			if (hitInfo.collider != null)
-			{
-				if (close == -1 || close > hitInfo.distance) {
-					close = hitInfo.distance;
-					transform.Translate(Vector3.right * Mathf.Sign(velocity.x) * (hitInfo.distance - colliderWidth / 2));
-					trajectory = velocity.x * Vector3.right;
+
+		float close;
+
+		if (velocity.x != 0) {
+			hits = colCheck.CheckXCollision (velocity, Margin);
+			close = -1;
+			for (int i = 0; i < hits.Length; i++) {
+				RaycastHit hitInfo = hits[i];
+				if (hitInfo.collider != null)
+				{
+					if (close == -1 || close > hitInfo.distance) {
+						close = hitInfo.distance;
+						//transform.Translate(Vector3.right * Mathf.Sign(velocity.x) * (hitInfo.distance - colliderWidth / 2));
+						Debug.Log ("X");
+						trajectory = velocity.x * Vector3.right;
+					}
 				}
 			}
-		}
-		if (close != -1) {
-			//transform.Translate(Vector3.right * Mathf.Sign(velocity.x) * (close - colliderWidth / 2));
-			velocity = new Vector3(0f, velocity.y, velocity.z);
+			if (close != -1) {
+				//transform.Translate(Vector3.right * Mathf.Sign(velocity.x) * (close - colliderWidth / 2));
+				velocity = new Vector3(0f, velocity.y, velocity.z);
+			}
 		}
 
-		hits = colCheck.CheckZCollision (velocity, Margin);
-		
-		close = -1;
-		for (int i = 0; i < hits.Length; i++) {
-			RaycastHit hitInfo = hits[i];
-			if (hitInfo.collider != null)
-			{
-				if (close == -1 || close > hitInfo.distance) {
-					close = hitInfo.distance;
-					transform.Translate(Vector3.forward * Mathf.Sign(velocity.z) * (hitInfo.distance - colliderDepth / 2));
-					trajectory = velocity.z * Vector3.forward;
+		if (velocity.z != 0) {
+			hits = colCheck.CheckZCollision (velocity, Margin);
+			close = -1;
+			for (int i = 0; i < hits.Length; i++) {
+				RaycastHit hitInfo = hits[i];
+				if (hitInfo.collider != null)
+				{
+					if (close == -1 || close > hitInfo.distance) {
+						close = hitInfo.distance;
+						//transform.Translate(Vector3.forward * Mathf.Sign(velocity.z) * (hitInfo.distance - colliderDepth / 2));
+						Debug.Log ("Z");
+						trajectory = velocity.z * Vector3.forward;
+					}
 				}
 			}
-		}
-		if (close != -1) {
-			//transform.Translate(Vector3.forward * Mathf.Sign(velocity.z) * (close - colliderDepth / 2));
-			velocity = new Vector3(velocity.x, velocity.y, 0f);
+			if (close != -1) {
+				//transform.Translate(Vector3.forward * Mathf.Sign(velocity.z) * (close - colliderDepth / 2));
+				velocity = new Vector3(velocity.x, velocity.y, 0f);
+			}
 		}
 	}
 
