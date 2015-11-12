@@ -5,9 +5,14 @@ public class CollisionChecker {
 
 	Collider col;
 	float colliderWidth, colliderHeight, colliderDepth;
+	public float precision = 2;
 	
 	#pragma warning disable 219
 
+	private const int X = 0;
+	private const int Y = 1;
+	private const int Z = 2;
+	
 	public CollisionChecker(Collider col) {
 		this.col = col;
 		colliderWidth = col.bounds.size.x;
@@ -15,11 +20,11 @@ public class CollisionChecker {
 		colliderDepth = col.bounds.size.z;
 	}
 	
-	public RaycastHit[] CheckCollisionOnAxis(char axis, Vector3 velocity, float Margin){
+	public RaycastHit[] CheckCollisionOnAxis(int axis, Vector3 velocity, float Margin){
 		switch(axis){
-			case 'X': return CheckXCollision(velocity, Margin);
-			case 'Y': return CheckYCollision(velocity, Margin);
-			case 'Z': return CheckZCollision(velocity, Margin);
+			case X: return CheckXCollision(velocity, Margin);
+			case Y: return CheckYCollision(velocity, Margin);
+			case Z: return CheckZCollision(velocity, Margin);
 			default:
 				throw new System.ArgumentException("Invalid Axis Character");
 		}
@@ -27,9 +32,8 @@ public class CollisionChecker {
 	
 	public RaycastHit[] CheckXCollision(Vector3 velocity, float Margin) {
 		colliderWidth = col.bounds.max.x - col.bounds.min.x;
-		Vector3[] startPoints = new Vector3[5];
-		RaycastHit[] hits = new RaycastHit[5];
-		RaycastHit hitInfo = new RaycastHit();
+		RaycastHit[] hits = new RaycastHit[(int)Mathf.Pow(precision + 1, 2)];
+		RaycastHit hitInfo = new RaycastHit(); 
 
 		float minX 		= col.bounds.min.x + Margin;
 		float centerX 	= col.bounds.center.x;
@@ -47,22 +51,14 @@ public class CollisionChecker {
 		// Set the raycast distance to check as far as the player will move this frame
 		float distance = (colliderWidth / 2) + Mathf.Abs(velocity.x * Time.deltaTime);
 		
-		//setup startPoints
-		startPoints[0] = new Vector3(centerX, minY, maxZ);
-		startPoints[1] = new Vector3(centerX, maxY, maxZ);
-		startPoints[2] = new Vector3(centerX, minY, minZ);
-		startPoints[3] = new Vector3(centerX, maxY, minZ);
-		startPoints[4] = new Vector3(centerX, centerY, centerZ);
-		
 		//test all startpoints
 		Vector3 dir = Vector3.right * Mathf.Sign(velocity.x);
-		connected = Physics.Raycast(startPoints[0], dir, out hitInfo, distance);
-		hits[0] = hitInfo;
-		int i = 1;
-		while (i < startPoints.Length) {
-			connected = Physics.Raycast(startPoints[i], dir, out hitInfo, distance);
-			hits[i] = hitInfo;
-			i++;
+		for (int i = 0; i <= precision; i++) {
+			for (int j = 0; j <= precision; j++) {
+				connected = Physics.Raycast(new Vector3(centerX, minY + (maxY - minY) * (i / precision), minZ + (maxZ - minZ) * (j / precision)), dir, out hitInfo, distance);
+				hits[(int)(i * precision + j)] = hitInfo;
+				i++;
+			}
 		}
 		
 		return hits;
@@ -70,7 +66,7 @@ public class CollisionChecker {
 
 	public RaycastHit[] CheckYCollision(Vector3 velocity, float Margin) {
 		colliderHeight = col.bounds.max.y - col.bounds.min.y;
-		RaycastHit[] hits = new RaycastHit[5];
+		RaycastHit[] hits = new RaycastHit[(int)Mathf.Pow(precision + 1, 2)];
 		RaycastHit hitInfo = new RaycastHit();
 		
 		float minX 		= col.bounds.min.x + Margin;
@@ -101,13 +97,12 @@ public class CollisionChecker {
 		//test all startpoints
 		Vector3 dir = Vector3.up * Mathf.Sign(velocity.y);
 		// must run outside loop once to ensure hitInfo is initialized
-		connected = Physics.Raycast(startPoints[0], dir, out hitInfo, distance);
-		hits[0] = hitInfo;
-		int i = 1;
-		while (i < startPoints.Length) {
-			connected = Physics.Raycast(startPoints[i], dir, out hitInfo, distance);
-			hits[i] = hitInfo;
-			i++;
+		for (int i = 0; i <= precision; i++) {
+			for (int j = 0; j <= precision; j++) {
+				connected = Physics.Raycast(new Vector3(minX + (maxX - minX) * (i / precision), centerY, minZ + (maxZ - minZ) * (j / precision)), dir, out hitInfo, distance);
+				hits[(int)(i * precision + j)] = hitInfo;
+				i++;
+			}
 		}
 		
 		return hits;
@@ -115,8 +110,7 @@ public class CollisionChecker {
 
 	public RaycastHit[] CheckZCollision(Vector3 velocity, float Margin) {
 		colliderDepth = col.bounds.max.z - col.bounds.min.z;
-		Vector3[] startPoints = new Vector3[5];
-		RaycastHit[] hits = new RaycastHit[5];
+		RaycastHit[] hits = new RaycastHit[(int)Mathf.Pow(precision + 1, 2)];
 		RaycastHit hitInfo = new RaycastHit();
 		
 		float minX 		= col.bounds.min.x + Margin;
@@ -134,22 +128,14 @@ public class CollisionChecker {
 		// Set the raycast distance to check as far as the player will move this frame
 		float distance = (colliderDepth / 2 + Mathf.Abs(velocity.z * Time.deltaTime));
 		
-		//setup startPoints arary
-		startPoints[0] = new Vector3(minX, maxY, centerZ);
-		startPoints[1] = new Vector3(maxX, maxY, centerZ);
-		startPoints[2] = new Vector3(minX, minY, centerZ);
-		startPoints[3] = new Vector3(maxX, minY, centerZ);
-		startPoints[4] = new Vector3(centerX, centerY, centerZ);
-		
 		//loop through and check all startpoints
 		Vector3 dir = Vector3.forward * Mathf.Sign(velocity.z);
-		connected = Physics.Raycast(startPoints[0], dir, out hitInfo, distance);
-		hits[0] = hitInfo;
-		int i = 1;
-		while (i < startPoints.Length) {
-			connected = Physics.Raycast(startPoints[i], dir, out hitInfo, distance);
-			hits[i] = hitInfo;
-			i++;
+		for (int i = 0; i <= precision; i++) {
+			for (int j = 0; j <= precision; j++) {
+				connected = Physics.Raycast(new Vector3(minX + (maxX - minX) * (i / precision), minY + (maxY - minY) * (j / precision), centerZ), dir, out hitInfo, distance);
+				hits[(int)(i * precision + j)] = hitInfo;
+				i++;
+			}
 		}
 
 		return hits;

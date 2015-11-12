@@ -4,6 +4,8 @@ using System.Collections.Generic;
 
 public class DoorManager : MonoBehaviour {
 
+	#pragma warning disable 168
+
 	Dictionary<string,Door> doors = 
 		new Dictionary<string,Door>();
 
@@ -33,10 +35,5 @@ public class DoorManager : MonoBehaviour {
 		Door returnDoor = null;
 		doors.TryGetValue(doorName, out returnDoor);
 		return returnDoor;
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	
 	}
 }

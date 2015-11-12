@@ -25,12 +25,27 @@ public class ObjectFade : MonoBehaviour {
 	void Update() {
 		setAlpha = 1;
 		float dist;
-		if (GetComponent<Collider>().bounds.IntersectRay(new Ray(Camera.main.transform.position, player.transform.position - Camera.main.transform.position), out dist)) { 
+		if (getBounds().IntersectRay(new Ray(Camera.main.transform.position, player.transform.position - Camera.main.transform.position), out dist)) { 
 			if (dist < Vector3.Distance(player.transform.position, Camera.main.transform.position))
 				setAlpha = 0.5f - Mathf.Lerp(0, 0.5f, (transform.position.x - player.transform.position.x) / (Camera.main.transform.position.x - player.transform.position.x));
 		}
 	}
 
+	Bounds getBounds(){
+		Collider myCollider = GetComponent<Collider>();
+		if(myCollider != null){
+			return myCollider.bounds;
+		}else{
+			Vector3 scale = transform.lossyScale;
+			scale.x /= 2;
+			scale.y *= 2;
+			scale.z *= 2;
+			return new Bounds(
+				transform.position,
+				scale
+			);
+		}
+	}
 	void FixedUpdate () {
 		foreach (Renderer rend in rends) {
 			Color col = rend.material.GetColor("_Color");

@@ -10,7 +10,7 @@ public class LevelGeometry : MonoBehaviour
 
 	#region Properties & Variables
 
-	public GameObject parentPlatform;   // The platform this geometry belongs to
+	private GameObject parentPlatform;   // The platform this geometry belongs to
 
 	private float platWidth;
 
@@ -23,11 +23,7 @@ public class LevelGeometry : MonoBehaviour
 	#endregion Properties & Variables
 
 
-	#region Monobehavior Implementation
-
-	void Awake(){
-		
-	}
+	#region Monobehavior Implementation	
 	
 	void Start () {
 		parentPlatform = IslandControl.instance.findGround(this.gameObject);
@@ -58,8 +54,10 @@ public class LevelGeometry : MonoBehaviour
 			rot = 270;
 		if (p == PerspectiveType.p2D && parentPlatform!=null)
 		{
-			boxCollider.size = new Vector3(colliderSize.x * Mathf.Cos(rot * Mathf.Deg2Rad) + (platWidth / transform.lossyScale.x) * Mathf.Sin(rot * Mathf.Deg2Rad), colliderSize.y, 
-			                               colliderSize.z * Mathf.Sin(rot * Mathf.Deg2Rad) + (platWidth / transform.lossyScale.z) * Mathf.Cos(rot * Mathf.Deg2Rad));
+			boxCollider.size = new Vector3(
+				colliderSize.x * Mathf.Cos(rot * Mathf.Deg2Rad) + (platWidth / transform.lossyScale.x) * Mathf.Sin(rot * Mathf.Deg2Rad), 
+				colliderSize.y, 
+				colliderSize.z * Mathf.Sin(rot * Mathf.Deg2Rad) + (platWidth / transform.lossyScale.z) * Mathf.Cos(rot * Mathf.Deg2Rad));
 			if (Mathf.Round(rot) == 90 || Mathf.Round(rot) == 270)
 				boxCollider.center = new Vector3(-(parentPlatform.transform.position.z - transform.position.z) * (1 / Mathf.Abs(transform.localScale.x)) * Mathf.Sin(rot * Mathf.Deg2Rad), startCenter.y, startCenter.z);
 			else

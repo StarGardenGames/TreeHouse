@@ -2,7 +2,6 @@
 using System.Collections;
 
 public class Edge : MonoBehaviour {
-	
 	//suppress warnings
 	#pragma warning disable 162, 649, 219, 414
 	
@@ -54,13 +53,13 @@ public class Edge : MonoBehaviour {
 			//if player is trying to get up
 			if(status == 3 && GrabButtonDown() && SpaceFreeForClimbing()){
 				Vector3 playerPos = player.gameObject.transform.position;
-				playerPos.y += player.colliderHeight;
+				playerPos.y += player.getColliderHeight();
 				float offsetScale = .5f;
 				switch(or){
-				case 0: playerPos.x -= player.colliderWidth * offsetScale; break;
-				case 1: playerPos.z -= player.colliderDepth * offsetScale; break;
-				case 2: playerPos.x += player.colliderWidth * offsetScale; break;
-				case 3: playerPos.z += player.colliderDepth * offsetScale; break;
+				case 0: playerPos.x -= player.getColliderWidth() * offsetScale; break;
+				case 1: playerPos.z -= player.getColliderDepth() * offsetScale; break;
+				case 2: playerPos.x += player.getColliderWidth() * offsetScale; break;
+				case 3: playerPos.z += player.getColliderDepth() * offsetScale; break;
 				}
 				player.gameObject.transform.position = playerPos;
 				status = 0;
@@ -166,16 +165,16 @@ public class Edge : MonoBehaviour {
 		PlayerController player = PlayerController.instance;
 		return SpaceFreeAbovePlayerForPositionAndHeight(
 			player.gameObject.transform.position,
-			player.colliderHeight
+			player.getColliderHeight()
 		);
 	}
 	
 	bool SpaceFreeForGrabbing(){
 		PlayerController player = PlayerController.instance;
 		Vector3 pos = player.gameObject.transform.position;
-		pos.y = gameObject.transform.position.y + (gameObject.transform.lossyScale.y * .5f) - (player.colliderHeight * .5f);
+		pos.y = gameObject.transform.position.y + (gameObject.transform.lossyScale.y * .5f) - (player.getColliderHeight() * .5f);
 		return SpaceFreeAbovePlayerForPositionAndHeight(
-			pos, player.colliderHeight * validGrabFactor
+			pos, player.getColliderHeight() * validGrabFactor
 		);
 	}
 	
@@ -185,10 +184,10 @@ public class Edge : MonoBehaviour {
 		//generate hitbox
 		Vector3[] checkBox = new Vector3[2];
 		PlayerController player = PlayerController.instance;
-		checkBox[0] = playerPos + new Vector3(0,player.colliderHeight * .5f,0);
-		checkBox[1] = playerPos + new Vector3(0,player.colliderHeight * .5f + boxHeight,0);
-		float width = player.colliderWidth;
-		float halfDepth = player.colliderDepth * .5f;
+		checkBox[0] = playerPos + new Vector3(0,player.getColliderHeight() * .5f,0);
+		checkBox[1] = playerPos + new Vector3(0,player.getColliderHeight() * .5f + boxHeight,0);
+		float width = player.getColliderWidth();
+		float halfDepth = player.getColliderDepth() * .5f;
 		switch(or){
 		case 0://right
 			checkBox[0] += new Vector3(-width,0,-halfDepth);
@@ -324,9 +323,17 @@ public class Edge : MonoBehaviour {
 	}
 
 	public bool isPositionValidOnEdge(Vector3 pos){
+		int axis = (or%2==1)?0:2;
+
+		float center = transform.position[axis];
+		float scale = transform.lossyScale[axis];
+		float minBound = center - scale * .5f + .5f;
+		float maxBound = center + scale * .5f - .5f;
+		bool inBounds = minBound <= pos[axis] && pos[axis] <= maxBound;
+		
 		return SpaceFreeAbovePlayerForPositionAndHeight(
 			pos,
-			player.colliderHeight * validGrabFactor
-		);
+			player.getColliderHeight() * validGrabFactor
+		) && inBounds;
 	}
 }
