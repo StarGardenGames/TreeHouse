@@ -123,14 +123,15 @@ public class PlayerAnimController : MonoBehaviour {
 	private void updateEdgeStates(){
 		//TODO store animation edge states into series of const variables
 		int animEdgeState = anim.GetInteger("EdgeState");
-		if(animEdgeState < 3 || (animEdgeState == 5 && !player.isClimbing()))	
-			anim.SetInteger("EdgeState", (int)player.getEdgeState());
+		int playerState = (int)player.getEdgeState();
+		if(animEdgeState < 3 || (animEdgeState == 5 && !player.isClimbing()))
+			updateEdgeState(playerState);
 		else if(animEdgeState == 3){
 			if(player.getVelocity().magnitude < epsilon)
-				anim.SetInteger("EdgeState", (int)(int)player.getEdgeState());
+				updateEdgeState(playerState);
 		}else if(!anim.GetCurrentAnimatorStateInfo(0).IsName("HangBegin") && 
 				!anim.GetCurrentAnimatorStateInfo(0).IsName("HangShimmying")){
-			anim.SetInteger("EdgeState", (int)player.getEdgeState());
+			updateEdgeState(playerState);
 		}
 	}
 
