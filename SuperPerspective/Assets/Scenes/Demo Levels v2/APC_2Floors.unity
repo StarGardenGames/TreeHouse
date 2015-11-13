@@ -1511,8 +1511,8 @@ Transform:
   - {fileID: 1708987684}
   - {fileID: 1875947915}
   - {fileID: 1156224940}
-  m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_Father: {fileID: 462135279}
+  m_RootOrder: 1
 --- !u!1001 &400654364
 Prefab:
   m_ObjectHideFlags: 0
@@ -1762,6 +1762,37 @@ Prefab:
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 74c8ff9310ecd7f4d9492373fc6975d0, type: 2}
   m_IsPrefabParent: 0
+--- !u!1 &462135278
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 462135279}
+  m_Layer: 0
+  m_Name: TwoFloors
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &462135279
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 462135278}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 1300296180}
+  - {fileID: 391866200}
+  - {fileID: 1072420882}
+  - {fileID: 1586424155}
+  m_Father: {fileID: 0}
+  m_RootOrder: 4
 --- !u!1001 &468256266
 Prefab:
   m_ObjectHideFlags: 0
@@ -4667,8 +4698,8 @@ Transform:
   m_Children:
   - {fileID: 1669849387}
   - {fileID: 252311149}
-  m_Father: {fileID: 0}
-  m_RootOrder: 6
+  m_Father: {fileID: 462135279}
+  m_RootOrder: 2
 --- !u!1 &1074539135 stripped
 GameObject:
   m_PrefabParentObject: {fileID: 184916, guid: 3654cfe1252d1094d93aeb561f6cc8bd, type: 2}
@@ -5617,8 +5648,8 @@ Transform:
   m_LocalPosition: {x: -5, y: 61.7000008, z: -1.20000005}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_Father: {fileID: 462135279}
+  m_RootOrder: 0
 --- !u!1001 &1304770375
 Prefab:
   m_ObjectHideFlags: 0
@@ -6844,8 +6875,8 @@ Transform:
   - {fileID: 586777160}
   - {fileID: 986789850}
   - {fileID: 266595781}
-  m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_Father: {fileID: 462135279}
+  m_RootOrder: 3
 --- !u!4 &1590160183 stripped
 Transform:
   m_PrefabParentObject: {fileID: 400012, guid: 74c8ff9310ecd7f4d9492373fc6975d0, type: 2}

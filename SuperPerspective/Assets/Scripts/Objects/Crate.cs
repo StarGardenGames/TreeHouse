@@ -284,9 +284,7 @@ public class Crate : ActiveInteractable {
 	}
 
 	void checkBreak() {
-		print("crate break called " + Check2DIntersect());
 		if (GameStateManager.instance.currentPerspective == PerspectiveType.p2D && Check2DIntersect ()) {
-			Debug.Log("true");
 			if (grabbed){
 				player.GetComponent<PlayerController> ().Grab (null);
 				grabbed = false;

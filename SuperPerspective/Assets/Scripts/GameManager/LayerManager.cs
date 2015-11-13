@@ -3,17 +3,25 @@ using System.Collections;
 
 public class LayerManager : MonoBehaviour {
 	
-	public GameObject collisionParent;
-	public GameObject artParent;
+	public GameObject[] collisionParents;
+	public GameObject[] artParents;
 	
 	public bool collisionLayerVisible = false;
 	public bool artLayerVisible = true;
 		
 	void Awake () {
-		collisionParent.SetActive(true);
-		artParent.SetActive(true);
-		if(!collisionLayerVisible) makeChildrenInvisible(collisionParent);
-		if(!artLayerVisible) makeChildrenInvisible(artParent);
+		for(int i = 0; i < collisionParents.Length; i++)
+			collisionParents[i].SetActive(true);
+		for(int i = 0; i < artParents.Length; i++)
+			artParents[i].SetActive(true);
+		if(!collisionLayerVisible){
+			for(int i = 0; i < collisionParents.Length; i++)
+				makeChildrenInvisible(collisionParents[i]);		
+		}
+		if(!artLayerVisible){
+			for(int i = 0; i < artParents.Length; i++)
+				makeChildrenInvisible(artParents[i]);
+		}
 	}
 	
 	private void makeChildrenInvisible(GameObject par){

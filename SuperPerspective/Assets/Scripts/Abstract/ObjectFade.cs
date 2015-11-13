@@ -39,7 +39,7 @@ public class ObjectFade : MonoBehaviour {
 			Vector3 scale = transform.lossyScale;
 			scale.x /= 2;
 			scale.y *= 2;
-			scale.z *= 2;
+			scale.z *= 3;
 			return new Bounds(
 				transform.position,
 				scale
