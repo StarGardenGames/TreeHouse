@@ -262,8 +262,8 @@ public class Crate : ActiveInteractable {
 		float minY 		= GetComponent<Collider>().bounds.min.y + Margin;
 		float centerY 	= GetComponent<Collider>().bounds.center.y;
 		float maxY 		= GetComponent<Collider>().bounds.max.y - Margin;
-		float centerZ   = GetComponent<Collider>().bounds.center.z;
-		
+		//float centerZ   = GetComponent<Collider>().bounds.center.z;
+		float centerZ = -2000;
 		//array of startpoints
 		Vector3[] startPoints = {
 			new Vector3(minX, maxY, centerZ),
@@ -275,13 +275,16 @@ public class Crate : ActiveInteractable {
 		
 		//check all startpoints
 		for (int i = 0; i < startPoints.Length; i++) {
-			connected = connected || Physics.Raycast (startPoints [i], Vector3.forward) || Physics.Raycast (startPoints [i], -Vector3.forward);
+			connected = connected || 
+			Physics.Raycast (startPoints [i], Vector3.forward) || 
+			Physics.Raycast (startPoints [i], -Vector3.forward);
 		}
 
 		return connected;
 	}
 
 	void checkBreak() {
+		print("crate break called " + Check2DIntersect());
 		if (GameStateManager.instance.currentPerspective == PerspectiveType.p2D && Check2DIntersect ()) {
 			Debug.Log("true");
 			if (grabbed){
