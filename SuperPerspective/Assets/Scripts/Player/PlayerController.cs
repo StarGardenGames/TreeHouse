@@ -523,9 +523,9 @@ public class PlayerController : PhysicalObject{
 		float zDiff = Mathf.Abs (crate.transform.position.z - transform.position.z);
 		bool closerAlongXAxis = xDiff > zDiff;
 		if (!GameStateManager.is3D() || closerAlongXAxis) {
-			grabAxis = Vector3.right * xDiff;
+			grabAxis = Vector3.right;
 		} else {
-			grabAxis = Vector3.forward * zDiff;
+			grabAxis = Vector3.forward;
 		}
 	}
 	
