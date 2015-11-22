@@ -469,7 +469,7 @@ Prefab:
       value: 1.5
       objectReference: {fileID: 0}
     m_RemovedComponents:
-    - {fileID: 11401686, guid: c1ca9dfa4fea52445ab6203799ac1114, type: 2}
+    - {fileID: 0}
     - {fileID: 11408028, guid: c1ca9dfa4fea52445ab6203799ac1114, type: 2}
   m_ParentPrefab: {fileID: 100100000, guid: c1ca9dfa4fea52445ab6203799ac1114, type: 2}
   m_IsPrefabParent: 0
@@ -578,7 +578,7 @@ Prefab:
       value: 2.5
       objectReference: {fileID: 0}
     m_RemovedComponents:
-    - {fileID: 11401686, guid: c1ca9dfa4fea52445ab6203799ac1114, type: 2}
+    - {fileID: 0}
   m_ParentPrefab: {fileID: 100100000, guid: c1ca9dfa4fea52445ab6203799ac1114, type: 2}
   m_IsPrefabParent: 0
 --- !u!4 &177158323 stripped
@@ -3456,7 +3456,7 @@ Prefab:
       value: 1.5
       objectReference: {fileID: 0}
     m_RemovedComponents:
-    - {fileID: 11401686, guid: c1ca9dfa4fea52445ab6203799ac1114, type: 2}
+    - {fileID: 0}
     - {fileID: 11408028, guid: c1ca9dfa4fea52445ab6203799ac1114, type: 2}
   m_ParentPrefab: {fileID: 100100000, guid: c1ca9dfa4fea52445ab6203799ac1114, type: 2}
   m_IsPrefabParent: 0
@@ -4309,7 +4309,7 @@ Prefab:
       value: 2.5
       objectReference: {fileID: 0}
     m_RemovedComponents:
-    - {fileID: 11401686, guid: c1ca9dfa4fea52445ab6203799ac1114, type: 2}
+    - {fileID: 0}
   m_ParentPrefab: {fileID: 100100000, guid: c1ca9dfa4fea52445ab6203799ac1114, type: 2}
   m_IsPrefabParent: 0
 --- !u!1001 &837888779
@@ -4456,7 +4456,7 @@ Prefab:
       value: PressurePlate (1)
       objectReference: {fileID: 0}
     m_RemovedComponents:
-    - {fileID: 11401686, guid: c1ca9dfa4fea52445ab6203799ac1114, type: 2}
+    - {fileID: 0}
   m_ParentPrefab: {fileID: 100100000, guid: c1ca9dfa4fea52445ab6203799ac1114, type: 2}
   m_IsPrefabParent: 0
 --- !u!4 &838944534 stripped
@@ -5529,7 +5529,7 @@ Prefab:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents:
-    - {fileID: 11401686, guid: c1ca9dfa4fea52445ab6203799ac1114, type: 2}
+    - {fileID: 0}
   m_ParentPrefab: {fileID: 100100000, guid: c1ca9dfa4fea52445ab6203799ac1114, type: 2}
   m_IsPrefabParent: 0
 --- !u!4 &1150844666 stripped
@@ -5972,7 +5972,7 @@ Prefab:
       value: 2.5
       objectReference: {fileID: 0}
     m_RemovedComponents:
-    - {fileID: 11401686, guid: c1ca9dfa4fea52445ab6203799ac1114, type: 2}
+    - {fileID: 0}
   m_ParentPrefab: {fileID: 100100000, guid: c1ca9dfa4fea52445ab6203799ac1114, type: 2}
   m_IsPrefabParent: 0
 --- !u!1001 &1232383203
@@ -7054,7 +7054,7 @@ Prefab:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents:
-    - {fileID: 11401686, guid: c1ca9dfa4fea52445ab6203799ac1114, type: 2}
+    - {fileID: 0}
   m_ParentPrefab: {fileID: 100100000, guid: c1ca9dfa4fea52445ab6203799ac1114, type: 2}
   m_IsPrefabParent: 0
 --- !u!4 &1412001140 stripped
@@ -8991,10 +8991,6 @@ Prefab:
   m_Modification:
     m_TransformParent: {fileID: 1918873774}
     m_Modifications:
-    - target: {fileID: 11408028, guid: c1ca9dfa4fea52445ab6203799ac1114, type: 2}
-      propertyPath: triggers.Array.size
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 476146, guid: c1ca9dfa4fea52445ab6203799ac1114, type: 2}
       propertyPath: m_LocalPosition.x
       value: 4.8500061
@@ -9027,20 +9023,11 @@ Prefab:
       propertyPath: m_RootOrder
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 476148, guid: c1ca9dfa4fea52445ab6203799ac1114, type: 2}
-      propertyPath: m_LocalScale.x
-      value: .800000012
-      objectReference: {fileID: 0}
-    - target: {fileID: 476148, guid: c1ca9dfa4fea52445ab6203799ac1114, type: 2}
-      propertyPath: m_LocalScale.z
-      value: .800000012
-      objectReference: {fileID: 0}
     - target: {fileID: 11408028, guid: c1ca9dfa4fea52445ab6203799ac1114, type: 2}
       propertyPath: triggers.Array.data[0]
       value: 
       objectReference: {fileID: 1269791149}
-    m_RemovedComponents:
-    - {fileID: 11401686, guid: c1ca9dfa4fea52445ab6203799ac1114, type: 2}
+    m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: c1ca9dfa4fea52445ab6203799ac1114, type: 2}
   m_IsPrefabParent: 0
 --- !u!4 &1844069875 stripped
