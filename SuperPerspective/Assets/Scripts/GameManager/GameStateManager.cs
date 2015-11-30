@@ -110,6 +110,7 @@ public class GameStateManager : MonoBehaviour
 		InputManager.instance.LeanRightReleasedEvent += HandleLeanRightReleased;
 		InputManager.instance.BackwardMovementEvent += HandleBackwardMovement;
 		InputManager.instance.ForwardMovementEvent += HandleForwardMovement;
+		InputManager.instance.InteractPressedEvent += HandleInteractPressed;
 		
 		CameraController.instance.TransitionCompleteEvent += HandleTransitionComplete;
 	}
@@ -202,6 +203,12 @@ public class GameStateManager : MonoBehaviour
 		if(InputManager.instance.GetForwardMovement() == 1 && currentState == ViewType.BACKWARD){
 			EnterState(ViewType.STANDARD_3D);
 		}	
+	}
+	
+	private void HandleInteractPressed(){
+		if(onDynamicState()){
+			ExitDynamicState();
+		}
 	}
 	
 	#endregion Event Handlers
@@ -342,6 +349,14 @@ public class GameStateManager : MonoBehaviour
 	
 	public static bool IsGamePaused(){
 		return GameStateManager.instance.IsPauseState(GameStateManager.instance.targetState);
+	}
+
+	public static bool onDynamicState(){
+		return instance.currentState == ViewType.DYNAMIC;
+	}
+	
+	public static bool targetingDynamicState(){
+		return instance.targetState == ViewType.DYNAMIC;
 	}
 	
 	#endregion Public Interface

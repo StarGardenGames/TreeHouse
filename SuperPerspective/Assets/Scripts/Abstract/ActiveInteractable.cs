@@ -46,7 +46,7 @@ public class ActiveInteractable : PhysicalObject {
 	}
 	
 	void InteractPressed(){
-		if(!GameStateManager.IsGamePaused() && selected == this)
+		if(!GameStateManager.IsGamePaused() && !PlayerController.instance.isDisabled() && selected == this)
 			Triggered();
 	}
 	
@@ -78,12 +78,12 @@ public class ActiveInteractable : PhysicalObject {
 			
 		bool inYRange = yRangeOverlapsWithPlayer();
 	
-		bool aa = (GetComponentInChildren<Renderer>().enabled || GetComponent<Door>());
+		bool someImportantVariable = (GetComponentInChildren<Renderer>().enabled || GetComponent<Door>());
 		
 		bool unlockable = ((this.gameObject.GetComponent<LockedDoor>() == null || Key.GetKeysHeld() > 0));
 
 		bool canTrigger = 
-			aa && inRange && (playerFacing || !GameStateManager.is3D()) && inYRange && unlockable;
+			someImportantVariable && inRange && (playerFacing || !GameStateManager.is3D()) && inYRange && unlockable;
 		
 		bool notificationCanBeShown = !notiShown || dist < notiDist;
 		

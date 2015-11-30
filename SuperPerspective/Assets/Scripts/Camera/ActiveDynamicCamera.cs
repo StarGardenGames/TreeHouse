@@ -3,19 +3,26 @@ using System.Collections;
 
 public class ActiveDynamicCamera : Activatable {
 
-	public float lockDuration = 3;
+	public bool panOnActivate = true;
+	public bool panOnDeactivate = false;
 	
-	private float activateTime = -1f;
+	public float panDuration = 3;
+	
+	private float panTime = -1f;
+	private bool panned = false;
+	
 	
 	public void FixedUpdate(){
 		checkForLockEnd();
-	}	
+	}
 	
 	private void checkForLockEnd(){
-		bool stillWaiting = activateTime > 0;
-		bool timesUp = Time.time - activateTime > lockDuration;
-		if(stillWaiting && timesUp)
-			setActivated(false);
+		bool stillWaiting = panTime > 0;
+		bool timesUp = Time.time - panTime > panDuration;
+		bool dynamicStateExited = !GameStateManager.targetingDynamicState();
+		if((stillWaiting && timesUp) || dynamicStateExited){
+			resetPan();
+		}
 	}
 	
 	public override void setActivated(bool a){
@@ -23,14 +30,21 @@ public class ActiveDynamicCamera : Activatable {
 		base.setActivated(a);
 		if(a == startA)
 			return;
-		if(a){
+		if(!panned && ((a && panOnActivate) || (!a && panOnDeactivate))){
 			GameStateManager.instance.EnterDynamicState(transform);
-			PlayerController.instance.setCutsceneMode(true);
-			activateTime = Time.time;
-		}else{
-			GameStateManager.instance.ExitDynamicState();
-			PlayerController.instance.setCutsceneMode(false);
-			activateTime = -1f;
+			bool dynamicStateEntered = GameStateManager.targetingDynamicState();
+			if(dynamicStateEntered){
+				PlayerController.instance.setCutsceneMode(true);
+				panTime = Time.time;
+				panned = true;
+			}
 		}
+	}
+	
+	private void resetPan(){
+		panned = false;
+		GameStateManager.instance.ExitDynamicState();
+		PlayerController.instance.setCutsceneMode(false);
+		panTime = -1f;
 	}
 }
