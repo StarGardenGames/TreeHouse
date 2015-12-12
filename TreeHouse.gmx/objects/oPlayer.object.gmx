@@ -50,6 +50,7 @@ dy = 0;
           <argument>
             <kind>1</kind>
             <string>ApplyPlayerMovement();
+AlignCameraWithPlayer();
 </string>
           </argument>
         </arguments>
