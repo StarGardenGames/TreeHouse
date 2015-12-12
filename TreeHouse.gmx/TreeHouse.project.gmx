@@ -28,22 +28,40 @@
       <script>scripts\snapCamera.gml</script>
     </scripts>
     <scripts name="Terrain">
-      <scripts name="Grass">
-        <script>scripts\drawGrass.gml</script>
-        <script>scripts\getGrassHeight.gml</script>
+      <scripts name="Chunks">
+        <script>scripts\loadChunk.gml</script>
+        <script>scripts\unloadChunk.gml</script>
+        <script>scripts\chunkExists.gml</script>
+        <script>scripts\playerInChunk.gml</script>
+        <script>scripts\getChunkAtPosition.gml</script>
+        <script>scripts\getChunkId.gml</script>
+        <script>scripts\chunkInDespawnRange.gml</script>
+        <script>scripts\drawChunk.gml</script>
+        <script>scripts\chunkLoaded.gml</script>
       </scripts>
-      <scripts name="Plants">
-        <script>scripts\drawPlants.gml</script>
-        <script>scripts\getPlantStatus.gml</script>
-        <script>scripts\checkPlantCollisions.gml</script>
-        <script>scripts\consumePlant.gml</script>
-        <script>scripts\isPlant.gml</script>
+      <scripts name="Generation">
+        <script>scripts\generateChunk.gml</script>
+        <script>scripts\emptyBlock.gml</script>
+        <script>scripts\growGrass.gml</script>
+        <script>scripts\growPlant.gml</script>
+        <script>scripts\createBlockValue.gml</script>
+        <script>scripts\setBlockInChunk.gml</script>
       </scripts>
+      <scripts name="Blocks">
+        <script>scripts\setBlockFrame.gml</script>
+        <script>scripts\setBlockType.gml</script>
+        <script>scripts\getBlockFrame.gml</script>
+        <script>scripts\getBlockType.gml</script>
+        <script>scripts\getBlockTypeInData.gml</script>
+        <script>scripts\getBlockId.gml</script>
+        <script>scripts\checkCollisions.gml</script>
+        <script>scripts\getBlockFrameInData.gml</script>
+      </scripts>
+      <script>scripts\spawnChunks.gml</script>
     </scripts>
     <scripts name="Collisions">
       <script>scripts\rectOverlap.gml</script>
     </scripts>
-    <script>scripts\print.gml</script>
     <scripts name="Combat">
       <script>scripts\CheckActionState.gml</script>
       <script>scripts\UseEnemyAbilities.gml</script>
@@ -51,6 +69,7 @@
       <script>scripts\ExecuteCharge.gml</script>
     </scripts>
     <script>scripts\SetWanderAlarm.gml</script>
+    <script>scripts\print.gml</script>
   </scripts>
   <objects name="objects">
     <object>objects\oPlayer</object>
@@ -58,18 +77,22 @@
     <object>objects\oEnemy</object>
     <object>objects\oTerrainControl</object>
     <object>objects\oChargeEnemy</object>
+    <object>objects\oChunk</object>
   </objects>
   <rooms name="rooms">
     <room>rooms\rmSplash</room>
     <room>rooms\rmGrass</room>
   </rooms>
-  <constants number="7">
+  <constants number="10">
     <constant name="RANGED_ENEMY">2</constant>
     <constant name="CHARGING_ENEMY">1</constant>
     <constant name="STANDARD_ENEMY">0</constant>
     <constant name="STATE_ATTACK">1</constant>
     <constant name="STATE_AGRO">0</constant>
     <constant name="STATE_IDLE">-1</constant>
+    <constant name="PLANT">2</constant>
+    <constant name="GRASS">1</constant>
+    <constant name="EMPTY">0</constant>
     <constant name="NULL">-1</constant>
   </constants>
   <help>
