@@ -11,9 +11,7 @@ for(var i = 0; i <= gridSize; i+= gridSize){
         var type = getBlockType(xx,yy);
         switch(type){
         case PLANT:
-            if(getBlockFrame(xx,yy)==1){
-                setBlockFrame(xx,yy,0);
-            }
+            setBlockType(xx,yy,GRASS,getBlockFrame(xx,yy)+1);   
             break;
         }
     }

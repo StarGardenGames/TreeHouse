@@ -9,7 +9,8 @@
     <sprite>sprites\sGrass</sprite>
     <sprite>sprites\sEnemy</sprite>
     <sprite>sprites\sPlayer</sprite>
-    <sprite>sprites\sPlant</sprite>
+    <sprite>sprites\sPlant_small</sprite>
+    <sprite>sprites\sPlant_large</sprite>
   </sprites>
   <backgrounds name="background"/>
   <paths name="paths"/>
@@ -74,8 +75,8 @@
     <object>objects\oPlayer</object>
     <object>objects\oGameControl</object>
     <object>objects\oEnemy</object>
-    <object>objects\oTerrainControl</object>
     <object>objects\oChargeEnemy</object>
+    <object>objects\oTerrainControl</object>
     <object>objects\oChunk</object>
   </objects>
   <rooms name="rooms">
