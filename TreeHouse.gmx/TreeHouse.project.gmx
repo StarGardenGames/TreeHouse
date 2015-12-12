@@ -8,6 +8,7 @@
   <sprites name="sprites">
     <sprite>sprites\sGrass</sprite>
     <sprite>sprites\sprite0</sprite>
+    <sprite>sprites\sEnemy</sprite>
   </sprites>
   <backgrounds name="background"/>
   <paths name="paths"/>
@@ -23,12 +24,16 @@
     <scripts name="Camera">
       <script>scripts\AlignCameraWithPlayer.gml</script>
     </scripts>
+    <scripts name="Collisions">
+      <script>scripts\rectOverlap.gml</script>
+    </scripts>
   </scripts>
   <objects name="objects">
     <object>objects\oPlayer</object>
     <object>objects\oGameControl</object>
     <object>objects\oGrassSpawner</object>
     <object>objects\oViewPanner</object>
+    <object>objects\oEnemy</object>
   </objects>
   <rooms name="rooms">
     <room>rooms\rmSplash</room>
