@@ -5,9 +5,27 @@
   </Configs>
   <NewExtensions/>
   <sounds name="sound"/>
-  <sprites name="sprites"/>
+  <sprites name="sprites">
+    <sprite>sprites\sGrass</sprite>
+  </sprites>
   <backgrounds name="background"/>
   <paths name="paths"/>
+  <scripts name="scripts">
+    <scripts name="noise">
+      <script>scripts\perlinNoise2D.gml</script>
+      <script>scripts\randomSeed.gml</script>
+    </scripts>
+    <script>scripts\getGrassHeight.gml</script>
+  </scripts>
+  <objects name="objects">
+    <object>objects\oGameControl</object>
+    <object>objects\oGrassSpawner</object>
+    <object>objects\oViewPanner</object>
+  </objects>
+  <rooms name="rooms">
+    <room>rooms\rmSplash</room>
+    <room>rooms\rmGrass</room>
+  </rooms>
   <help>
     <rtf>help.rtf</rtf>
   </help>
