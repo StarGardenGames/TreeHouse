@@ -25,6 +25,6 @@ if(cutTime == -1){
     return -1;
 }else{
     return min(numGrassFrames-1,
-        (current_time - cutTime) div timePerFrame);
+        (current_time - cutTime) div timePerFrame-);
 }
 

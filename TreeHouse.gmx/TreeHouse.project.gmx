@@ -7,10 +7,14 @@
   <sounds name="sound"/>
   <sprites name="sprites">
     <sprite>sprites\sGrass</sprite>
+    <sprite>sprites\sprite0</sprite>
   </sprites>
   <backgrounds name="background"/>
   <paths name="paths"/>
   <scripts name="scripts">
+    <scripts name="Movement">
+      <script>scripts\ApplyPlayerMovement.gml</script>
+    </scripts>
     <scripts name="noise">
       <script>scripts\perlinNoise2D.gml</script>
       <script>scripts\randomSeed.gml</script>
@@ -18,11 +22,13 @@
     <script>scripts\getGrassHeight.gml</script>
   </scripts>
   <objects name="objects">
+    <object>objects\oPlayer</object>
     <object>objects\oGameControl</object>
     <object>objects\oGrassSpawner</object>
     <object>objects\oViewPanner</object>
   </objects>
   <rooms name="rooms">
+    <room>rooms\room0</room>
     <room>rooms\rmSplash</room>
     <room>rooms\rmGrass</room>
   </rooms>
