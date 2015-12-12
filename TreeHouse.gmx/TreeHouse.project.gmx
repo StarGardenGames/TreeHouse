@@ -22,7 +22,8 @@
     <object>objects\oPlayer</object>
   </objects>
   <rooms name="rooms">
-    <room>rooms\room0</room>
+    <room>rooms\rmSplash</room>
+    <room>rooms\rmGrass</room>
   </rooms>
   <help>
     <rtf>help.rtf</rtf>
