@@ -20,6 +20,9 @@
       <script>scripts\randomSeed.gml</script>
     </scripts>
     <script>scripts\getGrassHeight.gml</script>
+    <scripts name="Camera">
+      <script>scripts\AlignCameraWithPlayer.gml</script>
+    </scripts>
   </scripts>
   <objects name="objects">
     <object>objects\oPlayer</object>
