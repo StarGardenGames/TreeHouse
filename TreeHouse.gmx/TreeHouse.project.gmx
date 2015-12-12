@@ -16,6 +16,8 @@
   <scripts name="scripts">
     <scripts name="Movement">
       <script>scripts\ApplyPlayerMovement.gml</script>
+      <script>scripts\SeekPlayer.gml</script>
+      <script>scripts\WanderAround.gml</script>
     </scripts>
     <scripts name="noise">
       <script>scripts\perlinNoise2D.gml</script>
@@ -42,18 +44,32 @@
       <script>scripts\rectOverlap.gml</script>
     </scripts>
     <script>scripts\print.gml</script>
+    <scripts name="Combat">
+      <script>scripts\CheckActionState.gml</script>
+      <script>scripts\UseEnemyAbilities.gml</script>
+      <script>scripts\ShootProjectiles.gml</script>
+      <script>scripts\ExecuteCharge.gml</script>
+    </scripts>
+    <script>scripts\SetWanderAlarm.gml</script>
   </scripts>
   <objects name="objects">
     <object>objects\oPlayer</object>
     <object>objects\oGameControl</object>
     <object>objects\oEnemy</object>
     <object>objects\oTerrainControl</object>
+    <object>objects\oChargeEnemy</object>
   </objects>
   <rooms name="rooms">
     <room>rooms\rmSplash</room>
     <room>rooms\rmGrass</room>
   </rooms>
-  <constants number="1">
+  <constants number="7">
+    <constant name="RANGED_ENEMY">2</constant>
+    <constant name="CHARGING_ENEMY">1</constant>
+    <constant name="STANDARD_ENEMY">0</constant>
+    <constant name="STATE_ATTACK">1</constant>
+    <constant name="STATE_AGRO">0</constant>
+    <constant name="STATE_IDLE">-1</constant>
     <constant name="NULL">-1</constant>
   </constants>
   <help>
