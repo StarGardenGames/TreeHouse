@@ -35,6 +35,7 @@ numGrassFrames = 4;
 plantOffset = irandom_range(200,300);
 plantScale = 1.2;
 
+snapCamera();
 </string>
           </argument>
         </arguments>
