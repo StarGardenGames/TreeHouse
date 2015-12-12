@@ -25,7 +25,7 @@
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>randomize();
+            <string>//randomize();
 
 globalvar gameSeed;
 gameSeed = random_range(100000,10000000);

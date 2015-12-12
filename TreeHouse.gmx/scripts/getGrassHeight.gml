@@ -1,5 +1,5 @@
-var xx = argument0;
-var yy = argument1;
+var xx = argument0 / gridSize;
+var yy = argument1 / gridSize;
 
 var grassId = string(xx)+"_"+string(yy);
 if(!ds_map_exists(grassHeights,grassId)){

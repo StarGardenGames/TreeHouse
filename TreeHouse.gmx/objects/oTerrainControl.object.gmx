@@ -32,8 +32,9 @@ grassOffset = irandom_range(100,200);
 grassScale = .75;
 numGrassFrames = 4;
 
+plantMap = ds_map_create();
 plantOffset = irandom_range(200,300);
-plantScale = 1.2;
+plantScale = .5;
 
 snapCamera();
 </string>
@@ -60,6 +61,8 @@ snapCamera();
             <kind>1</kind>
             <string>if(keyboard_check_pressed(vk_space))
     game_restart();
+    
+checkPlantCollisions();
 </string>
           </argument>
         </arguments>
@@ -83,6 +86,7 @@ snapCamera();
           <argument>
             <kind>1</kind>
             <string>ds_map_destroy(grassHeights);
+ds_map_destroy(plantMap);
 </string>
           </argument>
         </arguments>

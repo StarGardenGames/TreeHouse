@@ -26,20 +26,26 @@
       <script>scripts\snapCamera.gml</script>
     </scripts>
     <scripts name="Terrain">
-      <script>scripts\drawGrass.gml</script>
-      <script>scripts\drawPlants.gml</script>
-      <script>scripts\getGrassHeight.gml</script>
-      <script>scripts\isPlant.gml</script>
+      <scripts name="Grass">
+        <script>scripts\drawGrass.gml</script>
+        <script>scripts\getGrassHeight.gml</script>
+      </scripts>
+      <scripts name="Plants">
+        <script>scripts\drawPlants.gml</script>
+        <script>scripts\getPlantStatus.gml</script>
+        <script>scripts\checkPlantCollisions.gml</script>
+        <script>scripts\consumePlant.gml</script>
+        <script>scripts\isPlant.gml</script>
+      </scripts>
     </scripts>
     <scripts name="Collisions">
       <script>scripts\rectOverlap.gml</script>
     </scripts>
+    <script>scripts\print.gml</script>
   </scripts>
   <objects name="objects">
     <object>objects\oPlayer</object>
     <object>objects\oGameControl</object>
-    <object>objects\oGrassSpawner</object>
-    <object>objects\oViewPanner</object>
     <object>objects\oEnemy</object>
     <object>objects\oTerrainControl</object>
   </objects>
@@ -47,6 +53,9 @@
     <room>rooms\rmSplash</room>
     <room>rooms\rmGrass</room>
   </rooms>
+  <constants number="1">
+    <constant name="NULL">-1</constant>
+  </constants>
   <help>
     <rtf>help.rtf</rtf>
   </help>

@@ -6,8 +6,9 @@ var endX = view_xview + view_wview;
 var endY = view_yview + view_hview;
 for(var i = startX; i < endX; i += gridSize){
     for(var j = startY; j < endY; j += gridSize){
-        if(isPlant(i / gridSize, j / gridSize)){
-            draw_sprite(sPlant,0,i,j);
+        var status = getPlantStatus(i, j)
+        if(status != NULL){
+            draw_sprite(sPlant,status,i,j);
         }
     }
 }

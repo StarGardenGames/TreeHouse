@@ -6,8 +6,7 @@ var endX = view_xview + view_wview;
 var endY = view_yview + view_hview;
 for(var i = startX; i < endX; i += gridSize){
     for(var j = startY; j < endY; j += gridSize){
-        var height = getGrassHeight(
-            i / gridSize, j / gridSize);
+        var height = getGrassHeight(i,j);
         if(height != -1){
             draw_sprite(sGrass,height,i,j);
         }
