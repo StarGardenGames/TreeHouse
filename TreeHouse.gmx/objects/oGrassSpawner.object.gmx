@@ -25,7 +25,7 @@
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>grassCutTime = ds_map_create();
+            <string>grassHeights = ds_map_create();
 
 grassGridSize = 32;
 
@@ -78,7 +78,7 @@ totalGrowthTime = 30;
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>ds_map_destroy(grassCutTime);
+            <string>ds_map_destroy(grassHeights);
 </string>
           </argument>
         </arguments>
