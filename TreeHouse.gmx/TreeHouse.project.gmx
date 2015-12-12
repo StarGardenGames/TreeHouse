@@ -7,7 +7,8 @@
   <sounds name="sound"/>
   <sprites name="sprites">
     <sprite>sprites\sGrass</sprite>
-    <sprite>sprites\sprite0</sprite>
+    <sprite>sprites\sPlayer</sprite>
+    <sprite>sprites\sPlant</sprite>
   </sprites>
   <backgrounds name="background"/>
   <paths name="paths"/>
@@ -19,16 +20,20 @@
       <script>scripts\perlinNoise2D.gml</script>
       <script>scripts\randomSeed.gml</script>
     </scripts>
-    <script>scripts\getGrassHeight.gml</script>
     <scripts name="Camera">
       <script>scripts\AlignCameraWithPlayer.gml</script>
+    </scripts>
+    <scripts name="Terrain">
+      <script>scripts\drawGrass.gml</script>
+      <script>scripts\drawPlants.gml</script>
+      <script>scripts\getGrassHeight.gml</script>
+      <script>scripts\isPlant.gml</script>
     </scripts>
   </scripts>
   <objects name="objects">
     <object>objects\oPlayer</object>
     <object>objects\oGameControl</object>
-    <object>objects\oGrassSpawner</object>
-    <object>objects\oViewPanner</object>
+    <object>objects\oTerrainControl</object>
   </objects>
   <rooms name="rooms">
     <room>rooms\rmSplash</room>
