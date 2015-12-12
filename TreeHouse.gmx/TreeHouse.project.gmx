@@ -31,12 +31,11 @@
       <scripts name="Chunks">
         <script>scripts\loadChunk.gml</script>
         <script>scripts\unloadChunk.gml</script>
-        <script>scripts\chunkExists.gml</script>
         <script>scripts\playerInChunk.gml</script>
-        <script>scripts\getChunkAtPosition.gml</script>
         <script>scripts\getChunkId.gml</script>
         <script>scripts\chunkInDespawnRange.gml</script>
         <script>scripts\drawChunk.gml</script>
+        <script>scripts\chunkExists.gml</script>
         <script>scripts\chunkLoaded.gml</script>
       </scripts>
       <scripts name="Generation">
@@ -52,9 +51,9 @@
         <script>scripts\setBlockType.gml</script>
         <script>scripts\getBlockFrame.gml</script>
         <script>scripts\getBlockType.gml</script>
-        <script>scripts\getBlockTypeInData.gml</script>
         <script>scripts\getBlockId.gml</script>
         <script>scripts\checkCollisions.gml</script>
+        <script>scripts\getBlockTypeInData.gml</script>
         <script>scripts\getBlockFrameInData.gml</script>
       </scripts>
       <script>scripts\spawnChunks.gml</script>

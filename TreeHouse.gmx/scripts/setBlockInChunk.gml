@@ -1,6 +1,12 @@
-var xx = (argument0 % blocksAlongChunk) + blocksAlongChunk;
-var yy = (argument1 % blocksAlongChunk) + blocksAlongChunk;
+//global grid space
+var offsetX = argument0;
+var offsetY = argument1;
 var val = argument2;
 
-data[# xx % blocksAlongChunk,
-       yy % blocksAlongChunk] = val;
+offsetX %= blocksAlongChunk;
+offsetY %= blocksAlongChunk;
+
+if(offsetX < 0) offsetX += blocksAlongChunk;
+if(offsetY < 0) offsetY += blocksAlongChunk;
+
+data[# offsetX, offsetY] = val;

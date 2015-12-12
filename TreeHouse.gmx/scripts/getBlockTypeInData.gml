@@ -1,3 +1,4 @@
+//grid space (relative to chunk)
 var i = argument0;
 var j = argument1;
 

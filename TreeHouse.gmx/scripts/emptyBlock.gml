@@ -1,3 +1,4 @@
+//global grid space
 var i = (argument0 % blocksAlongChunk) + blocksAlongChunk;
 var j = (argument1 % blocksAlongChunk) + blocksAlongChunk;
 

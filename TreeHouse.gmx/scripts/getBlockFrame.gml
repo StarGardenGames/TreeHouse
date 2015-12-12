@@ -1,3 +1,4 @@
+//room space
 var i = (argument0-x) div gridSize;
 var j = (argument1-y) div gridSize;
 if(i<0 || j < 0)

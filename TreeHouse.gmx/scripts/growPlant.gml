@@ -1,3 +1,4 @@
+//global grid space
 var xx = argument0;
 var yy = argument1;
 
