@@ -1,3 +1,6 @@
+if(!instance_exists(oPlayer))
+    exit;
+
 var playerX = oPlayer.x - oPlayer.x % gridSize;
 var playerY = oPlayer.y - oPlayer.y % gridSize;
 
