@@ -33,7 +33,7 @@ attackRange = 0;
 agroRange = 200;
 maxHP = 90;
 currentHP = 90;
-damage = 30;
+damage = 45;
 enemyType = STANDARD_ENEMY;
 newGame = true;
 </string>
@@ -89,8 +89,10 @@ CheckActionState();
 
 checkForPlayerCollision();
 
-x += dx;
-y += dy;
+if(place_free(x+dx,y))
+    x += dx;
+if(place_free(x,y+dy))
+    y += dy;
 </string>
           </argument>
         </arguments>
