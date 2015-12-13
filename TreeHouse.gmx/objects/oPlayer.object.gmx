@@ -27,7 +27,9 @@
             <kind>1</kind>
             <string>dx = 0;
 dy = 0;
-
+currentPlayerDamage = 30;
+maxHP = 150;
+currentHP = 150;
 snapCamera();
 </string>
           </argument>
