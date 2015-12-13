@@ -24,10 +24,12 @@ for(var i = 0; i < ds_grid_width(data); i++){
         var drawY = y + j * gridSize;
         if(type == PLANT){
             if(frame == 0){
-                draw_sprite(sPlant_small,windFrame,drawX,drawY);
+                draw_sprite_ext(sPlant_small,windFrame,drawX,drawY,
+                    1.5,1.5,0,$FFFFFF,1);
             }
             if(frame == 1){
-                draw_sprite(sPlant_large,windFrame,drawX,drawY);
+                draw_sprite_ext(sPlant_large,windFrame,drawX,drawY,
+                    1.5,1.5,0,$FFFFFF,1);
             }
         }
     }

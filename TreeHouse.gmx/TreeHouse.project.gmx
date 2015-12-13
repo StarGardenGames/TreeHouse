@@ -28,7 +28,13 @@
         <sprite>sprites\sQueen_eye4</sprite>
       </sprites>
     </sprites>
-    <sprite>sprites\sCreep</sprite>
+    <sprites name="Creep">
+      <sprite>sprites\sCreepEye</sprite>
+      <sprite>sprites\sCreepEyes</sprite>
+      <sprite>sprites\sCreepMouth</sprite>
+      <sprite>sprites\sCreepPod</sprite>
+      <sprite>sprites\sCreep</sprite>
+    </sprites>
   </sprites>
   <backgrounds name="background"/>
   <paths name="paths"/>
@@ -57,6 +63,9 @@
         <script>scripts\chunkExists.gml</script>
         <script>scripts\chunkLoaded.gml</script>
         <script>scripts\queenNearChunk.gml</script>
+        <script>scripts\chunkUpdateCreep.gml</script>
+        <script>scripts\getChunkData.gml</script>
+        <script>scripts\getChunkCoord.gml</script>
       </scripts>
       <scripts name="Generation">
         <script>scripts\generateChunk.gml</script>
@@ -74,6 +83,8 @@
         <script>scripts\getBlockId.gml</script>
         <script>scripts\getBlockTypeInData.gml</script>
         <script>scripts\getBlockFrameInData.gml</script>
+        <script>scripts\getValueForBlock.gml</script>
+        <script>scripts\setValueForBlock.gml</script>
       </scripts>
       <script>scripts\spawnChunks.gml</script>
       <script>scripts\checkCollisions.gml</script>
@@ -99,6 +110,7 @@
     <object>objects\oQueen</object>
     <object>objects\oOrb</object>
     <object>objects\oParentEnemy</object>
+    <object>objects\oCreepPod</object>
   </objects>
   <rooms name="rooms">
     <room>rooms\rmSplash</room>

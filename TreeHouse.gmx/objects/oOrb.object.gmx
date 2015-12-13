@@ -3,7 +3,7 @@
   <spriteName>sOrb</spriteName>
   <solid>0</solid>
   <visible>-1</visible>
-  <depth>0</depth>
+  <depth>-1</depth>
   <persistent>0</persistent>
   <parentName>&lt;undefined&gt;</parentName>
   <maskName>&lt;undefined&gt;</maskName>
@@ -35,8 +35,12 @@ dy = lengthdir_y(sp,dir);
 l = 0;
 runningTimer = 10;
 
+var pod = instance_nearest(x,y,oCreepPod);
+
 if(point_distance(x,y,oQueen.x,oQueen.y)&lt;100*oQueen.scale){
     destObj = oQueen;
+}else if(point_distance(x,y,pod.x,pod.y)&lt;100 &amp;&amp; pod.sprite_index == sCreepMouth){
+    destObj = pod;
 }else{
     destObj = oPlayer;
 }

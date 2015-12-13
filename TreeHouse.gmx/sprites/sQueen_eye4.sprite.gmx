@@ -7,10 +7,10 @@
   <coltolerance>0</coltolerance>
   <sepmasks>0</sepmasks>
   <bboxmode>0</bboxmode>
-  <bbox_left>51</bbox_left>
-  <bbox_right>60</bbox_right>
-  <bbox_top>89</bbox_top>
-  <bbox_bottom>98</bbox_bottom>
+  <bbox_left>50</bbox_left>
+  <bbox_right>59</bbox_right>
+  <bbox_top>88</bbox_top>
+  <bbox_bottom>97</bbox_bottom>
   <HTile>0</HTile>
   <VTile>0</VTile>
   <TextureGroups>
@@ -23,6 +23,6 @@
     <frame index="0">images\sQueen_eye4_0.png</frame>
   </frames>
   <SWFfile>images\sQueen_eye4.swf</SWFfile>
-  <SWFnumframes>35</SWFnumframes>
+  <SWFnumframes>64</SWFnumframes>
   <SWFprecision>0.5</SWFprecision>
 </sprite>
