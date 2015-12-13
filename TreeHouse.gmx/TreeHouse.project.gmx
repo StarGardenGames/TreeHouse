@@ -18,9 +18,17 @@
       <sprite>sprites\sQueen_size3</sprite>
       <sprite>sprites\sQueen_size4</sprite>
       <sprites name="Oriphi">
-        <sprite>sprites\sQueen_face1</sprite>
+        <sprite>sprites\sQueen_mouth1</sprite>
+        <sprite>sprites\sQueen_mouth2</sprite>
+        <sprite>sprites\sQueen_mouth4</sprite>
+        <sprite>sprites\sQueen_mouth4_2</sprite>
+        <sprite>sprites\sQueen_eye1</sprite>
+        <sprite>sprites\sQueen_eye2</sprite>
+        <sprite>sprites\sQueen_eye3</sprite>
+        <sprite>sprites\sQueen_eye4</sprite>
       </sprites>
     </sprites>
+    <sprite>sprites\sCreep</sprite>
   </sprites>
   <backgrounds name="background"/>
   <paths name="paths"/>
@@ -48,6 +56,7 @@
         <script>scripts\drawChunk.gml</script>
         <script>scripts\chunkExists.gml</script>
         <script>scripts\chunkLoaded.gml</script>
+        <script>scripts\queenNearChunk.gml</script>
       </scripts>
       <scripts name="Generation">
         <script>scripts\generateChunk.gml</script>
@@ -95,7 +104,7 @@
     <room>rooms\rmSplash</room>
     <room>rooms\rmGrass</room>
   </rooms>
-  <constants number="13">
+  <constants number="14">
     <constant name="STATE_RESTING">4</constant>
     <constant name="STATE_INCHARGE">3</constant>
     <constant name="STATE_PREPARING">2</constant>
@@ -105,6 +114,7 @@
     <constant name="STATE_ATTACK">1</constant>
     <constant name="STATE_AGRO">0</constant>
     <constant name="STATE_IDLE">-1</constant>
+    <constant name="CREEP">3</constant>
     <constant name="PLANT">2</constant>
     <constant name="GRASS">1</constant>
     <constant name="EMPTY">0</constant>

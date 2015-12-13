@@ -5,8 +5,13 @@ for(var i = 0; i < ds_grid_width(data); i++){
         var frame = getBlockFrameInData(i,j);
         var drawX = x + i * gridSize;
         var drawY = y + j * gridSize;
-        if(type == GRASS){
-            draw_sprite(sGrass,frame,drawX,drawY);
+        switch(type){
+            case GRASS:
+                draw_sprite(sGrass,frame,drawX,drawY);
+                break;
+            case CREEP:
+                draw_sprite(sCreep,frame,drawX,drawY);
+                break;
         }
     }
 }

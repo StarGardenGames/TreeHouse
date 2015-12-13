@@ -32,6 +32,31 @@ orbsTillFullGrown = 6000;
 stage = 0;
 hunger = 0;
 orbs = 0;
+frame = 0;
+frameSpeed = .5;
+
+ori_spr[0] = sQueen_mouth1;
+ori_spr[1] = sQueen_mouth2;
+ori_spr[2] = sQueen_mouth4;
+ori_spr[3] = sQueen_mouth4_2;
+ori_spr[4] = sQueen_eye1;
+ori_spr[5] = sQueen_eye2;
+ori_spr[6] = sQueen_eye3;
+ori_spr[7] = sQueen_eye4;
+
+ori_stg[0] = 0;
+ori_stg[1] = 1;
+ori_stg[2] = 3;
+ori_stg[3] = 3;
+ori_stg[4] = 0;
+ori_stg[5] = 1;
+ori_stg[6] = 2;
+ori_stg[7] = 3;
+
+for(var i = 0; i &lt; 8; i++){
+    ori_frame[i] = 0;
+    ori_timer[i] = room_speed * random(5)
+}
 </string>
           </argument>
         </arguments>
@@ -54,8 +79,7 @@ orbs = 0;
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>orbs=min(orbsTillFullGrown,orbs+100);
-scale = 1 + (maxScale-1) * sin(((2 * pi)*orbs)/(4*orbsTillFullGrown));
+            <string>scale = 1 + (maxScale-1) * sin(((2 * pi)*orbs)/(4*orbsTillFullGrown));
 
 if(((scale-1) / (maxScale-1)) &gt; (stage + 1)/4){
     stage++;
@@ -69,6 +93,9 @@ if(((scale-1) / (maxScale-1)) &gt; (stage + 1)/4){
 
 image_xscale = scale;
 image_yscale = scale;
+
+//update frames
+frame = (frame + frameSpeed) % sprite_get_number(sprite_index);
 </string>
           </argument>
         </arguments>
@@ -91,7 +118,15 @@ image_yscale = scale;
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>draw_sprite_ext(sprite_index,image_index,x,y,scale,scale,0,$FFFFFF,1);
+            <string>draw_sprite_ext(sprite_index,frame,x,y,scale,scale,0,$FFFFFF,1);
+for(var i = 0; i &lt; 8; i++){
+    if(stage &gt;= ori_stg[i]){
+        draw_sprite_ext(ori_spr[i],0,
+            x-5 + (i==2)*-16 + (i==6)*16,
+            y-12 + (i==2)*16,
+            scale*.8,scale*.8,0,$FFFFFF,1);
+    }
+}
 </string>
           </argument>
         </arguments>

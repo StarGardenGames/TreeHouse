@@ -60,6 +60,38 @@ snapCamera();
 AlignCameraWithPlayer();
 
 image_angle = point_direction(x,y,mouse_x,mouse_y);
+
+if(place_meeting(x,y,oQueen)){
+    var dir = point_direction(x,y,oQueen.x,oQueen.y);
+    x-=lengthdir_x(5,dir);
+    y-=lengthdir_y(5,dir);  
+}
+
+var distToQueen = point_distance(x,y,oQueen.x,oQueen.y);
+var orbRate = max(4,min(30,.2 * inv));
+if(distToQueen &lt; 80 * oQueen.scale &amp;&amp; inv &gt;= orbRate){
+    orbRate = min(inv,orbRate);    
+    repeat(orbRate){
+        instance_create(x,y,oOrb);
+    }
+    inv-=orbRate;
+}
+
+if(keyboard_check(ord('R'))){
+    var dist = point_distance(x,y,oQueen.x,oQueen.y);
+    if( dist &gt; 100*oQueen.scale){
+        var dir = point_direction(x,y,oQueen.x,oQueen.y);
+        x += lengthdir_x(min(50,dist),dir);
+        y += lengthdir_y(min(50,dist),dir);
+        image_angle = dir;
+    }
+}
+
+if(keyboard_check(ord('O'))){
+    repeat(10){
+        instance_create(x,y,oOrb);
+    }
+}
 </string>
           </argument>
         </arguments>

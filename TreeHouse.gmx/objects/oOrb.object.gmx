@@ -29,11 +29,17 @@
 sp = 4 + random(8);
 x+=4+random(24);
 y+=4+random(24);
-accToPlayer = 3;
+accToDest = 3;
 dx = lengthdir_x(sp,dir);
 dy = lengthdir_y(sp,dir);
 l = 0;
 runningTimer = 10;
+
+if(point_distance(x,y,oQueen.x,oQueen.y)&lt;100*oQueen.scale){
+    destObj = oQueen;
+}else{
+    destObj = oPlayer;
+}
 </string>
           </argument>
         </arguments>
@@ -57,11 +63,10 @@ runningTimer = 10;
           <argument>
             <kind>1</kind>
             <string>runningTimer--;
-accToPlayer+=.3;
+accToDest+=.3;
 l+=.002;
 l = min(l,1);
 
-var dirToPlayer = point_direction(x,y,oPlayer.x,oPlayer.y);
 
 if(oPlayer.inv == oPlayer.maxInv){
     dx *= .95;
@@ -69,17 +74,22 @@ if(oPlayer.inv == oPlayer.maxInv){
     if(dx &lt; .1) dx = 0;
     if(dy &lt; .1) dy = 0;
 }else{
-    var distToPlayer = point_distance(x,y,oPlayer.x,oPlayer.y);
-    accToPlayer = min(distToPlayer,accToPlayer);
-    ddx = lengthdir_x(accToPlayer,dirToPlayer);
-    ddy = lengthdir_y(accToPlayer,dirToPlayer);
+    var distToDest = point_distance(x,y,destObj.x,destObj.y);
+    var dirToDest = point_direction(x,y,destObj.x,destObj.y);
+    accToDest = min(distToDest,accToDest);
+    ddx = lengthdir_x(accToDest,dirToDest);
+    ddy = lengthdir_y(accToDest,dirToDest);
     dx = (dx+ddx) * (1-l) + l * ddx;
     dy = (dy+ddy) * (1-l) + l * ddy;
         
-    distToPlayer = point_distance(x,y,oPlayer.x,oPlayer.y);
+    distToDest = point_distance(x,y,destObj.x,destObj.y);
     var runningAway = runningTimer &gt; 0;
-    if(distToPlayer&lt;20 &amp;&amp; !runningAway){
-        oPlayer.inv++;
+    if(distToDest&lt;20 &amp;&amp; !runningAway){
+        if(destObj==oPlayer){
+            oPlayer.inv++;
+        }else{
+            oQueen.orbs++;
+        }
         instance_destroy();
     }
 }
