@@ -1,6 +1,6 @@
 if(!instance_exists(oPlayer))
     exit;
 return rectOverlap(
-    oPlayer.x, oPlayer.y, oPlayer.x + 32, oPlayer.y + 32,
+    oPlayer.x-16, oPlayer.y-16, oPlayer.x + 16, oPlayer.y + 16,
     x,y,x+chunkSize, y+chunkSize
 );

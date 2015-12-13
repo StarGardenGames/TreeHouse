@@ -4,8 +4,8 @@ var viewCenterX, viewCenterY,
     centerAxis, centerSprite, 
     enemyW, enemyH;
 //dimensions
-var targetW = 1280;
-var targetH = 720;
+var targetW = 960;
+var targetH = 540;
 
 //position
 var targetX = x - view_wview/2 + sprite_width/2;

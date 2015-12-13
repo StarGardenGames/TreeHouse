@@ -92,7 +92,7 @@ CheckActionState();
 with(oPlayer)
 {
     if(rectOverlap(enemyX,enemyY,enemyX+enemySpriteWidth,enemyY+enemySpriteHeight,
-    oPlayer.x, oPlayer.y, oPlayer.x + oPlayer.sprite_width, oPlayer.y + oPlayer.sprite_height))
+    oPlayer.x-16, oPlayer.y-16, oPlayer.x-16 + oPlayer.sprite_width, oPlayer.y-16 + oPlayer.sprite_height))
     {
         instance_destroy();
     }

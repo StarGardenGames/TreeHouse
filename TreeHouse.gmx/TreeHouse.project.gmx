@@ -11,6 +11,12 @@
     <sprite>sprites\sPlayer</sprite>
     <sprite>sprites\sPlant_small</sprite>
     <sprite>sprites\sPlant_large</sprite>
+    <sprites name="Queen">
+      <sprite>sprites\sQueen_size1</sprite>
+      <sprite>sprites\sQueen_size2</sprite>
+      <sprite>sprites\sQueen_size3</sprite>
+      <sprite>sprites\sQueen_size4</sprite>
+    </sprites>
   </sprites>
   <backgrounds name="background"/>
   <paths name="paths"/>
@@ -76,6 +82,7 @@
     <object>objects\oChargeEnemy</object>
     <object>objects\oTerrainControl</object>
     <object>objects\oChunk</object>
+    <object>objects\oQueen</object>
   </objects>
   <rooms name="rooms">
     <room>rooms\rmSplash</room>

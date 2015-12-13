@@ -5,15 +5,13 @@ for(var i = 0; i < ds_grid_width(data); i++){
         var drawX = x + i * gridSize;
         var drawY = y + j * gridSize;
         switch(type){
-            case GRASS: draw_sprite_ext(sGrass,frame,drawX,drawY,2,2,0,c_white,1); break;
+            case GRASS: draw_sprite(sGrass,frame,drawX,drawY); break;
             case PLANT: 
-                drawX-=gridSize/4;
-                drawY-=gridSize/4;
                 if(frame == 0){
-                    draw_sprite_ext(sPlant_small,windFrame,drawX,drawY,2,2,0,c_white,1);
+                    draw_sprite(sPlant_small,windFrame,drawX,drawY);
                 }
                 if(frame == 1){
-                    draw_sprite_ext(sPlant_large,windFrame,drawX,drawY,2,2,0,c_white,1);
+                    draw_sprite(sPlant_large,windFrame,drawX,drawY);
                 }
                 break;
         }

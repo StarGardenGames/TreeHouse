@@ -119,10 +119,17 @@ if(chargeTimer != -1){
 if(restTimer != -1){
     restTimer = max(0,restTimer-1);
 }
-    
+
 CheckActionState();
 
-checkForPlayerCollision();
+with(oPlayer)
+{
+    if(rectOverlap(enemyX,enemyY,enemyX+enemySpriteWidth,enemyY+enemySpriteHeight,
+    oPlayer.x-16, oPlayer.y-16, oPlayer.x-16 + oPlayer.sprite_width, oPlayer.y-16 + oPlayer.sprite_height))
+    {
+        instance_destroy();
+    }
+}
 
 x += dx;
 y += dy;
