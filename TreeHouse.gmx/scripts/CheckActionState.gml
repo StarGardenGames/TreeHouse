@@ -4,26 +4,39 @@ prevState = state;
 switch(state){
     case STATE_IDLE:
         if(distance < agroRange)
-            state = STATE_AGRO; 
+            state = STATE_AGRO;
         break;
     case STATE_AGRO:
         if(distance < attackRange)
             state = STATE_PREPARING;
         if(distance > agroRange)
             state = STATE_IDLE;
+        if(distance < retreatRange-20)
+            state = STATE_RETREATING;
         break;
     case STATE_PREPARING: 
-        print(alarm[1]);
         if(distance > attackRange)
             state = STATE_AGRO;
         if(distance > agroRange)
             state = STATE_IDLE;
         if(prepareTimer==0)
-            state = STATE_INCHARGE;
+        {
+            if(enemyType == CHARGING_ENEMY)
+                state = STATE_INCHARGE;
+            if(enemyType == RANGED_ENEMY)
+            {
+                if(distance < retreatRange)
+                    state = STATE_RETREATING;
+            }
+        }
         break;
     case STATE_INCHARGE:
         if(chargeTimer==0)
             state = STATE_RESTING;
+        break;
+    case STATE_RETREATING:
+        if(distance > retreatRange+20)
+            state = STATE_AGRO;
         break;
     case STATE_RESTING:
         if(restTimer==0)
@@ -45,6 +58,8 @@ if(prevState != state || newGame){
             image_blend = c_yellow;
             break;
         case STATE_PREPARING:
+            if(enemyType == RANGED_ENEMY)
+                alarm[2] = room_speed * .8;
             dx = 0;
             dy = 0;
             prepareTimer = room_speed * .5;
@@ -57,6 +72,8 @@ if(prevState != state || newGame){
             chargeTimer = room_speed * .6;
             image_blend = c_red;
             break;
+        case STATE_RETREATING:
+            image_blend = c_yellow;
         case STATE_RESTING:
             dx = 0;
             dy = 0;
@@ -70,5 +87,8 @@ if(prevState != state || newGame){
 switch(state){
     case STATE_AGRO:
         SeekPlayer();
+        break;
+    case STATE_RETREATING:
+        FleeFromPlayer();
         break;
 }

@@ -95,13 +95,6 @@ if(chargeTimer != -1){
 if(restTimer != -1){
     restTimer = max(0,restTimer-1);
 }
-
-CheckActionState();
-
-checkForPlayerCollision();
-
-x += dx;
-y += dy;
 </string>
           </argument>
         </arguments>

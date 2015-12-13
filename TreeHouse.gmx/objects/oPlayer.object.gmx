@@ -33,6 +33,9 @@ maxInv = 1000;
 currentPlayerDamage = 30;
 maxHP = 150;
 currentHP = 150;
+invincible = false;
+
+invincibilityTimer = -1;
 snapCamera();
 </string>
           </argument>
@@ -56,10 +59,27 @@ snapCamera();
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>ApplyPlayerMovement();
+            <string>visible = true;
+ApplyPlayerMovement();
 AlignCameraWithPlayer();
 
 image_angle = point_direction(x,y,mouse_x,mouse_y);
+
+if(invincibilityTimer != -1)
+    invincibilityTimer = max(0,invincibilityTimer-1);
+if(invincibilityTimer % 3 == 0)
+{
+    visible = false;
+}
+if(invincibilityTimer = 0) {
+    invincible = false;
+    visible = true;
+}
+
+if(currentHP &lt;= 0) {
+    instance_destroy();
+    room_restart();
+    }
 </string>
           </argument>
         </arguments>

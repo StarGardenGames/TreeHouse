@@ -21,6 +21,7 @@
         <sprite>sprites\sQueen_face1</sprite>
       </sprites>
     </sprites>
+    <sprite>sprites\sRangedEnemy</sprite>
   </sprites>
   <backgrounds name="background"/>
   <paths name="paths"/>
@@ -29,6 +30,7 @@
       <script>scripts\ApplyPlayerMovement.gml</script>
       <script>scripts\SeekPlayer.gml</script>
       <script>scripts\WanderAround.gml</script>
+      <script>scripts\FleeFromPlayer.gml</script>
     </scripts>
     <scripts name="noise">
       <script>scripts\perlinNoise2D.gml</script>
@@ -90,12 +92,16 @@
     <object>objects\oQueen</object>
     <object>objects\oOrb</object>
     <object>objects\oParentEnemy</object>
+    <object>objects\oShakeControl</object>
+    <object>objects\oArcherEnemy</object>
+    <object>objects\oProjectile</object>
   </objects>
   <rooms name="rooms">
     <room>rooms\rmSplash</room>
     <room>rooms\rmGrass</room>
   </rooms>
-  <constants number="13">
+  <constants number="14">
+    <constant name="STATE_RETREATING">5</constant>
     <constant name="STATE_RESTING">4</constant>
     <constant name="STATE_INCHARGE">3</constant>
     <constant name="STATE_PREPARING">2</constant>
