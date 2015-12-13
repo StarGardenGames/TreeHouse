@@ -1,5 +1,8 @@
 var tweenFactor = .1;
 
+if(keyboard_check(ord('R'))) tweenFactor = .6;
+
+
 var viewCenterX, viewCenterY, 
     centerAxis, centerSprite, 
     enemyW, enemyH;

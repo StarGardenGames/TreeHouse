@@ -54,6 +54,31 @@
         </arguments>
       </action>
     </event>
+    <event eventtype="2" enumb="0">
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>for(var i = 0; i &lt; ds_grid_width(data); i++){
+    
+}
+</string>
+          </argument>
+        </arguments>
+      </action>
+    </event>
     <event eventtype="3" enumb="0">
       <action>
         <libid>1</libid>
@@ -71,15 +96,27 @@
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>if(playerInChunk()){
+            <string>if(playerInChunk() &amp;&amp; !keyboard_check(ord('R'))){
     checkCollisions();
+}
+
+if(queenNearChunk()){
+    for(var i = 0; i &lt; ds_grid_width(data); i++){
+        for(var j = 0; j &lt; ds_grid_height(data); j++){
+            var xx = x+i*gridSize+gridSize/2;
+            var yy = y+j*gridSize+gridSize/2;
+            if(point_distance(xx,yy,oQueen.x,oQueen.y) &lt; 150 * oQueen.scale){
+                if(getBlockType(xx,yy)!=CREEP){
+                    setBlockType(xx,yy,CREEP,irandom(3));
+                }
+            }
+        }
+    }
 }
 
 if(chunkInDespawnRange(x,y)){
     instance_destroy();
 }
-
-
 </string>
           </argument>
         </arguments>
