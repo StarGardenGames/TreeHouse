@@ -5,7 +5,7 @@
   <visible>-1</visible>
   <depth>0</depth>
   <persistent>0</persistent>
-  <parentName>&lt;undefined&gt;</parentName>
+  <parentName>oParentEnemy</parentName>
   <maskName>&lt;undefined&gt;</maskName>
   <events>
     <event eventtype="0" enumb="0">
@@ -25,13 +25,14 @@
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>enemyMoveSpeed = 5;
-dx = 0;
-dy = 0;
-state = 0;
+            <string>event_inherited();
+
 chargeState = STATE_PREPARING;
-attackRange = 300;
-agroRange = 500;
+attackRange = 200;
+agroRange = 350;
+maxHP = 500;
+currentHP = 500;
+damage = 90;
 enemyType = CHARGING_ENEMY;
 newGame = true;
 alarmSet = false;
@@ -66,30 +67,6 @@ restTimer = -1;
         </arguments>
       </action>
     </event>
-    <event eventtype="2" enumb="0">
-      <action>
-        <libid>1</libid>
-        <id>603</id>
-        <kind>7</kind>
-        <userelative>0</userelative>
-        <isquestion>0</isquestion>
-        <useapplyto>-1</useapplyto>
-        <exetype>2</exetype>
-        <functionname></functionname>
-        <codestring></codestring>
-        <whoName>self</whoName>
-        <relative>0</relative>
-        <isnot>0</isnot>
-        <arguments>
-          <argument>
-            <kind>1</kind>
-            <string>WanderAround();
-alarm[0] = room_speed*(3 - random(1.5));
-</string>
-          </argument>
-        </arguments>
-      </action>
-    </event>
     <event eventtype="3" enumb="0">
       <action>
         <libid>1</libid>
@@ -107,8 +84,7 @@ alarm[0] = room_speed*(3 - random(1.5));
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>if(!instance_exists(oPlayer))
-    exit;
+            <string>event_inherited();
 
 if(prepareTimer != -1){
     prepareTimer = max(0,prepareTimer-1);

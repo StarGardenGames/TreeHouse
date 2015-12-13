@@ -75,6 +75,7 @@
     </scripts>
     <scripts name="Combat">
       <script>scripts\CheckActionState.gml</script>
+      <script>scripts\PerformAttack.gml</script>
     </scripts>
     <script>scripts\SetWanderAlarm.gml</script>
     <script>scripts\print.gml</script>
@@ -88,6 +89,7 @@
     <object>objects\oChunk</object>
     <object>objects\oQueen</object>
     <object>objects\oOrb</object>
+    <object>objects\oParentEnemy</object>
   </objects>
   <rooms name="rooms">
     <room>rooms\rmSplash</room>
