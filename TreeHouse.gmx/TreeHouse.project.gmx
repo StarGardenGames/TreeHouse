@@ -11,11 +11,15 @@
     <sprite>sprites\sPlayer</sprite>
     <sprite>sprites\sPlant_small</sprite>
     <sprite>sprites\sPlant_large</sprite>
+    <sprite>sprites\sOrb</sprite>
     <sprites name="Queen">
       <sprite>sprites\sQueen_size1</sprite>
       <sprite>sprites\sQueen_size2</sprite>
       <sprite>sprites\sQueen_size3</sprite>
       <sprite>sprites\sQueen_size4</sprite>
+      <sprites name="Oriphi">
+        <sprite>sprites\sQueen_face1</sprite>
+      </sprites>
     </sprites>
   </sprites>
   <backgrounds name="background"/>
@@ -59,11 +63,11 @@
         <script>scripts\getBlockFrame.gml</script>
         <script>scripts\getBlockType.gml</script>
         <script>scripts\getBlockId.gml</script>
-        <script>scripts\checkCollisions.gml</script>
         <script>scripts\getBlockTypeInData.gml</script>
         <script>scripts\getBlockFrameInData.gml</script>
       </scripts>
       <script>scripts\spawnChunks.gml</script>
+      <script>scripts\checkCollisions.gml</script>
     </scripts>
     <scripts name="Collisions">
       <script>scripts\rectOverlap.gml</script>
@@ -83,6 +87,7 @@
     <object>objects\oTerrainControl</object>
     <object>objects\oChunk</object>
     <object>objects\oQueen</object>
+    <object>objects\oOrb</object>
   </objects>
   <rooms name="rooms">
     <room>rooms\rmSplash</room>

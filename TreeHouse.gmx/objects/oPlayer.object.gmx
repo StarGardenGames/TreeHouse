@@ -27,6 +27,8 @@
             <kind>1</kind>
             <string>dx = 0;
 dy = 0;
+inv = 0;
+maxInv = 1000;
 
 snapCamera();
 </string>

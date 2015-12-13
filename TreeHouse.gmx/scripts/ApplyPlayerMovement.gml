@@ -34,7 +34,11 @@ if(dx != 0 && inputx == 0)
         dx = 0;
 }
 
-y += dy;
-x += dx;
+if(place_free(x,y+dy)){
+    y += dy;
+}
+if(place_free(x+dx,y)){
+    x += dx;
+}
 
 
