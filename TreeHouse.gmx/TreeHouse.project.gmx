@@ -61,12 +61,10 @@
     </scripts>
     <scripts name="Collisions">
       <script>scripts\rectOverlap.gml</script>
+      <script>scripts\checkForPlayerCollision.gml</script>
     </scripts>
     <scripts name="Combat">
       <script>scripts\CheckActionState.gml</script>
-      <script>scripts\UseEnemyAbilities.gml</script>
-      <script>scripts\ShootProjectiles.gml</script>
-      <script>scripts\ExecuteCharge.gml</script>
     </scripts>
     <script>scripts\SetWanderAlarm.gml</script>
     <script>scripts\print.gml</script>
@@ -83,7 +81,10 @@
     <room>rooms\rmSplash</room>
     <room>rooms\rmGrass</room>
   </rooms>
-  <constants number="10">
+  <constants number="13">
+    <constant name="STATE_RESTING">4</constant>
+    <constant name="STATE_INCHARGE">3</constant>
+    <constant name="STATE_PREPARING">2</constant>
     <constant name="RANGED_ENEMY">2</constant>
     <constant name="CHARGING_ENEMY">1</constant>
     <constant name="STANDARD_ENEMY">0</constant>

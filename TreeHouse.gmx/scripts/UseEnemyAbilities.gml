@@ -7,9 +7,6 @@ switch(enemyType)
         alarmSet = true;
         break;
     case CHARGING_ENEMY:
-        dx = 0;
-        dy = 0;
-        alarm[1] = room_speed * .25;
-        alarmSet = true;
+        CheckChargingState();
         break;
 }

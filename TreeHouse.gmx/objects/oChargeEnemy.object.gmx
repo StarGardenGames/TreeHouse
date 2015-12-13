@@ -29,11 +29,16 @@
 dx = 0;
 dy = 0;
 state = 0;
+chargeState = STATE_PREPARING;
 attackRange = 300;
 agroRange = 500;
 enemyType = CHARGING_ENEMY;
 newGame = true;
 alarmSet = false;
+
+prepareTimer = -1;
+chargeTimer = -1;
+restTimer = -1;
 </string>
           </argument>
         </arguments>
@@ -42,12 +47,12 @@ alarmSet = false;
     <event eventtype="2" enumb="1">
       <action>
         <libid>1</libid>
-        <id>603</id>
-        <kind>7</kind>
+        <id>605</id>
+        <kind>0</kind>
         <userelative>0</userelative>
         <isquestion>0</isquestion>
-        <useapplyto>-1</useapplyto>
-        <exetype>2</exetype>
+        <useapplyto>0</useapplyto>
+        <exetype>0</exetype>
         <functionname></functionname>
         <codestring></codestring>
         <whoName>self</whoName>
@@ -56,10 +61,7 @@ alarmSet = false;
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>show_debug_message("about to charge");
-ExecuteCharge();
-alarmSet = false;
-</string>
+            <string></string>
           </argument>
         </arguments>
       </action>
@@ -82,7 +84,7 @@ alarmSet = false;
           <argument>
             <kind>1</kind>
             <string>WanderAround();
-alarmSet = false;
+alarm[0] = room_speed*(3 - random(1.5));
 </string>
           </argument>
         </arguments>
@@ -108,21 +110,19 @@ alarmSet = false;
             <string>if(!instance_exists(oPlayer))
     exit;
 
-var enemyX = x;
-var enemyY = y;
-var enemySpriteHeight = sprite_height;
-var enemySpriteWidth = sprite_width;
-
+if(prepareTimer != -1){
+    prepareTimer = max(0,prepareTimer-1);
+}
+if(chargeTimer != -1){
+    chargeTimer = max(0,chargeTimer-1);
+}
+if(restTimer != -1){
+    restTimer = max(0,restTimer-1);
+}
+    
 CheckActionState();
 
-with(oPlayer)
-{
-    if(rectOverlap(enemyX,enemyY,enemyX+enemySpriteWidth,enemyY+enemySpriteHeight,
-    oPlayer.x, oPlayer.y, oPlayer.x + oPlayer.sprite_width, oPlayer.y + oPlayer.sprite_height))
-    {
-        instance_destroy();
-    }
-}
+checkForPlayerCollision();
 
 x += dx;
 y += dy;
