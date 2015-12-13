@@ -25,7 +25,9 @@
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>dir = random(360);
+            <string>if(!instance_exists(oCreepPod))
+    exit;
+dir = random(360);
 sp = 4 + random(8);
 x+=4+random(24);
 y+=4+random(24);

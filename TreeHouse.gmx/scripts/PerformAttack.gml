@@ -15,7 +15,7 @@ if(facingTowardsEnemy && playerInAttackRange)
     with(enemy)
     {
         currentHP -= damage;
-        if(currentHP < 0)
+        if(currentHP <= 0)
             instance_destroy();
         print(currentHP);
     }

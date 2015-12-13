@@ -30,9 +30,12 @@ dy = 0;
 inv = 0;
 maxInv = 1000;
 
-currentPlayerDamage = 30;
+currentPlayerDamage = 15;
+headButtDamage = 50;
 maxHP = 150;
 currentHP = 150;
+invincible = false;
+invincibilityTimer = -1;
 snapCamera();
 </string>
           </argument>
@@ -92,6 +95,23 @@ if(keyboard_check(ord('O'))){
         instance_create(x,y,oOrb);
     }
 }
+
+if(invincibilityTimer != -1)
+    invincibilityTimer = max(0,invincibilityTimer-1);
+if(invincibilityTimer % 3 == 0)
+{
+    visible = false;
+}
+if(invincibilityTimer = 0) {
+    invincible = false;
+    visible = true;
+}
+
+if(currentHP &lt;= 0) {
+    instance_destroy();
+    room_restart();
+    }
+
 </string>
           </argument>
         </arguments>
