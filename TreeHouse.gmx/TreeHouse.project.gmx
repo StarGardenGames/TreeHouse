@@ -35,6 +35,7 @@
       <sprite>sprites\sCreepPod</sprite>
       <sprite>sprites\sCreep</sprite>
     </sprites>
+    <sprite>sprites\sRangedEnemy</sprite>
   </sprites>
   <backgrounds name="background"/>
   <paths name="paths"/>
@@ -111,6 +112,9 @@
     <object>objects\oOrb</object>
     <object>objects\oParentEnemy</object>
     <object>objects\oCreepPod</object>
+    <object>objects\oShakeControl</object>
+    <object>objects\oArcherEnemy</object>
+    <object>objects\oProjectile</object>
   </objects>
   <rooms name="rooms">
     <room>rooms\rmSplash</room>
