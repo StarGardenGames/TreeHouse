@@ -25,9 +25,11 @@
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>//randomize();
+            <string>debug = false;
 
-show_debug_overlay(true);
+randomize();
+
+audio_play_sound(sndBack,100,true);
 
 globalvar gameSeed;
 gameSeed = random_range(100000,10000000);
@@ -36,6 +38,10 @@ room_goto_next();
 
 cameraOnQueen = false;
 playerSpawnTime = NULL;
+
+titleScreen = true;
+
+show_debug_overlay(debug);
 </string>
           </argument>
         </arguments>
@@ -58,11 +64,18 @@ playerSpawnTime = NULL;
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>if(instance_exists(oPlayer)){
+            <string>if(room != rmGrass)
+    exit;
+    
+if(instance_exists(oPlayer) &amp;&amp; !oQueen.dying){
     targetX = oPlayer.x - view_wview/2 + sprite_width/2;
     targetY = oPlayer.y - view_hview/2 + sprite_height/2;
     tweenFactor = .1;
     if(keyboard_check(ord('R'))) tweenFactor = .6;
+}else if(oQueen.finalScene || oQueen.dying){
+    targetX = oQueen.x - view_wview / 2;
+    targetY = oQueen.y - view_hview / 2;
+    tweenFactor = .2;
 }else{
     targetX = oQueen.x - view_wview / 4;
     targetY = oQueen.y - view_hview / 2;
@@ -70,15 +83,23 @@ playerSpawnTime = NULL;
 }
 updateCamera();
 
-var viewDist = point_distance(view_xview,view_yview,oQueen.x - view_wview / 4,
-    oQueen.y - view_hview / 2);
-cameraOnQueen = viewDist &lt; 10;
+var viewDist = point_distance(view_xview,view_yview,targetX,targetY);
+cameraOnQueen = (!instance_exists(oPlayer) || oQueen.dying) &amp;&amp; viewDist &lt; 10;
 
 if(!instance_exists(oPlayer)){
     playerSpawnTime = NULL;
 }else if(playerSpawnTime == NULL){
     playerSpawnTime = current_time;
 }
+
+if(oGameControl.debug &amp;&amp; !titleScreen &amp;&amp; keyboard_check_pressed(vk_space))
+    game_restart();
+    
+if(titleScreen &amp;&amp; keyboard_check_pressed(vk_anykey)){
+    titleScreen = false;
+}
+
+
 </string>
           </argument>
         </arguments>
@@ -101,13 +122,42 @@ if(!instance_exists(oPlayer)){
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>if(instance_exists(oQueen)){
+            <string>if(room == rmGrass){
     view_xview = oQueen.x - view_wview / 4;
     view_yview = oQueen.y - view_hview / 2; 
     cameraOnQueen = true;
 }
 
 
+</string>
+          </argument>
+        </arguments>
+      </action>
+    </event>
+    <event eventtype="8" enumb="0">
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>if(titleScreen &amp;&amp; room == rmGrass){
+    draw_sprite_ext(sMenuTitle,0,view_xview,view_yview,
+        960/1920,960/1920,0,$FFFFFF,1);
+    draw_sprite(sMenuWASD,0,view_xview + 10,view_yview + 370);
+    draw_sprite_ext(sMenuMouse,0,view_xview + 800,view_yview + 340,
+        .75,.75,0,$FFFFFF,1);    
+}
 </string>
           </argument>
         </arguments>

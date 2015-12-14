@@ -90,7 +90,7 @@ queenInteraction();
 updatePlayerCombat();
 
 //debug
-if(keyboard_check(ord('O'))){
+if(oGameControl.debug &amp;&amp; keyboard_check(ord('O'))){
     repeat(10){
         instance_create(x,y,oOrb);
     }
@@ -99,7 +99,7 @@ if(keyboard_check(ord('O'))){
     }
 }
 
-if(keyboard_check(ord('X')))
+if(oGameControl.debug &amp;&amp; keyboard_check(ord('X')))
     dying = true;
 </string>
           </argument>

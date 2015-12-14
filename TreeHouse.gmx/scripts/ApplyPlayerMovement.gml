@@ -1,7 +1,7 @@
-if(recalling || attacking || dying)
+if(recalling || attacking || dying || oQueen.dying)
     exit;
 
-var moveSpeed = 9;
+var moveSpeed = 12;
 var slowDownFrames = 5;
 var skidCoef = moveSpeed/slowDownFrames;
 var inputx = keyboard_check(ord('D')) - keyboard_check(ord('A'));

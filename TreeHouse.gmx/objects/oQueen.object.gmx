@@ -28,14 +28,15 @@
             <string>startTime = current_time;
 scale = 1;
 maxScale = 4;
-orbsTillFullGrown = 6000;
+orbsTillFullGrown = 2000;
 stage = 0;
 hunger = 0;
 orbs = 0;
 frame = 0;
 frameSpeed = .5;
 hp = 100;
-
+finalScene = false;
+dying = false;
 
 ori_spr[0] = sQueen_mouth1;
 ori_spr[1] = sQueen_mouth2;
@@ -62,7 +63,6 @@ for(var i = 0; i &lt; 8; i++){
 
 spawning = false;
 spawnFrame = 0;
-
 
 colors[0] = $FF8800;
 colors[1] = $FFFF00;
@@ -107,13 +107,26 @@ if(((scale-1) / (maxScale-1)) &gt; (stage + 1)/4){
 image_xscale = scale;
 image_yscale = scale;
 
+if(finalScene &amp;&amp; (frame + frameSpeed) &gt;= image_number){
+    room_goto_next();
+}
+
+if(dying &amp;&amp; (frame + frameSpeed) &gt;= image_number){
+    game_restart();
+}
+
+if(dying &amp;&amp; !oGameControl.cameraOnQueen){
+    frame = 0;
+}
+
 //update frames
+if(!finalScene || oGameControl.cameraOnQueen)
 frame = (frame + frameSpeed) % sprite_get_number(sprite_index);
 
-if(!spawning &amp;&amp; !instance_exists(oPlayer) &amp;&amp; oGameControl.cameraOnQueen){
+if(!spawning &amp;&amp; !finalScene &amp;&amp; !oGameControl.titleScreen &amp;&amp; !instance_exists(oPlayer) &amp;&amp; 
+        oGameControl.cameraOnQueen){
     spawning = true; 
     spawnFrame = 0;
-    
 }
 
 if(spawning){
@@ -124,10 +137,16 @@ if(spawning){
     }
 }
 
-hp -= (scale/(30));
-if(hp &lt; 0){
-    game_restart();
+if(!oGameControl.titleScreen &amp;&amp; !finalScene &amp;&amp; !dying){
+    hp -= (scale/30);
+    if(oGameControl.debug &amp;&amp; keyboard_check(ord('F')))
+        hp -= 49*(scale/30);
+    if(hp &lt; 0){
+        dying = true;
+        frame = 0;
+    }
 }
+
 
 maxBlend = c_white;
 minBlend = $AA8888;
@@ -137,6 +156,15 @@ image_blend = make_color_rgb(
     color_get_green(minBlend) * (1-b) + color_get_green(maxBlend) * b,
     color_get_blue(minBlend) * (1-b) + color_get_blue(maxBlend) * b,
 );
+
+if(instance_exists(oPlayer) &amp;&amp; !finalScene &amp;&amp; point_distance(x,y,oPlayer.x,oPlayer.y) &lt; 400 &amp;&amp; orbs == orbsTillFullGrown){
+    finalScene = true;
+    frame = 0;
+    with(oPlayer) instance_destroy();
+    sprite_index = sSceneBirth;
+}
+
+
 </string>
           </argument>
         </arguments>
@@ -159,7 +187,14 @@ image_blend = make_color_rgb(
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>//body
+            <string>if(finalScene){
+    draw_sprite_ext(sprite_index,frame,x,y,1,1,0,$FFFFFF,1);
+    exit;
+}
+
+
+if(!dying || frame &lt; 10){
+
 draw_sprite_ext(sprite_index,frame,x,y,scale,scale,0,image_blend,1);
 
 //oriphi
@@ -183,7 +218,13 @@ if(spawning){
         x+(-5+9)*scale*.8,y+(-12+4)*scale*.8);
 }
 
+}
+if(dying){
+    draw_sprite_ext(sSceneDeath,frame,x,y,scale,scale,0,$FFFFFF,1);
+}
+
 //hp
+if(oGameControl.titleScreen || dying) exit;
 var l = array_length_1d(colors)
 var backColor = colors[(hp div 100)%(l-1)];
 var foreColor = colors[((hp div 100) +1)%(l-1)];

@@ -67,10 +67,7 @@ windAnimSpeed = .2;
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>if(keyboard_check_pressed(vk_space))
-    game_restart();
-
-spawnChunks();
+            <string>spawnChunks();
 
 windFrame += windAnimSpeed;
 windFrame %=15;

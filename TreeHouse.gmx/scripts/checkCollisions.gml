@@ -21,6 +21,23 @@ for(var i = 0; i <= gridSize; i+= gridSize){
                 instance_create(px,py,oOrb);
             } 
             break;
+        case PLANT_RED:
+        case PLANT_GREEN:
+        case PLANT_PURPLE:
+            var orbs = 10;
+            var hungOrbs = 5;
+            setBlockType(xx,yy,EMPTY,0);
+            var px = oPlayer.x-16;
+            var py = oPlayer.y-16;
+            px -= px%gridSize;
+            py -= py%gridSize;
+            repeat(orbs){
+                instance_create(px,py,oOrb);
+            }
+            repeat(hungOrbs){
+                instance_create(px,py,oHungerOrb);
+            }
+            break;
         }
     }
 }
