@@ -13,12 +13,9 @@ if(facingTowardsEnemy && playerInAttackRange)
 {
     with(enemy)
     {
-        print("HIT");
         currentHP -= damage;
         stunned = true;
         if(currentHP > 0)
             stunTimer = room_speed * maxHP/currentHP;
-        if(currentHP <= 0)
-            instance_destroy();
     }
 }

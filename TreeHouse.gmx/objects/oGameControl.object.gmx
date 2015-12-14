@@ -27,10 +27,87 @@
             <kind>1</kind>
             <string>//randomize();
 
+show_debug_overlay(true);
+
 globalvar gameSeed;
 gameSeed = random_range(100000,10000000);
 
 room_goto_next();
+
+cameraOnQueen = false;
+playerSpawnTime = NULL;
+</string>
+          </argument>
+        </arguments>
+      </action>
+    </event>
+    <event eventtype="3" enumb="0">
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>if(instance_exists(oPlayer)){
+    targetX = oPlayer.x - view_wview/2 + sprite_width/2;
+    targetY = oPlayer.y - view_hview/2 + sprite_height/2;
+    tweenFactor = .1;
+    if(keyboard_check(ord('R'))) tweenFactor = .6;
+}else{
+    targetX = oQueen.x - view_wview / 4;
+    targetY = oQueen.y - view_hview / 2;
+    tweenFactor = .2;
+}
+updateCamera();
+
+var viewDist = point_distance(view_xview,view_yview,oQueen.x - view_wview / 4,
+    oQueen.y - view_hview / 2);
+cameraOnQueen = viewDist &lt; 10;
+
+if(!instance_exists(oPlayer)){
+    playerSpawnTime = NULL;
+}else if(playerSpawnTime == NULL){
+    playerSpawnTime = current_time;
+}
+</string>
+          </argument>
+        </arguments>
+      </action>
+    </event>
+    <event eventtype="7" enumb="4">
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>if(instance_exists(oQueen)){
+    view_xview = oQueen.x - view_wview / 4;
+    view_yview = oQueen.y - view_hview / 2; 
+    cameraOnQueen = true;
+}
+
+
 </string>
           </argument>
         </arguments>

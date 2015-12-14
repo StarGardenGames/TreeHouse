@@ -97,7 +97,6 @@ sprites[ANIM_IDLE] = sChargerRest;
             <kind>1</kind>
             <string>event_inherited();
 
-
 if(prepareTimer != -1){
     prepareTimer = max(0,prepareTimer-1);
 }

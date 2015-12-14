@@ -1,13 +1,19 @@
 //check for transitions
 prevAnimState = animState;
+if(!instance_exists(oPlayer)) animState = ANIM_MOVE;
+
+if(animState != ANIM_DYING && currentHP < 0){
+    animState = ANIM_DYING;
+}
 switch(animState){
     case ANIM_MOVE:
-        if(shooting) 
-            animState = ANIM_SHOOT;
-        
-        if(dx == 0 && dy == 0) 
-            animState = ANIM_IDLE;
-        
+        if(instance_exists(oPlayer)){
+            if(shooting) 
+                animState = ANIM_SHOOT;
+            
+            if(dx == 0 && dy == 0) 
+                animState = ANIM_IDLE;
+        }
         break;
     case ANIM_IDLE:
         if(shooting) 
@@ -45,5 +51,16 @@ case ANIM_SHOOT:
         sprite_get_number(sprites[animState])){
         shooting = false;
     }
-default:       
+    break;
+case ANIM_DYING:
+    frame = 0;
+    image_alpha = max(0,image_alpha - .01);
+    if(image_alpha == 0){
+        dead = true;
+    }
+    var r = color_get_red(image_blend);
+    var g = color_get_green(image_blend);
+    var b = color_get_blue(image_blend);
+    image_blend = make_color_rgb(
+        r, max(0,g-5), max(0,b-5));
 }

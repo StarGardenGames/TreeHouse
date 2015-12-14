@@ -1,10 +1,12 @@
-var xx = argument0 * gridSize;
-var yy = argument1 * gridSize;
+var spawnX = x + random(chunkSize);
+var spawnY = y + random(chunkSize);
 
-if(random(1) < (1 / 2000)){
-    var obj = instance_nearest(xx,yy,oParentEnemy);
+var dist = point_distance(spawnX,spawnY,oQueen.x,oQueen.y);
+
+if(random(1) < (1 / 80) && dist > 1000){
+    var obj = instance_nearest(spawnX,spawnY,oParentEnemy);
     if(!instance_exists(oParentEnemy) ||
-            point_distance(xx,yy,obj.x,obj.y) > 400){
+            point_distance(spawnX,spawnY,obj.x,obj.y) > 400){
         var theta = random(360);
         var enemyCount, enemyObj;
         enemyObj[0] = oGruntEnemy;
@@ -14,7 +16,7 @@ if(random(1) < (1 / 2000)){
         switch(irandom(4)){
         case 0: // grunt crowd
             enemyCount[0] = irandom_range(2,5); break;
-        case 1: // arcer crowd
+        case 1: // archer crowd
             enemyCount[1] = irandom_range(1,3); break;
         case 2: //loner charger
             enemyCount[2] = 1; break;
@@ -38,8 +40,8 @@ if(random(1) < (1 / 2000)){
             enemyCount[curEnemy]--;
             var dist = random_range(128,256);
             instance_create(
-                xx + lengthdir_x(dist,i),
-                yy + lengthdir_y(dist,i),
+                spawnX + lengthdir_x(dist,i),
+                spawnY + lengthdir_y(dist,i),
                 enemyObj[curEnemy]
             );
         }

@@ -7,6 +7,5 @@ for(var i = 0; i < ds_grid_width(data); i++){
         emptyBlock(curX, curY);
         growGrass(curX, curY);
         growPlant(curX, curY);
-        spawnCreatures(curX,curY);
     }
 }

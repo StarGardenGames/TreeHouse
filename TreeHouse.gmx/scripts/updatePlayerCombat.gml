@@ -1,0 +1,7 @@
+playerHeadButt();
+
+playerShoot();
+
+updateInvincibility();
+
+checkForDeath();

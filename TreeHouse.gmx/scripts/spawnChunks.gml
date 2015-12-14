@@ -10,6 +10,6 @@ for(var i = left; i < right; i+= chunkSize){
     for(var j = top; j < bot; j+= chunkSize){
         if(!chunkLoaded(i,j)){
             instance_create(i,j,oChunk);
-        }   
+        }
     }
 }

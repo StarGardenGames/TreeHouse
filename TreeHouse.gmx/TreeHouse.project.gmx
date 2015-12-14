@@ -8,17 +8,20 @@
   <sprites name="sprites">
     <sprite>sprites\sEnemy</sprite>
     <sprite>sprites\sOrb</sprite>
+    <sprite>sprites\sHungerOrb</sprite>
     <sprites name="Plants">
       <sprite>sprites\sPlant_large</sprite>
       <sprite>sprites\sPlant_small</sprite>
       <sprite>sprites\sGrass</sprite>
     </sprites>
     <sprites name="Player">
-      <sprite>sprites\sPlayer</sprite>
+      <sprite>sprites\sPlayerIdle</sprite>
+      <sprite>sprites\sPlayerFly</sprite>
       <sprite>sprites\sPlayerAttack</sprite>
       <sprite>sprites\sPlayerReturn</sprite>
       <sprite>sprites\sPlayerBullet</sprite>
       <sprite>sprites\sPlayerShoot</sprite>
+      <sprite>sprites\sPlayerDeath</sprite>
     </sprites>
     <sprites name="Queen">
       <sprite>sprites\sQueen_size1</sprite>
@@ -42,6 +45,10 @@
         <sprite>sprites\sCreepPod</sprite>
         <sprite>sprites\sCreep</sprite>
       </sprites>
+      <sprites name="playerSpawn">
+        <sprite>sprites\sQueen_spawnMouth</sprite>
+        <sprite>sprites\sQueen_spawnPlayer</sprite>
+      </sprites>
     </sprites>
     <sprites name="Enemy">
       <sprites name="Archer">
@@ -63,14 +70,32 @@
   <backgrounds name="background"/>
   <paths name="paths"/>
   <scripts name="scripts">
-    <scripts name="Animation">
+    <scripts name="Player">
+      <script>scripts\ApplyPlayerMovement.gml</script>
       <script>scripts\playerUpdateAnimation.gml</script>
+      <script>scripts\playerPerformingAction.gml</script>
+      <scripts name="Queen Interaction">
+        <script>scripts\queenInteraction.gml</script>
+        <script>scripts\recallToQueen.gml</script>
+        <script>scripts\releaseOrbsForQueen.gml</script>
+        <script>scripts\getUnstuckFromQueen.gml</script>
+      </scripts>
+      <scripts name="Combat">
+        <script>scripts\updatePlayerCombat.gml</script>
+        <script>scripts\playerHeadButt.gml</script>
+        <script>scripts\playerShoot.gml</script>
+        <script>scripts\ApplyHeadbuttDamage.gml</script>
+        <script>scripts\updateInvincibility.gml</script>
+        <script>scripts\checkForDeath.gml</script>
+        <script>scripts\ShootPlayerProjectile.gml</script>
+      </scripts>
+    </scripts>
+    <scripts name="Animation">
       <script>scripts\archerUpdateAnimation.gml</script>
       <script>scripts\chargerUpdateAnimation.gml</script>
       <script>scripts\gruntUpdateAnimation.gml</script>
     </scripts>
     <scripts name="Movement">
-      <script>scripts\ApplyPlayerMovement.gml</script>
       <script>scripts\SeekPlayer.gml</script>
       <script>scripts\WanderAround.gml</script>
       <script>scripts\FleeFromPlayer.gml</script>
@@ -80,7 +105,7 @@
       <script>scripts\randomSeed.gml</script>
     </scripts>
     <scripts name="Camera">
-      <script>scripts\AlignCameraWithPlayer.gml</script>
+      <script>scripts\updateCamera.gml</script>
       <script>scripts\snapCamera.gml</script>
     </scripts>
     <scripts name="Terrain">
@@ -127,8 +152,6 @@
     </scripts>
     <scripts name="Combat">
       <script>scripts\CheckActionState.gml</script>
-      <script>scripts\ApplyHeadbuttDamage.gml</script>
-      <script>scripts\ShootPlayerProjectile.gml</script>
       <script>scripts\checkIfStunned.gml</script>
     </scripts>
     <script>scripts\SetWanderAlarm.gml</script>
@@ -137,7 +160,7 @@
   <objects name="objects">
     <object>objects\oGameControl</object>
     <object>objects\oPlayer</object>
-    <object>objects\oProjectile</object>
+    <object>objects\oPlayerProjectile</object>
     <object>objects\oQueen</object>
     <object>objects\oOrb</object>
     <object>objects\oShakeControl</object>
@@ -151,14 +174,17 @@
       <object>objects\oArcherEnemy</object>
       <object>objects\oChargeEnemy</object>
       <object>objects\oGruntEnemy</object>
+      <object>objects\oProjectile</object>
     </objects>
   </objects>
   <rooms name="rooms">
     <room>rooms\rmSplash</room>
     <room>rooms\rmGrass</room>
   </rooms>
-  <constants number="23">
+  <constants number="25">
+    <constant name="STATE_DYING">6</constant>
     <constant name="STATE_RETREATING">5</constant>
+    <constant name="ANIM_DYING">8</constant>
     <constant name="ANIM_PREP">7</constant>
     <constant name="ANIM_CHARGE">6</constant>
     <constant name="ANIM_MOVE">5</constant>

@@ -37,8 +37,13 @@ damage = 45;
 enemyType = STANDARD_ENEMY;
 newGame = true;
 
+
 stunned = false;
 stunTimer = -1;
+hurt = false;
+hurtTimer = -1;
+dead = false;
+dying = false;
 </string>
           </argument>
         </arguments>
@@ -61,8 +66,10 @@ stunTimer = -1;
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>WanderAround();
-alarm[0] = room_speed*(3 - random(1.5));
+            <string>if(state == STATE_IDLE){
+    WanderAround();
+    alarm[0] = room_speed*(3 - random(1.5));
+}
 </string>
           </argument>
         </arguments>
@@ -94,6 +101,13 @@ checkForPlayerCollision();
 
 checkIfStunned();
 
+/*if(hurt){
+    image_blend = $AAAAFF; 
+    hurtTimer--;
+    hurt = hurtTimer &lt; 0;
+}
+if(!hurt){ image_blend = $FFFFFF;}
+*/
 if(place_free(x+dx,y))
     x += dx;
 if(place_free(x,y+dy))
@@ -122,7 +136,10 @@ if(place_free(x,y+dy))
           <argument>
             <kind>1</kind>
             <string>draw_sprite_ext(sprite_index,frame,x,y,
-    1,1,image_angle,image_blend,1);
+    1,1,image_angle,image_blend,image_alpha);
+    
+draw_set_color(c_orange);
+draw_text(x,y,state);
 </string>
           </argument>
         </arguments>

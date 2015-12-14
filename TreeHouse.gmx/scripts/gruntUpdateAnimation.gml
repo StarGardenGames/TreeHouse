@@ -1,7 +1,11 @@
 //check for transitions
 prevAnimState = animState;
+if(!instance_exists(oPlayer)) animState = ANIM_MOVE;
 switch(animState){
     case ANIM_MOVE:
+        if(!instance_exists(oPlayer)){
+        
+        }
         break;
     case ANIM_MELEE:
         if((frame + frameSpeed) > 

@@ -1,9 +1,19 @@
-distance = point_distance(x,y,oPlayer.x,oPlayer.y);
+if(instance_exists(oPlayer))
+    distance = point_distance(x,y,oPlayer.x,oPlayer.y);
+else{
+    distance = NULL;
+    state = STATE_IDLE;
+}
 //check for transitions
 prevState = state;
+
+if(state != STATE_DYING && currentHP <= 0){
+    state = STATE_DYING;
+}
+
 switch(state){
     case STATE_IDLE:
-        if(distance < agroRange)
+        if(instance_exists(oPlayer) && distance < agroRange)
             state = STATE_AGRO; 
         break;
     case STATE_AGRO:
@@ -16,10 +26,6 @@ switch(state){
                 state = STATE_RETREATING;
         break;
     case STATE_PREPARING: 
-        if(distance > attackRange*1.2)
-            state = STATE_AGRO;
-        if(distance > agroRange*1.2)
-            state = STATE_IDLE;
         if(prepareTimer==0)
         {
             if(enemyType == CHARGING_ENEMY)
@@ -55,7 +61,6 @@ if(prevState != state || newGame){
     switch(state){
         case STATE_IDLE:
             alarm[0] = room_speed*(3 - random(1.5));
-            //image_blend = c_green;
             break;
         case STATE_PREPARING:
             if(enemyType == RANGED_ENEMY)
@@ -63,20 +68,22 @@ if(prevState != state || newGame){
             dx = 0;
             dy = 0;
             prepareTimer = room_speed * .5;
-            //image_blend = c_purple;
             break;
         case STATE_INCHARGE:
-            dir = point_direction(x,y,oPlayer.x,oPlayer.y);
+            dir = image_angle;
             dx = lengthdir_x(enemyMoveSpeed*3.5, dir);
             dy = lengthdir_y(enemyMoveSpeed*3.5, dir);
             chargeTimer = room_speed * 1;
-            //image_blend = c_red;
             break;
         case STATE_RESTING:
             dx = 0;
             dy = 0;
-            //image_blend = c_blue;
             restTimer = room_speed * 2;
+            break;
+        case STATE_DYING:
+            dx = 0;
+            dy = 0;
+            if(dead) instance_destroy();
             break;
     }
     newGame = false;

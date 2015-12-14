@@ -35,9 +35,11 @@ dy = lengthdir_y(sp,dir);
 l = 0;
 runningTimer = 3;
 
+stranded = false;
+
 var pod = instance_nearest(x,y,oCreepPod);
 
-if(point_distance(x,y,oQueen.x,oQueen.y)&lt;100*oQueen.scale){
+if(point_distance(x,y,oQueen.x,oQueen.y)&lt;(100*oQueen.scale)+50){
     destObj = oQueen;
 }else if(instance_exists(oCreepPod) &amp;&amp; point_distance(x,y,pod.x,pod.y)&lt;100 &amp;&amp; pod.sprite_index == sCreepMouth){
     destObj = pod;
@@ -68,15 +70,32 @@ if(point_distance(x,y,oQueen.x,oQueen.y)&lt;100*oQueen.scale){
             <kind>1</kind>
             <string>runningTimer--;
 accToDest+=.3;
-l+=.002;
+l+=.02;
 l = min(l,1);
 
+    
+if(!instance_exists(destObj) || 
+    (destObj == oPlayer &amp;&amp; (oPlayer.inv &gt;= oPlayer.maxInv || 
+    oPlayer.dying)) || 
+    (l==1 &amp;&amp; point_distance(x,y,destObj.x,destObj.y) &gt; 50)){
+        stranded = true;   
+}
 
-if(oPlayer.inv == oPlayer.maxInv){
+if(stranded){
+    desetObj = oPlayer;
     dx *= .95;
     dy *= .95;
-    if(dx &lt; .1) dx = 0;
-    if(dy &lt; .1) dy = 0;
+    if(abs(dx) &lt; .1) dx = 0;
+    if(abs(dy) &lt; .1) dy = 0;
+    if(instance_exists(oPlayer)){
+        var distToDest = point_distance(x,y,destObj.x,destObj.y);
+        if(distToDest &lt; 50){
+            l = 0;
+            stranded = false;
+            runningTimer = 1;
+            accToDest = 3;
+        }
+    }
 }else{
     var distToDest = point_distance(x,y,destObj.x,destObj.y);
     var dirToDest = point_direction(x,y,destObj.x,destObj.y);

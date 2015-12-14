@@ -1,6 +1,6 @@
 if(stunTimer != -1)
     stunTimer = max(0,stunTimer-1);
-print(stunTimer + stunned);
+
 if(stunTimer = 0)
 {
     stunned = false;
@@ -8,7 +8,7 @@ if(stunTimer = 0)
 
 if(stunned)
 {
-    image_blend = c_blue;
+    image_blend = $FFAAAA;
     dx = 0;
     dy = 0;
 }
