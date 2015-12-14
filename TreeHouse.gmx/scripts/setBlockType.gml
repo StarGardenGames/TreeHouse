@@ -12,7 +12,7 @@ if(object_index != oChunk){
 }
 
 if(type == CREEP){
-    if(random(1) < .02 && !place_meeting(xx,yy,oCreepPod)
+    if(oQueen.scale!=1 && random(1) < .02 && !place_meeting(xx,yy,oCreepPod)
             && !place_meeting(xx,yy,oQueen)){
         instance_create(xx,yy,oCreepPod);
     }

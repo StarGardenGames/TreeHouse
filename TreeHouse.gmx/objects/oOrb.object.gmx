@@ -3,7 +3,7 @@
   <spriteName>sOrb</spriteName>
   <solid>0</solid>
   <visible>-1</visible>
-  <depth>-1</depth>
+  <depth>-2</depth>
   <persistent>0</persistent>
   <parentName>&lt;undefined&gt;</parentName>
   <maskName>&lt;undefined&gt;</maskName>
@@ -25,9 +25,7 @@
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>if(!instance_exists(oCreepPod))
-    exit;
-dir = random(360);
+            <string>dir = random(360);
 sp = 4 + random(8);
 x+=4+random(24);
 y+=4+random(24);
@@ -35,13 +33,13 @@ accToDest = 3;
 dx = lengthdir_x(sp,dir);
 dy = lengthdir_y(sp,dir);
 l = 0;
-runningTimer = 10;
+runningTimer = 3;
 
 var pod = instance_nearest(x,y,oCreepPod);
 
 if(point_distance(x,y,oQueen.x,oQueen.y)&lt;100*oQueen.scale){
     destObj = oQueen;
-}else if(point_distance(x,y,pod.x,pod.y)&lt;100 &amp;&amp; pod.sprite_index == sCreepMouth){
+}else if(instance_exists(oCreepPod) &amp;&amp; point_distance(x,y,pod.x,pod.y)&lt;100 &amp;&amp; pod.sprite_index == sCreepMouth){
     destObj = pod;
 }else{
     destObj = oPlayer;
@@ -90,7 +88,7 @@ if(oPlayer.inv == oPlayer.maxInv){
         
     distToDest = point_distance(x,y,destObj.x,destObj.y);
     var runningAway = runningTimer &gt; 0;
-    if(distToDest&lt;20 &amp;&amp; !runningAway){
+    if(distToDest&lt;destObj.sprite_width/3 &amp;&amp; !runningAway){
         if(destObj==oPlayer){
             oPlayer.inv++;
         }else{

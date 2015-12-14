@@ -11,12 +11,10 @@ var facingTowardsEnemy = angleTowardsEnemy < 40;
 var playerInAttackRange = point_distance(x, y, enemy.x + 16, enemy.y +16) <= 500;
 if(facingTowardsEnemy && playerInAttackRange)
 {
-    print("HIT");
     with(enemy)
     {
         currentHP -= damage;
         if(currentHP <= 0)
             instance_destroy();
-        print(currentHP);
     }
 }

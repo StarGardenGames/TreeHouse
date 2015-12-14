@@ -3,7 +3,7 @@
   <spriteName>sQueen_size1</spriteName>
   <solid>-1</solid>
   <visible>-1</visible>
-  <depth>-2</depth>
+  <depth>-3</depth>
   <persistent>0</persistent>
   <parentName>&lt;undefined&gt;</parentName>
   <maskName>&lt;undefined&gt;</maskName>
@@ -79,7 +79,8 @@ for(var i = 0; i &lt; 8; i++){
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>scale = 1 + (maxScale-1) * sin(((2 * pi)*orbs)/(4*orbsTillFullGrown));
+            <string>orbs = min(orbs,orbsTillFullGrown);
+scale = 1 + (maxScale-1) * sin(((2 * pi)*orbs)/(4*orbsTillFullGrown));
 
 if(((scale-1) / (maxScale-1)) &gt; (stage + 1)/4){
     stage++;

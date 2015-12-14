@@ -3,7 +3,7 @@
   <spriteName>sCreepEye</spriteName>
   <solid>0</solid>
   <visible>-1</visible>
-  <depth>-2</depth>
+  <depth>-1</depth>
   <persistent>0</persistent>
   <parentName>&lt;undefined&gt;</parentName>
   <maskName>&lt;undefined&gt;</maskName>
@@ -34,18 +34,23 @@ image_angle = random(60) - 30
 
 scale = 1;
 switch(sprite_index){
+    case sCreepEye:
     case sCreepMouth: 
     case sCreepPod:
         scale = 2; 
-        if(random(1)&lt;.5){ x-=32; }
-        if(random(1)&lt;.5){ y-=32; }
+        if(random(1)&lt;.5 &amp;&amp; !place_meeting(x-32,y,oQueen)
+            &amp;&amp; !place_meeting(x-32,y,oCreepPod)){ x-=32; }
+        if(random(1)&lt;.5 &amp;&amp; !place_meeting(x,y-32,oQueen)
+            &amp;&amp; !place_meeting(x,y-32,oCreepPod)){ y-=32; }
         break;
     case sCreepEyes:
         scale = 3;
-        if(random(1)&lt;.5){ x-=32; }
-        if(random(1)&lt;.5){ y-=32; }
-        if(random(1)&lt;.5){ x-=32; }
-        if(random(1)&lt;.5){ y-=32; }
+        repeat(2){
+            if(random(1)&lt;.5 &amp;&amp; !place_meeting(x-32,y,oQueen)
+                &amp;&amp; !place_meeting(x-32,y,oCreepPod)){ x-=32; }
+            if(random(1)&lt;.5 &amp;&amp; !place_meeting(x,y-32,oQueen)
+                &amp;&amp; !place_meeting(x,y-32,oCreepPod)){ y-=32; }
+        }
         break;
 }
 

@@ -37,6 +37,15 @@ currentHP = 150;
 invincible = false;
 invincibilityTimer = -1;
 snapCamera();
+
+animState = ANIM_MOVE;
+frame = 0;
+frameSpeed = .5;
+
+sprites[ANIM_MOVE] = sPlayer;
+sprites[ANIM_MELEE] = sPlayerAttack;
+sprites[ANIM_RETURN] = sPlayerReturn;
+sprites[ANIM_SHOOT] = sPlayerShoot;
 </string>
           </argument>
         </arguments>
@@ -61,8 +70,7 @@ snapCamera();
             <kind>1</kind>
             <string>ApplyPlayerMovement();
 AlignCameraWithPlayer();
-
-image_angle = point_direction(x,y,mouse_x,mouse_y);
+playerUpdateAnimation();
 
 if(place_meeting(x,y,oQueen)){
     var dir = point_direction(x,y,oQueen.x,oQueen.y);
@@ -86,7 +94,6 @@ if(keyboard_check(ord('R'))){
         var dir = point_direction(x,y,oQueen.x,oQueen.y);
         x += lengthdir_x(min(50,dist),dir);
         y += lengthdir_y(min(50,dist),dir);
-        image_angle = dir;
     }
 }
 
@@ -110,8 +117,34 @@ if(invincibilityTimer = 0) {
 if(currentHP &lt;= 0) {
     instance_destroy();
     room_restart();
-    }
+}
 
+
+
+</string>
+          </argument>
+        </arguments>
+      </action>
+    </event>
+    <event eventtype="8" enumb="0">
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>draw_sprite_ext(sprite_index,frame,x,y,
+    1,1,image_angle,$FFFFFF,1);
 </string>
           </argument>
         </arguments>

@@ -16,7 +16,6 @@ switch(state){
                 state = STATE_RETREATING;
         break;
     case STATE_PREPARING: 
-        print(alarm[1]);
         if(distance > attackRange)
             state = STATE_AGRO;
         if(distance > agroRange)
@@ -42,8 +41,9 @@ switch(state){
             state = STATE_RESTING;
         break;
     case STATE_RESTING:
-        if(restTimer==0)
+        if(restTimer==0){
             state = STATE_PREPARING;
+        }
         break;
 }
 
@@ -55,10 +55,10 @@ if(prevState != state || newGame){
     switch(state){
         case STATE_IDLE:
             alarm[0] = room_speed*(3 - random(1.5));
-            image_blend = c_green;
+            //image_blend = c_green;
             break;
         case STATE_AGRO:
-            image_blend = c_yellow;
+            //image_blend = c_yellow;
             break;
         case STATE_PREPARING:
             if(enemyType == RANGED_ENEMY)
@@ -66,21 +66,24 @@ if(prevState != state || newGame){
             dx = 0;
             dy = 0;
             prepareTimer = room_speed * .5;
-            image_blend = c_purple;
+            //image_blend = c_purple;
             break;
         case STATE_INCHARGE:
             dir = point_direction(x,y,oPlayer.x,oPlayer.y);
-            dx = lengthdir_x(enemyMoveSpeed*5, dir);
-            dy = lengthdir_y(enemyMoveSpeed*5, dir);
+            dx = lengthdir_x(enemyMoveSpeed*2, dir);
+            dy = lengthdir_y(enemyMoveSpeed*2, dir);
             chargeTimer = room_speed * .6;
-            image_blend = c_red;
+            //image_blend = c_red;
             break;
         case STATE_RETREATING:
-            image_blend = c_yellow;
+            //image_blend = c_yellow;
+
+            break; // APC : just added this
+            //was it supposed to be left out?
         case STATE_RESTING:
             dx = 0;
             dy = 0;
-            image_blend = c_blue;
+            //image_blend = c_blue;
             restTimer = room_speed * 2;
             break;
     }
@@ -94,5 +97,16 @@ switch(state){
         break;
     case STATE_RETREATING:
         FleeFromPlayer();
+    case STATE_PREPARING:
+        if(enemyType == RANGED_ENEMY && shooting){
+            if(frame < 11){
+                shotThisCycle = false;
+            }
+            if(frame >= 11 && !shotThisCycle){
+                instance_create(x,y,oProjectile);
+                shotThisCycle = true;
+            }
+            
+        }
         break;
 }

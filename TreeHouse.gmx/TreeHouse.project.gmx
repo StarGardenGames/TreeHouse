@@ -8,10 +8,17 @@
   <sprites name="sprites">
     <sprite>sprites\sGrass</sprite>
     <sprite>sprites\sEnemy</sprite>
-    <sprite>sprites\sPlayer</sprite>
     <sprite>sprites\sPlant_small</sprite>
     <sprite>sprites\sPlant_large</sprite>
     <sprite>sprites\sOrb</sprite>
+    <sprite>sprites\sRangedEnemy</sprite>
+    <sprites name="Player">
+      <sprite>sprites\sPlayer</sprite>
+      <sprite>sprites\sPlayerAttack</sprite>
+      <sprite>sprites\sPlayerReturn</sprite>
+      <sprite>sprites\sPlayerBullet</sprite>
+      <sprite>sprites\sPlayerShoot</sprite>
+    </sprites>
     <sprites name="Queen">
       <sprite>sprites\sQueen_size1</sprite>
       <sprite>sprites\sQueen_size2</sprite>
@@ -27,19 +34,40 @@
         <sprite>sprites\sQueen_eye3</sprite>
         <sprite>sprites\sQueen_eye4</sprite>
       </sprites>
+      <sprites name="Creep">
+        <sprite>sprites\sCreepEye</sprite>
+        <sprite>sprites\sCreepEyes</sprite>
+        <sprite>sprites\sCreepMouth</sprite>
+        <sprite>sprites\sCreepPod</sprite>
+        <sprite>sprites\sCreep</sprite>
+      </sprites>
     </sprites>
-    <sprites name="Creep">
-      <sprite>sprites\sCreepEye</sprite>
-      <sprite>sprites\sCreepEyes</sprite>
-      <sprite>sprites\sCreepMouth</sprite>
-      <sprite>sprites\sCreepPod</sprite>
-      <sprite>sprites\sCreep</sprite>
+    <sprites name="Enemy">
+      <sprites name="Archer">
+        <sprite>sprites\sArcherMove</sprite>
+        <sprite>sprites\sArcherShoot</sprite>
+      </sprites>
+      <sprites name="Charger">
+        <sprite>sprites\sChargerCharge</sprite>
+        <sprite>sprites\sChargerPrep</sprite>
+        <sprite>sprites\sChargerRest</sprite>
+        <sprite>sprites\sChargerWalk</sprite>
+      </sprites>
+      <sprites name="Grunt">
+        <sprite>sprites\sGruntAttack</sprite>
+        <sprite>sprites\sGruntMove</sprite>
+      </sprites>
     </sprites>
-    <sprite>sprites\sRangedEnemy</sprite>
   </sprites>
   <backgrounds name="background"/>
   <paths name="paths"/>
   <scripts name="scripts">
+    <scripts name="Animation">
+      <script>scripts\playerUpdateAnimation.gml</script>
+      <script>scripts\archerUpdateAnimation.gml</script>
+      <script>scripts\chargerUpdateAnimation.gml</script>
+      <script>scripts\gruntUpdateAnimation.gml</script>
+    </scripts>
     <scripts name="Movement">
       <script>scripts\ApplyPlayerMovement.gml</script>
       <script>scripts\SeekPlayer.gml</script>
@@ -103,26 +131,38 @@
     <script>scripts\print.gml</script>
   </scripts>
   <objects name="objects">
-    <object>objects\oPlayer</object>
     <object>objects\oGameControl</object>
-    <object>objects\oEnemy</object>
-    <object>objects\oChargeEnemy</object>
-    <object>objects\oTerrainControl</object>
-    <object>objects\oChunk</object>
+    <object>objects\oPlayer</object>
+    <object>objects\oProjectile</object>
     <object>objects\oQueen</object>
     <object>objects\oOrb</object>
-    <object>objects\oParentEnemy</object>
-    <object>objects\oCreepPod</object>
     <object>objects\oShakeControl</object>
-    <object>objects\oArcherEnemy</object>
-    <object>objects\oProjectile</object>
+    <objects name="Terrain">
+      <object>objects\oTerrainControl</object>
+      <object>objects\oChunk</object>
+      <object>objects\oCreepPod</object>
+    </objects>
+    <objects name="Enemy">
+      <object>objects\oParentEnemy</object>
+      <object>objects\oArcherEnemy</object>
+      <object>objects\oChargeEnemy</object>
+      <object>objects\oGruntEnemy</object>
+    </objects>
   </objects>
   <rooms name="rooms">
     <room>rooms\rmSplash</room>
     <room>rooms\rmGrass</room>
   </rooms>
-  <constants number="15">
+  <constants number="23">
     <constant name="STATE_RETREATING">5</constant>
+    <constant name="ANIM_PREP">7</constant>
+    <constant name="ANIM_CHARGE">6</constant>
+    <constant name="ANIM_MOVE">5</constant>
+    <constant name="ANIM_SHOOT">4</constant>
+    <constant name="ANIM_RETURN">3</constant>
+    <constant name="ANIM_MELEE">2</constant>
+    <constant name="ANIM_STUN">1</constant>
+    <constant name="ANIM_IDLE">0</constant>
     <constant name="STATE_RESTING">4</constant>
     <constant name="STATE_INCHARGE">3</constant>
     <constant name="STATE_PREPARING">2</constant>
