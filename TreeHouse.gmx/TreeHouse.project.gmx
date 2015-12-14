@@ -67,6 +67,7 @@
         <sprite>sprites\sGruntMove</sprite>
       </sprites>
     </sprites>
+    <sprite>sprites\sprite41_plant-grass-3-anim</sprite>
   </sprites>
   <backgrounds name="background"/>
   <paths name="paths"/>
@@ -165,6 +166,7 @@
     <object>objects\oPlayerProjectile</object>
     <object>objects\oQueen</object>
     <object>objects\oOrb</object>
+    <object>objects\oHungerOrb</object>
     <object>objects\parBullet</object>
     <object>objects\oShakeControl</object>
     <objects name="Terrain">

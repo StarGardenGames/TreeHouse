@@ -3,10 +3,10 @@ var spawnY = y + chunkSize / 2;
 
 var dist = point_distance(spawnX,spawnY,oQueen.x,oQueen.y);
 
-if(random(1) < (1 / 80) && dist > 1000){
+if(random(1) < (1 / 20) && dist > 800){
     var obj = instance_nearest(spawnX,spawnY,oParentEnemy);
     if(!instance_exists(oParentEnemy) ||
-            point_distance(spawnX,spawnY,obj.x,obj.y) > 400){
+            point_distance(spawnX,spawnY,obj.x,obj.y) > 200){
         var theta = random(360);
         var enemyCount, enemyObj;
         enemyObj[0] = oGruntEnemy;

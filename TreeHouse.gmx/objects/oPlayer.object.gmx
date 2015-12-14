@@ -28,7 +28,9 @@
             <string>dx = 0;
 dy = 0;
 inv = 0;
+hungInv = 0;
 maxInv = 1000;
+maxHung = 200;
 
 currentPlayerDamage = 15;
 headbuttDamage = 50;
@@ -92,6 +94,9 @@ if(keyboard_check(ord('O'))){
     repeat(10){
         instance_create(x,y,oOrb);
     }
+    repeat(2){
+        instance_create(x,y,oHungerOrb)
+    }
 }
 
 if(keyboard_check(ord('X')))
@@ -119,7 +124,7 @@ if(keyboard_check(ord('X')))
           <argument>
             <kind>1</kind>
             <string>draw_sprite_ext(sprite_index,frame,x,y,
-    1,1,image_angle,$FFFFFF,1);
+    1,1,image_angle,oQueen.image_blend,1);
 </string>
           </argument>
         </arguments>

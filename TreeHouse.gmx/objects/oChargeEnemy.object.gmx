@@ -51,6 +51,7 @@ sprites[ANIM_CHARGE] = sChargerCharge;
 sprites[ANIM_IDLE] = sChargerRest;
 sprites[ANIM_DYING] = sChargerRest;
 
+value = 10;
 
 </string>
           </argument>

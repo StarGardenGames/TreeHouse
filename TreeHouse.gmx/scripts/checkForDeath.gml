@@ -9,6 +9,12 @@ if(dying){
             inv--;
         }
     }
+    repeat(2){
+        if(hungInv > 0){
+            instance_create(x,y,oHungerOrb)
+            hungInv--;
+        }
+    }
 }
 
 if(dead){

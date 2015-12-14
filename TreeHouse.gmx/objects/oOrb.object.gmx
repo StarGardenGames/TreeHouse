@@ -46,6 +46,8 @@ if(point_distance(x,y,oQueen.x,oQueen.y)&lt;(100*oQueen.scale)+50){
 }else{
     destObj = oPlayer;
 }
+
+orbType = 0;
 </string>
           </argument>
         </arguments>
@@ -69,8 +71,8 @@ if(point_distance(x,y,oQueen.x,oQueen.y)&lt;(100*oQueen.scale)+50){
           <argument>
             <kind>1</kind>
             <string>runningTimer--;
-accToDest+=.3;
-l+=.02;
+accToDest+=.3-orbType*.01;
+l+=.02+orbType*.02;
 l = min(l,1);
 var pickupDist = 200;
 
@@ -110,9 +112,15 @@ if(stranded){
     var runningAway = runningTimer &gt; 0;
     if(distToDest&lt;destObj.sprite_width/3 &amp;&amp; !runningAway){
         if(destObj==oPlayer){
-            oPlayer.inv++;
+            if(orbType == 0)
+                oPlayer.inv++;
+            if(orbType == 1)
+                oPlayer.hungInv++;
         }else{
-            oQueen.orbs++;
+            if(orbType == 0)
+                oQueen.orbs++;
+            if(orbType == 1)
+                oQueen.hp+=5;
         }
         instance_destroy();
     }

@@ -49,6 +49,8 @@ sprites[ANIM_MOVE] = sArcherMove;
 sprites[ANIM_SHOOT] = sArcherShoot;
 sprites[ANIM_IDLE] = sArcherShoot;
 sprites[ANIM_DYING] = sArcherShoot;
+
+value = 5;
 </string>
           </argument>
         </arguments>

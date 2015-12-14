@@ -34,6 +34,7 @@ hunger = 0;
 orbs = 0;
 frame = 0;
 frameSpeed = .5;
+hp = 100;
 
 
 ori_spr[0] = sQueen_mouth1;
@@ -61,6 +62,13 @@ for(var i = 0; i &lt; 8; i++){
 
 spawning = false;
 spawnFrame = 0;
+
+
+colors[0] = $FF8800;
+colors[1] = $FFFF00;
+colors[2] = $FFFF88;
+colors[3] = $FFFFFF;
+colors[4] = $FF0000;
 </string>
           </argument>
         </arguments>
@@ -115,6 +123,20 @@ if(spawning){
         spawning = false;
     }
 }
+
+hp -= (scale/(30));
+if(hp &lt; 0){
+    game_restart();
+}
+
+maxBlend = c_white;
+minBlend = $AA8888;
+var b = min(100,hp)/100;
+image_blend = make_color_rgb(
+    color_get_red(minBlend) * (1-b) + color_get_red(maxBlend) * b,
+    color_get_green(minBlend) * (1-b) + color_get_green(maxBlend) * b,
+    color_get_blue(minBlend) * (1-b) + color_get_blue(maxBlend) * b,
+);
 </string>
           </argument>
         </arguments>
@@ -138,7 +160,7 @@ if(spawning){
           <argument>
             <kind>1</kind>
             <string>//body
-draw_sprite_ext(sprite_index,frame,x,y,scale,scale,0,$FFFFFF,1);
+draw_sprite_ext(sprite_index,frame,x,y,scale,scale,0,image_blend,1);
 
 //oriphi
 for(var i = 0; i &lt; 8; i++){
@@ -148,7 +170,7 @@ for(var i = 0; i &lt; 8; i++){
         draw_sprite_ext(ori_spr[i],0,
             x-5 + (i==2)*-16 + (i==6)*16,
             y-12 + (i==2)*16,
-            scale*.8,scale*.8,0,$FFFFFF,1);
+            scale*.8,scale*.8,0,image_blend,1);
     }
 }
 
@@ -156,12 +178,39 @@ for(var i = 0; i &lt; 8; i++){
 if(spawning){
     draw_sprite_ext(sQueen_spawnMouth,min(12,spawnFrame),
         x+(-5+9)*scale*.8,y+(-12+4)*scale*.8,
-        scale*.8,scale*.8,0,$FFFFFF,1);
+        scale*.8,scale*.8,0,image_blend,1);
     draw_sprite(sQueen_spawnPlayer,min(13,spawnFrame),
         x+(-5+9)*scale*.8,y+(-12+4)*scale*.8);
 }
 
+//hp
+var l = array_length_1d(colors)
+var backColor = colors[(hp div 100)%(l-1)];
+var foreColor = colors[((hp div 100) +1)%(l-1)];
 
+if(hp div 100 == 0) backColor = colors[l-1];
+
+draw_set_color(colors[l-1]);
+draw_rectangle(
+    x -sprite_width/2  - 5,
+    y -sprite_height/1.5-5,
+    x +sprite_width/2  + 5,
+    y -sprite_height/1.5 +25,
+    false);
+draw_set_color(backColor);
+draw_rectangle(
+    x -sprite_width/2  ,
+    y -sprite_height/1.5 ,
+    x +sprite_width/2,
+    y -sprite_height/1.5 +20,
+    false);
+draw_set_color(foreColor);
+draw_rectangle(
+    x -sprite_width/2  ,
+    y -sprite_height/1.5 ,
+    x -sprite_width/2  + sprite_width * (hp % 100)/100,
+    y -sprite_height/1.5 +20,
+    false);
 </string>
           </argument>
         </arguments>

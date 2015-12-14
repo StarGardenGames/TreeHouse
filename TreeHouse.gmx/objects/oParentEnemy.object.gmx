@@ -43,6 +43,7 @@ hurt = false;
 hurtTimer = -1;
 dead = false;
 dying = false;
+orbsReleased = false;
 </string>
           </argument>
         </arguments>
@@ -112,6 +113,13 @@ if(place_free(x+dx,y))
     x += dx;
 if(place_free(x,y+dy))
     y += dy;
+    
+if(image_alpha &lt;=.8 &amp;&amp; !orbsReleased){
+    repeat(value){
+        instance_create(x,y,oHungerOrb);
+    }
+    orbsReleased = true;
+}
 
 </string>
           </argument>
