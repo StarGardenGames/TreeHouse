@@ -3,14 +3,24 @@ var slowDownFrames = 5;
 var skidCoef = moveSpeed/slowDownFrames;
 var inputx = keyboard_check(ord('D')) - keyboard_check(ord('A'));
 var inputy = keyboard_check(ord('S'))- keyboard_check(ord('W'));
-var playerAttacking = mouse_check_button_pressed(mb_left);
+var playerShooting = mouse_check_button_pressed(mb_right);
 if(point_distance(0,0,inputx,inputy) == sqrt(2))
 {
     moveSpeed = moveSpeed/sqrt(2);
 }
 
-if(playerAttacking)
-    PerformAttack();
+if(oPlayer.frame < 11)
+{
+    attackedThisCycle = false;
+}
+
+if(oPlayer.frame = 11 && oPlayer.animState == ANIM_MELEE && !attackedThisCycle)
+{
+    ApplyHeadbuttDamage();
+    attackedThisCycle = true;
+}
+if(playerShooting)
+    ShootPlayerProjectile();
 
 if(inputy != 0)
     dy = inputy*moveSpeed;

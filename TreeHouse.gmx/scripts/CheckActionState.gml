@@ -57,9 +57,6 @@ if(prevState != state || newGame){
             alarm[0] = room_speed*(3 - random(1.5));
             //image_blend = c_green;
             break;
-        case STATE_AGRO:
-            //image_blend = c_yellow;
-            break;
         case STATE_PREPARING:
             if(enemyType == RANGED_ENEMY)
                 alarm[2] = room_speed * .8;
@@ -75,11 +72,6 @@ if(prevState != state || newGame){
             chargeTimer = room_speed * 1;
             //image_blend = c_red;
             break;
-        case STATE_RETREATING:
-            //image_blend = c_yellow;
-
-            break; // APC : just added this
-            //was it supposed to be left out?
         case STATE_RESTING:
             dx = 0;
             dy = 0;
@@ -106,7 +98,6 @@ switch(state){
                 instance_create(x,y,oProjectile);
                 shotThisCycle = true;
             }
-            
         }
         break;
 }

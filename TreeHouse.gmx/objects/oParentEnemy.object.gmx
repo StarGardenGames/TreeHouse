@@ -36,6 +36,9 @@ currentHP = 90;
 damage = 45;
 enemyType = STANDARD_ENEMY;
 newGame = true;
+
+stunned = false;
+stunTimer = -1;
 </string>
           </argument>
         </arguments>
@@ -89,10 +92,13 @@ CheckActionState();
 
 checkForPlayerCollision();
 
+checkIfStunned();
+
 if(place_free(x+dx,y))
     x += dx;
 if(place_free(x,y+dy))
     y += dy;
+
 </string>
           </argument>
         </arguments>
@@ -116,7 +122,7 @@ if(place_free(x,y+dy))
           <argument>
             <kind>1</kind>
             <string>draw_sprite_ext(sprite_index,frame,x,y,
-    1,1,image_angle,$FFFFFF,1);
+    1,1,image_angle,image_blend,1);
 </string>
           </argument>
         </arguments>

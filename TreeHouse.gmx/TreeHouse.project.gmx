@@ -127,7 +127,9 @@
     </scripts>
     <scripts name="Combat">
       <script>scripts\CheckActionState.gml</script>
-      <script>scripts\PerformAttack.gml</script>
+      <script>scripts\ApplyHeadbuttDamage.gml</script>
+      <script>scripts\ShootPlayerProjectile.gml</script>
+      <script>scripts\checkIfStunned.gml</script>
     </scripts>
     <script>scripts\SetWanderAlarm.gml</script>
     <script>scripts\print.gml</script>

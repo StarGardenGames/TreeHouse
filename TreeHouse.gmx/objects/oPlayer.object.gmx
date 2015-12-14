@@ -31,11 +31,12 @@ inv = 0;
 maxInv = 1000;
 
 currentPlayerDamage = 15;
-headButtDamage = 50;
+headbuttDamage = 50;
 maxHP = 150;
 currentHP = 150;
 invincible = false;
 invincibilityTimer = -1;
+attackedThisCycle = false;
 snapCamera();
 
 animState = ANIM_MOVE;
@@ -68,7 +69,8 @@ sprites[ANIM_SHOOT] = sPlayerShoot;
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>ApplyPlayerMovement();
+            <string>visible = true;
+ApplyPlayerMovement();
 AlignCameraWithPlayer();
 playerUpdateAnimation();
 
