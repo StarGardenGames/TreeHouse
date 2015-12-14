@@ -6,12 +6,13 @@
   <NewExtensions/>
   <sounds name="sound"/>
   <sprites name="sprites">
-    <sprite>sprites\sGrass</sprite>
     <sprite>sprites\sEnemy</sprite>
-    <sprite>sprites\sPlant_small</sprite>
-    <sprite>sprites\sPlant_large</sprite>
     <sprite>sprites\sOrb</sprite>
-    <sprite>sprites\sRangedEnemy</sprite>
+    <sprites name="Plants">
+      <sprite>sprites\sPlant_large</sprite>
+      <sprite>sprites\sPlant_small</sprite>
+      <sprite>sprites\sGrass</sprite>
+    </sprites>
     <sprites name="Player">
       <sprite>sprites\sPlayer</sprite>
       <sprite>sprites\sPlayerAttack</sprite>
@@ -104,6 +105,7 @@
         <script>scripts\growPlant.gml</script>
         <script>scripts\createBlockValue.gml</script>
         <script>scripts\setBlockInChunk.gml</script>
+        <script>scripts\spawnCreatures.gml</script>
       </scripts>
       <scripts name="Blocks">
         <script>scripts\setBlockFrame.gml</script>

@@ -21,6 +21,7 @@
   <height>12</height>
   <frames>
     <frame index="0">images\sOrb_0.png</frame>
+    <frame index="1">images\sOrb_1.png</frame>
   </frames>
   <SWFfile>images\sOrb.swf</SWFfile>
   <SWFnumframes>1</SWFnumframes>
