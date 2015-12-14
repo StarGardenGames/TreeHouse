@@ -72,12 +72,13 @@ if(point_distance(x,y,oQueen.x,oQueen.y)&lt;(100*oQueen.scale)+50){
 accToDest+=.3;
 l+=.02;
 l = min(l,1);
+var pickupDist = 200;
 
     
 if(!instance_exists(destObj) || 
     (destObj == oPlayer &amp;&amp; (oPlayer.inv &gt;= oPlayer.maxInv || 
     oPlayer.dying)) || 
-    (l==1 &amp;&amp; point_distance(x,y,destObj.x,destObj.y) &gt; 50)){
+    (l==1 &amp;&amp; point_distance(x,y,destObj.x,destObj.y) &gt; pickupDist)){
         stranded = true;   
 }
 
@@ -89,7 +90,7 @@ if(stranded){
     if(abs(dy) &lt; .1) dy = 0;
     if(instance_exists(oPlayer)){
         var distToDest = point_distance(x,y,destObj.x,destObj.y);
-        if(distToDest &lt; 50){
+        if(distToDest &lt; pickupDist){
             l = 0;
             stranded = false;
             runningTimer = 1;

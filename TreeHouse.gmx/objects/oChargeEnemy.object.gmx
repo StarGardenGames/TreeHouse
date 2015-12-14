@@ -49,6 +49,7 @@ sprites[ANIM_MOVE] = sChargerWalk;
 sprites[ANIM_PREP] = sChargerPrep;
 sprites[ANIM_CHARGE] = sChargerCharge;
 sprites[ANIM_IDLE] = sChargerRest;
+sprites[ANIM_DYING] = sChargerRest;
 
 
 </string>

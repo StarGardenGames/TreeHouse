@@ -17,8 +17,13 @@ switch(state){
             state = STATE_AGRO; 
         break;
     case STATE_AGRO:
-        if(distance <= attackRange)
-            state = STATE_PREPARING;
+        if(distance <= attackRange){
+            if(enemyType == STANDARD_ENEMY){
+                state = STATE_ATTACK;
+            }else{
+                state = STATE_PREPARING;
+            }
+        }
         if(distance > agroRange)
             state = STATE_IDLE;
         if(enemyType == RANGED_ENEMY)
@@ -51,6 +56,10 @@ switch(state){
             state = STATE_PREPARING;
         }
         break;
+    case STATE_ATTACK:
+        if(!attacking)
+            state = STATE_AGRO;
+        break;
 }
 
 //initiate state
@@ -81,9 +90,9 @@ if(prevState != state || newGame){
             restTimer = room_speed * 2;
             break;
         case STATE_DYING:
+        case STATE_ATTACK:
             dx = 0;
             dy = 0;
-            if(dead) instance_destroy();
             break;
     }
     newGame = false;
@@ -96,6 +105,7 @@ switch(state){
         break;
     case STATE_RETREATING:
         FleeFromPlayer();
+        break;
     case STATE_PREPARING:
         if(enemyType == RANGED_ENEMY && shooting){
             if(frame < 11){
@@ -105,6 +115,11 @@ switch(state){
                 instance_create(x,y,oProjectile);
                 shotThisCycle = true;
             }
+        }
+        break;
+    case STATE_ATTACK:
+        if(frame <= 7 && frame + frameSpeed > 7){
+            gruntHitPlayer();
         }
         break;
 }

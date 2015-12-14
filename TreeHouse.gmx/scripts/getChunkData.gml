@@ -10,7 +10,6 @@ if(chunkExists(xx,yy)){
     generateChunk();
     chunkMap[? getChunkId(xx,yy)] =
         ds_grid_write(data);
-    spawnCreatures();
 }
 
 return data;

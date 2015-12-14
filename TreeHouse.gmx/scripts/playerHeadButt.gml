@@ -1,4 +1,4 @@
-if(!playerPerformingAction() && mouse_check_button_pressed(mb_left)){
+if(!playerPerformingAction() && mouse_check_button_pressed(mb_right)){
     attacking = true;
     dx = 0;
     dy = 0;

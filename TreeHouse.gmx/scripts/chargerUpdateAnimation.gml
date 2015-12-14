@@ -1,6 +1,9 @@
 //check for transitions
 prevAnimState = animState;
 if(!instance_exists(oPlayer)) animState = ANIM_IDLE;
+if(animState != ANIM_DYING && currentHP < 0){
+    animState = ANIM_DYING;
+}
 switch(state){ //charger follows state machine closely
     case STATE_IDLE:
     case STATE_AGRO:
@@ -35,6 +38,7 @@ frame += frameSpeed;
 switch(animState){
 case ANIM_MOVE:
 case ANIM_CHARGE:
+    if(dx!=0 || dy!=0)
     image_angle = point_direction(0,0,dx,dy);
 case ANIM_IDLE:
     frame %= sprite_get_number(sprites[animState]);
@@ -47,5 +51,14 @@ case ANIM_PREP:
     sig = (sig * 2) - 1;
     image_angle += sig * min(20, min(abs(dTheta),360 - abs(dTheta)));
     image_angle = (image_angle + 360) % 360;
+    break;
+case ANIM_DYING:
+    frame = 0;
+    image_alpha = max(0,image_alpha - .05);
+    var r = color_get_red(image_blend);
+    var g = color_get_green(image_blend);
+    var b = color_get_blue(image_blend);
+    image_blend = make_color_rgb(
+        r, max(0,g-5), max(0,b-5));
     break;
 }

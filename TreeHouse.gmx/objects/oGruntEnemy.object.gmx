@@ -30,9 +30,13 @@
 animState = ANIM_MOVE;
 frame = 0;
 frameSpeed = .5;
+enemyType = STANDARD_ENEMY;
+attackRange = 40;
+attacking = false;
 
 sprites[ANIM_MOVE] = sGruntMove;
 sprites[ANIM_MELEE] = sGruntAttack;
+sprites[ANIM_DYING] = sGruntMove;
 </string>
           </argument>
         </arguments>
@@ -57,7 +61,16 @@ sprites[ANIM_MELEE] = sGruntAttack;
             <kind>1</kind>
             <string>event_inherited();
 
+
+
 gruntUpdateAnimation();
+
+if(!instance_exists(oPlayer))
+    exit;
+
+distance = point_distance(x,y,oPlayer.x,oPlayer.y);
+if(distance &lt;= attackRange)
+    attacking = true;
 </string>
           </argument>
         </arguments>

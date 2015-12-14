@@ -54,6 +54,7 @@
       <sprites name="Archer">
         <sprite>sprites\sArcherMove</sprite>
         <sprite>sprites\sArcherShoot</sprite>
+        <sprite>sprites\sArcherBullet</sprite>
       </sprites>
       <sprites name="Charger">
         <sprite>sprites\sChargerCharge</sprite>
@@ -130,7 +131,6 @@
         <script>scripts\growPlant.gml</script>
         <script>scripts\createBlockValue.gml</script>
         <script>scripts\setBlockInChunk.gml</script>
-        <script>scripts\spawnCreatures.gml</script>
       </scripts>
       <scripts name="Blocks">
         <script>scripts\setBlockFrame.gml</script>
@@ -143,6 +143,7 @@
         <script>scripts\getValueForBlock.gml</script>
         <script>scripts\setValueForBlock.gml</script>
       </scripts>
+      <script>scripts\spawnCreatures.gml</script>
       <script>scripts\spawnChunks.gml</script>
       <script>scripts\checkCollisions.gml</script>
     </scripts>
@@ -153,6 +154,7 @@
     <scripts name="Combat">
       <script>scripts\CheckActionState.gml</script>
       <script>scripts\checkIfStunned.gml</script>
+      <script>scripts\gruntHitPlayer.gml</script>
     </scripts>
     <script>scripts\SetWanderAlarm.gml</script>
     <script>scripts\print.gml</script>
@@ -163,6 +165,7 @@
     <object>objects\oPlayerProjectile</object>
     <object>objects\oQueen</object>
     <object>objects\oOrb</object>
+    <object>objects\parBullet</object>
     <object>objects\oShakeControl</object>
     <objects name="Terrain">
       <object>objects\oTerrainControl</object>

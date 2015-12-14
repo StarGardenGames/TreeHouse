@@ -1,5 +1,5 @@
-var spawnX = x + random(chunkSize);
-var spawnY = y + random(chunkSize);
+var spawnX = x + chunkSize / 2;
+var spawnY = y + chunkSize / 2;
 
 var dist = point_distance(spawnX,spawnY,oQueen.x,oQueen.y);
 
@@ -13,8 +13,9 @@ if(random(1) < (1 / 80) && dist > 1000){
         enemyObj[1] = oArcherEnemy;
         enemyObj[2] = oChargeEnemy;
         for(var i = 0 ; i < 3; i++){enemyCount[i] = 0;}
-        switch(irandom(4)){
+        switch(irandom(5)){
         case 0: // grunt crowd
+        case 5:
             enemyCount[0] = irandom_range(2,5); break;
         case 1: // archer crowd
             enemyCount[1] = irandom_range(1,3); break;
@@ -38,7 +39,7 @@ if(random(1) < (1 / 80) && dist > 1000){
                 curEnemy = choose(0,1,2);
             }until(enemyCount[curEnemy]!=0);
             enemyCount[curEnemy]--;
-            var dist = random_range(128,256);
+            var dist = random_range(64,128);
             instance_create(
                 spawnX + lengthdir_x(dist,i),
                 spawnY + lengthdir_y(dist,i),

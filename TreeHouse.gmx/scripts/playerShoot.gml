@@ -1,4 +1,4 @@
-if(!playerPerformingAction() && mouse_check_button_pressed(mb_right))
+if(!playerPerformingAction() && mouse_check_button_pressed(mb_left))
     playerShooting = true;
 
 if(playerShooting){

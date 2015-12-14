@@ -8,6 +8,9 @@ if(stunTimer = 0)
 
 if(stunned)
 {
+    attacking = false;
+    state = STATE_IDLE;
+    animState = ANIM_IDLE;
     image_blend = $FFAAAA;
     dx = 0;
     dy = 0;
