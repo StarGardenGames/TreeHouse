@@ -34,8 +34,6 @@ maxHP = 100;
 currentHP = 100;
 damage = 80;
 enemyType = RANGED_ENEMY;
-newGame = true;
-alarmSet = false;
 
 shotThisCycle = false;
 shooting = true;

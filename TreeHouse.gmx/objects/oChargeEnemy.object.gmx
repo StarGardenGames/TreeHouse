@@ -28,8 +28,8 @@
             <string>event_inherited();
 
 chargeState = STATE_PREPARING;
-attackRange = 200;
-agroRange = 350;
+attackRange = 350;
+agroRange = 400;
 maxHP = 500;
 currentHP = 500;
 damage = 100;
@@ -108,14 +108,7 @@ if(restTimer != -1){
     restTimer = max(0,restTimer-1);
 }
 
-CheckActionState();//APC : checked twice?
-
 chargerUpdateAnimation();
-
-checkForPlayerCollision();
-
-x += dx;
-y += dy;
 </string>
           </argument>
         </arguments>

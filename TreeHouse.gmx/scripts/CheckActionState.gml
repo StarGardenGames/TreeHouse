@@ -7,7 +7,7 @@ switch(state){
             state = STATE_AGRO; 
         break;
     case STATE_AGRO:
-        if(distance < attackRange)
+        if(distance <= attackRange)
             state = STATE_PREPARING;
         if(distance > agroRange)
             state = STATE_IDLE;
@@ -16,9 +16,9 @@ switch(state){
                 state = STATE_RETREATING;
         break;
     case STATE_PREPARING: 
-        if(distance > attackRange)
+        if(distance > attackRange*1.2)
             state = STATE_AGRO;
-        if(distance > agroRange)
+        if(distance > agroRange*1.2)
             state = STATE_IDLE;
         if(prepareTimer==0)
         {
@@ -26,14 +26,14 @@ switch(state){
                 state = STATE_INCHARGE;
             if(enemyType == RANGED_ENEMY)
             {
-                if(distance < retreatRange)
+                if(distance < retreatRange * .8)
                     state = STATE_RETREATING;
             }
         }
 
         break;
     case STATE_RETREATING:
-        if(distance > retreatRange+20)
+        if(distance > retreatRange)
             state = STATE_AGRO;
         break;
     case STATE_INCHARGE:
@@ -70,9 +70,9 @@ if(prevState != state || newGame){
             break;
         case STATE_INCHARGE:
             dir = point_direction(x,y,oPlayer.x,oPlayer.y);
-            dx = lengthdir_x(enemyMoveSpeed*2, dir);
-            dy = lengthdir_y(enemyMoveSpeed*2, dir);
-            chargeTimer = room_speed * .6;
+            dx = lengthdir_x(enemyMoveSpeed*3.5, dir);
+            dy = lengthdir_y(enemyMoveSpeed*3.5, dir);
+            chargeTimer = room_speed * 1;
             //image_blend = c_red;
             break;
         case STATE_RETREATING:
