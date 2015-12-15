@@ -107,7 +107,7 @@ if(((scale-1) / (maxScale-1)) &gt; (stage + 1)/4){
 image_xscale = scale;
 image_yscale = scale;
 
-if(finalScene &amp;&amp; (frame + frameSpeed) &gt;= sprite_get_number(sSceneDeath)){
+if(finalScene &amp;&amp; (frame + frameSpeed) &gt;= sprite_get_number(sSceneBirth)){
     room_goto_next();
 }
 
