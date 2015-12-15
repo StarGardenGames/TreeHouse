@@ -107,7 +107,7 @@ if(((scale-1) / (maxScale-1)) &gt; (stage + 1)/4){
 image_xscale = scale;
 image_yscale = scale;
 
-if(finalScene &amp;&amp; (frame + frameSpeed) &gt;= image_number){
+if(finalScene &amp;&amp; (frame + frameSpeed) &gt;= sprite_get_number(sSceneDeath)){
     room_goto_next();
 }
 
@@ -139,7 +139,7 @@ if(spawning){
 
 if(!oGameControl.titleScreen &amp;&amp; !finalScene &amp;&amp; !dying){
     hp -= (1/30);
-    if(oGameControl.debug &amp;&amp; keyboard_check(ord('F')))
+    if(oGameControl.debug &amp;&amp; keyboard_check(ord('T')))
         hp -= 49*(scale/30);
     if(hp &lt; 0){
         dying = true;

@@ -28,7 +28,7 @@ switch(animState){
         break;
     case ANIM_MELEE:
         if((frame + frameSpeed) > 
-                sprite_get_number(sprites[animState]))
+                (sprite_get_number(sprites[animState])-4))
             animState = ANIM_MOVE;
         break;
     case ANIM_SHOOT:
@@ -87,7 +87,7 @@ case ANIM_MOVE:
     
 case ANIM_MELEE:
     if((frame + frameSpeed) > 
-        sprite_get_number(sprites[animState]))
+        (sprite_get_number(sprites[animState])-4))
     attacking = false;
     break;
     

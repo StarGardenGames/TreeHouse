@@ -42,6 +42,8 @@ playerSpawnTime = NULL;
 titleScreen = true;
 
 show_debug_overlay(debug);
+
+fullscreen = false;
 </string>
           </argument>
         </arguments>
@@ -97,6 +99,11 @@ if(oGameControl.debug &amp;&amp; !titleScreen &amp;&amp; keyboard_check_pressed(
     
 if(titleScreen &amp;&amp; (keyboard_check_pressed(vk_anykey) || mouse_check_button(mb_left))){
     titleScreen = false;
+}
+
+if(keyboard_check_pressed(ord('F'))){
+    fullscreen = !fullscreen;
+    window_set_fullscreen(fullscreen);
 }
 
 
