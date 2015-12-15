@@ -7,8 +7,7 @@ var enemyDamage = damage;
 
 with(oPlayer)
 {
-    if(rectOverlap(enemyX,enemyY,enemyX+enemySpriteWidth,enemyY+enemySpriteHeight,
-    oPlayer.x-16, oPlayer.y-16, oPlayer.x-16 + oPlayer.sprite_width, oPlayer.y-16 + oPlayer.sprite_height))
+    if(point_distance(x,y,enemyX,enemyY) < 55)
     {
         if(currentState = STATE_INCHARGE)
         {
