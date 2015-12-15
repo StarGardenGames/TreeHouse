@@ -30,7 +30,7 @@
 var enemy = instance_nearest(x,y,oParentEnemy);
 
 if(instance_exists(oParentEnemy) &amp;&amp; point_distance(x,y,enemy.x,enemy.y) &lt; 30){
-    var damage = 10;
+    var damage = 40;
     with(enemy){
         currentHP -= damage;
         hurt = true;
