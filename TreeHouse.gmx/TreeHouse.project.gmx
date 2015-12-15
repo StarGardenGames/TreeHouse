@@ -73,9 +73,9 @@
       </sprites>
     </sprites>
     <sprites name="UI">
-      <sprite>sprites\sMenuWASD</sprite>
       <sprite>sprites\sMenuMouse</sprite>
       <sprite>sprites\sMenuTitle</sprite>
+      <sprite>sprites\sMenuWASD</sprite>
     </sprites>
     <sprites name="CutScene">
       <sprite>sprites\sSceneBirth</sprite>

@@ -28,7 +28,7 @@
             <string>startTime = current_time;
 scale = 1;
 maxScale = 4;
-orbsTillFullGrown = 2000;
+orbsTillFullGrown = 1000;
 stage = 0;
 hunger = 0;
 orbs = 0;
@@ -138,9 +138,9 @@ if(spawning){
 }
 
 if(!oGameControl.titleScreen &amp;&amp; !finalScene &amp;&amp; !dying){
-    hp -= (scale/30);
+    hp -= (scale/40);
     if(oGameControl.debug &amp;&amp; keyboard_check(ord('F')))
-        hp -= 49*(scale/30);
+        hp -= 49*(scale/40);
     if(hp &lt; 0){
         dying = true;
         frame = 0;

@@ -95,7 +95,7 @@ if(!instance_exists(oPlayer)){
 if(oGameControl.debug &amp;&amp; !titleScreen &amp;&amp; keyboard_check_pressed(vk_space))
     game_restart();
     
-if(titleScreen &amp;&amp; keyboard_check_pressed(vk_anykey)){
+if(titleScreen &amp;&amp; (keyboard_check_pressed(vk_anykey) || mouse_check_button(mb_left))){
     titleScreen = false;
 }
 

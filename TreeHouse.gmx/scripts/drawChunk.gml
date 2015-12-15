@@ -33,7 +33,7 @@ for(var i = 0; i < ds_grid_width(data); i++){
             }
             break;
         case PLANT_RED:
-            draw_sprite_ext(sPlantPurple,0,drawX,drawY,
+            draw_sprite_ext(sPlantRed,0,drawX,drawY,
                 1.5,1.5,0,$FFFFFF,1);
             break;
         case PLANT_GREEN:
@@ -41,9 +41,8 @@ for(var i = 0; i < ds_grid_width(data); i++){
                 1.5,1.5,0,$FFFFFF,1);
             break;
         case PLANT_PURPLE:
-            draw_sprite_ext(sPlantRed,0,drawX+gridSize/2,drawY+gridSize/2,
+            draw_sprite_ext(sPlantPurple,0,drawX+gridSize/2,drawY+gridSize/2,
                 1.5,1.5,frame * 180,$FFFFFF,1);
-            
             break;
         }
     }
