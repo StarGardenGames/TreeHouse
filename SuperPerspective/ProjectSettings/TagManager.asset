@@ -13,6 +13,7 @@ TagManager:
   - Light_2D
   - Light_3D
   - Pause_Mount
+  - Art
   layers:
   - Default
   - TransparentFX
@@ -22,9 +23,9 @@ TagManager:
   - UI
   - 
   - 
-  - 
-  - 
-  - 
+  - HardSurface
+  - Grass
+  - Snow
   - 
   - 
   - 
