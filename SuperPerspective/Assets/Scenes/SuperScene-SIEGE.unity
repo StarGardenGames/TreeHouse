@@ -9625,7 +9625,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 495802, guid: a46c45855c7417045b2834e9688bf89b, type: 2}
       propertyPath: m_RootOrder
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 11429968, guid: a46c45855c7417045b2834e9688bf89b, type: 2}
       propertyPath: followTarget

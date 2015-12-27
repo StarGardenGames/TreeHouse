@@ -6,19 +6,26 @@ public class CameraFollow : MonoBehaviour {
 	public GameObject followTarget;
 	public bool followZ;
 
+	Rect myBounds;
+	Rect[] bounds;
+
 	// Use this for initialization
 	void Start () {
-	
+		bounds = IslandControl.instance.islandBounds;
 	}
-	
 	// Update is called once per frame
 	void Update () {
+		GameObject player = GameObject.FindGameObjectsWithTag("Player")[0];
+		BoundObject playerBoundObject = (BoundObject) player.GetComponent("BoundObject");
+		Rect playerBounds = playerBoundObject.GetBounds();
+		print(playerBounds);
+		//follow camera
 		if(followTarget != null){
 			Vector3 targetPos = followTarget.transform.position;
 			if(followZ){
 				transform.position = targetPos;
 			}else{
-				transform.position = new Vector3(targetPos.x, targetPos.y, transform.position.z);
+				transform.position = new Vector3(targetPos.x, targetPos.y, targetPos.z + (playerBounds.height) + 3.0f);
 			}
 		}
 	}
