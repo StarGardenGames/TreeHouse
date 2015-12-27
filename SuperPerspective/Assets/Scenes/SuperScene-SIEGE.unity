@@ -5781,38 +5781,9 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 414812, guid: de83d96658944fd4684e4560f5cf49d2, type: 2}
       propertyPath: m_RootOrder
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
-    - target: {fileID: 180044, guid: de83d96658944fd4684e4560f5cf49d2, type: 2}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 11435064, guid: de83d96658944fd4684e4560f5cf49d2, type: 2}
-      propertyPath: startDoorName
-      value: t4
-      objectReference: {fileID: 0}
-    - target: {fileID: 11435064, guid: de83d96658944fd4684e4560f5cf49d2, type: 2}
-      propertyPath: startAtDoor
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 11435064, guid: de83d96658944fd4684e4560f5cf49d2, type: 2}
-      propertyPath: m_Enabled
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8222868, guid: de83d96658944fd4684e4560f5cf49d2, type: 2}
-      propertyPath: panLevelCustomCurve.m_RotationOrder
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8222868, guid: de83d96658944fd4684e4560f5cf49d2, type: 2}
-      propertyPath: spreadCustomCurve.m_RotationOrder
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8222868, guid: de83d96658944fd4684e4560f5cf49d2, type: 2}
-      propertyPath: reverbZoneMixCustomCurve.m_RotationOrder
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 11479026, guid: de83d96658944fd4684e4560f5cf49d2, type: 2}
+    m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: de83d96658944fd4684e4560f5cf49d2, type: 2}
   m_IsPrefabParent: 0
 --- !u!4 &233331634 stripped

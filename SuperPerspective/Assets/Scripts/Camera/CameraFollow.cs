@@ -17,15 +17,15 @@ public class CameraFollow : MonoBehaviour {
 	void Update () {
 		GameObject player = GameObject.FindGameObjectsWithTag("Player")[0];
 		BoundObject playerBoundObject = (BoundObject) player.GetComponent("BoundObject");
-		Rect playerBounds = playerBoundObject.GetBounds();
-		print(playerBounds);
+		Rect groundBound = playerBoundObject.GetBounds();
+		print(groundBound);
 		//follow camera
 		if(followTarget != null){
 			Vector3 targetPos = followTarget.transform.position;
 			if(followZ){
 				transform.position = targetPos;
 			}else{
-				transform.position = new Vector3(targetPos.x, targetPos.y, targetPos.z + (playerBounds.height) + 3.0f);
+				transform.position = new Vector3(targetPos.x, targetPos.y, targetPos.z + 25.0f;
 			}
 		}
 	}
