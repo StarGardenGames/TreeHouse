@@ -43,11 +43,25 @@ public class ProceduralGround : MonoBehaviour {
 				newRotation.z = Random.rotation.z;
 			}
 
+			Vector3 newSize = Vector3.one;
+			print(newSize);
+			//change size
+			if(changeSize) {
+				newSize.x += Random.Range(0.0f, 0.2f);
+				newSize.y += Random.Range(0.0f, 0.2f);
+				newSize.z += Random.Range(0.0f, 0.2f);
+			}
+
+			//TODO: even distribution
+
 			//create
 			GameObject newObj = Object.Instantiate(obj, newPos, newRotation) as GameObject;
+			newObj.transform.localScale = newSize;
 			renderedObjects[i] = newObj;
 			newObj.transform.parent = this.gameObject.transform;
 		}
+
+
 		//hide
 		m.enabled = false;
 	}
@@ -62,13 +76,15 @@ public class ProceduralGround : MonoBehaviour {
 		if(cleanUpIn2D){
 			if(!GameStateManager.is3D()){
 				for(int i=0;i<Mathf.Ceil(renderedObjects.Length/2);i++){
-					MeshRenderer r = renderedObjects[i].GetComponentInChildren<MeshRenderer>();
-					r.enabled = false;
+					//MeshRenderer r = renderedObjects[i].GetComponentInChildren<MeshRenderer>();
+					//r.enabled = false;
+					renderedObjects[i].SetActive(false);
 				}
 			}else{
 				for(int i=0;i<Mathf.Ceil(renderedObjects.Length);i++){
-					MeshRenderer r = renderedObjects[i].GetComponentInChildren<MeshRenderer>();
-					r.enabled = true;
+					//MeshRenderer r = renderedObjects[i].GetComponentInChildren<MeshRenderer>();
+					//r.enabled = true;
+					renderedObjects[i].SetActive(true);
 				}
 			}
 		}

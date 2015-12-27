@@ -10,7 +10,7 @@ GameObject:
   - 4: {fileID: 480346}
   - 54: {fileID: 5499346}
   - 135: {fileID: 13580416}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: BendN
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -26,7 +26,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 428702}
   - 137: {fileID: 13787200}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Flower
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -44,8 +44,7 @@ GameObject:
   - 95: {fileID: 9514006}
   - 54: {fileID: 5441848}
   - 59: {fileID: 5958460}
-  - 114: {fileID: 11419888}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: AnimatedFlower
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -61,7 +60,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 421282}
   - 137: {fileID: 13714304}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Stalk
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -76,7 +75,7 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 475906}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: TopN
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -226,18 +225,6 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
---- !u!114 &11419888
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 138060}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e76445ce6beb680448529dcfc31488de, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  anim: {fileID: 0}
 --- !u!135 &13580416
 SphereCollider:
   m_ObjectHideFlags: 1
@@ -329,7 +316,31 @@ Prefab:
   serializedVersion: 2
   m_Modification:
     m_TransformParent: {fileID: 0}
-    m_Modifications: []
+    m_Modifications:
+    - target: {fileID: 0}
+      propertyPath: m_LocalScale.x
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_LocalScale.y
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_LocalScale.z
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_Layer
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_ApplyRootMotion
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 138060}

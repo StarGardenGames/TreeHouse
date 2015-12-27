@@ -15,9 +15,9 @@ public class CameraFollow : MonoBehaviour {
 	}
 	// Update is called once per frame
 	void Update () {
-		GameObject player = GameObject.FindGameObjectsWithTag("Player")[0];
-		BoundObject playerBoundObject = (BoundObject) player.GetComponent("BoundObject");
-		Rect groundBound = playerBoundObject.GetBounds();
+		//GameObject player = GameObject.FindGameObjectsWithTag("Player")[0];
+		//BoundObject playerBoundObject = (BoundObject) player.GetComponent("BoundObject");
+		//Rect groundBound = playerBoundObject.GetBounds();
 		//follow camera
 		if(followTarget != null){
 			Vector3 targetPos = followTarget.transform.position;
