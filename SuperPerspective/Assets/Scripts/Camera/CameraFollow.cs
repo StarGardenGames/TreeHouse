@@ -18,14 +18,13 @@ public class CameraFollow : MonoBehaviour {
 		GameObject player = GameObject.FindGameObjectsWithTag("Player")[0];
 		BoundObject playerBoundObject = (BoundObject) player.GetComponent("BoundObject");
 		Rect groundBound = playerBoundObject.GetBounds();
-		print(groundBound);
 		//follow camera
 		if(followTarget != null){
 			Vector3 targetPos = followTarget.transform.position;
 			if(followZ){
 				transform.position = targetPos;
 			}else{
-				transform.position = new Vector3(targetPos.x, targetPos.y, targetPos.z + 25.0f;
+				transform.position = new Vector3(targetPos.x, targetPos.y, targetPos.z + 45.0f);
 			}
 		}
 	}
