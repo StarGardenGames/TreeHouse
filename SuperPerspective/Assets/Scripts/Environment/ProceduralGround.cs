@@ -5,7 +5,15 @@ public class ProceduralGround : MonoBehaviour {
 
 	public GameObject[] generatableObjects;
 	public int numToGenerate;
-	public bool calculateAmountForMe, rotateX, rotateY, rotateZ, changeSize, evenDistribution, cleanUpIn2D;
+	public bool calculateAmountForMe;
+
+	public bool cleanUpIn2D;
+
+	public bool rotateX, rotateY, rotateZ;
+	public float heightVariation;
+
+	public float sizeVaration;
+	public bool keepSizeConsistent;
 
 	private GameObject[] renderedObjects;
 	// Use this for initialization
@@ -43,13 +51,22 @@ public class ProceduralGround : MonoBehaviour {
 				newRotation.z = Random.rotation.z;
 			}
 
+			//vary height position
+			if(heightVariation != 0) {
+				newPos.y += Random.Range(0.0f, heightVariation);
+			}
+
 			Vector3 newSize = Vector3.one;
-			print(newSize);
 			//change size
-			if(changeSize) {
-				newSize.x += Random.Range(0.0f, 0.2f);
-				newSize.y += Random.Range(0.0f, 0.2f);
-				newSize.z += Random.Range(0.0f, 0.2f);
+			if(sizeVaration != 0 && keepSizeConsistent){
+				float randSize = Random.Range(0.0f, sizeVaration);
+				newSize.x += randSize;
+				newSize.y += randSize;
+				newSize.z += randSize;
+			}else if(sizeVaration != 0) {
+				newSize.x += Random.Range(0.0f, sizeVaration);
+				newSize.y += Random.Range(0.0f, sizeVaration);
+				newSize.z += Random.Range(0.0f, sizeVaration);
 			}
 
 			//TODO: even distribution
