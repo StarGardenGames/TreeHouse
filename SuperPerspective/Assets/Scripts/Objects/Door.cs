@@ -10,6 +10,7 @@ public class Door : ActiveInteractable {
 	public Color particleColor;
 
 	public bool isSceneLoad;
+	public int crystalRequirement;
 	
 	public void Awake(){
 		//update particle color
@@ -32,7 +33,7 @@ public class Door : ActiveInteractable {
 		if(isSceneLoad && destName != null)
 			Application.LoadLevel(destName);
 
-		else if(destDoor!=null)
+		else if(destDoor!=null && MainCollectable.GetMainCollectableHeld() >= crystalRequirement)
 			player.GetComponent<PlayerController>().Teleport(
 				destDoor.GetComponent<Collider>().bounds.center + new Vector3(0,0,-2));
 		else
